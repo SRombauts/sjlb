@@ -61,7 +61,8 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
     private int         mNbMsg          = 0;
     private int         mNbNewMsg       = 0;
 
-    private SJLBContentProvider mSJLBDBAdapter;
+    private PMContentProvider   mPMDBAdapter = null;
+    private MsgContentProvider  mMsgDBAdapter = null;
       
     /**
      * Constructeur utilisé pour mémorisée la référence sur le service appelant
@@ -70,8 +71,8 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
     public RefreshTask(SJLBService context) {
         mContext        = context;
                                 
-        mSJLBDBAdapter  = new SJLBContentProvider();
-        mSJLBDBAdapter.open();
+        mPMDBAdapter  = new PMContentProvider(context);
+        mMsgDBAdapter = new MsgContentProvider(context);
     }
 
     protected void onPreExecute() {
@@ -143,7 +144,7 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
                         int     idPM    = Integer.parseInt(strIdPM);
                         
                         // Renseigne la bdd si PM inconnu
-                        long nbInserted = mSJLBDBAdapter.insertPM(idPM);
+                        long nbInserted = mPMDBAdapter.insertPM(idPM);
                         if (-1 != nbInserted) {
                             mNbNewPM++;
                         }
@@ -162,7 +163,7 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
                         int     idMsg    = Integer.parseInt(strIdMsg);
                         
                         // Renseigne la bdd si Message inconnu
-                        long nbInserted = mSJLBDBAdapter.insertMsg(idMsg);
+                        long nbInserted = mMsgDBAdapter.insertMsg(idMsg);
                         if (-1 != nbInserted) {
                             mNbNewMsg++;
                         }
@@ -238,7 +239,7 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
                     if (null != listPM)
                     {
                         // TODO Vider la table des messages privés
-                        mSJLBDBAdapter.clearPM ();
+                        mPMDBAdapter.clearPM ();
                         
                         mNbPM = listPM.getLength();
                         for (int i = 0; i < mNbPM; i++) {
@@ -259,11 +260,10 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
                             PrivateMessage newPM = new PrivateMessage(idPM, date, strAuthor, strText);
                             
                             /** TODO Renseigne la bdd */
-                            Boolean bInserted = mSJLBDBAdapter.insertPM(newPM);
+                            Boolean bInserted = mPMDBAdapter.insertPM(newPM);
                             if (bInserted) {
                                 Log.d(LOG_TAG, "PM " + idPM + " inserted");                                
                             }
-                            /**/
                         }
                     }
                     

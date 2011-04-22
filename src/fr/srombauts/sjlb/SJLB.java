@@ -12,6 +12,9 @@ public final class SJLB {
 
     public static final String AUTHORITY = "fr.srombauts.sjlb";
 
+    public static final String DATABASE_NAME       = "SJLB.db";
+    public static final int    DATABASE_VERSION    = 1;
+    
     /**
      * Table des messages privés
      */
@@ -19,6 +22,8 @@ public final class SJLB {
         // Interdiction de l'instanciation
         private PM() {}
 
+        public static final String TABLE_NAME   = "private_messages";
+        
         /**
          * The content:// style URL for this table
          */
@@ -71,6 +76,8 @@ public final class SJLB {
     public static final class Msg implements BaseColumns {
         // Interdiction de l'instanciation
         private Msg() {}
+
+        public static final String TABLE_NAME   = "forum_messages";
 
         /**
          * The content:// style URL for this table

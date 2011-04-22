@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="fr.srombauts.sjlb"
-      android:versionCode="6"
-      android:versionName="0.0.6">
+      android:versionCode="10"
+      android:versionName="0.1.0">
     <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
         <activity android:name=".SJLBPrivateMessages"
                   android:label="@string/app_name">
@@ -11,15 +11,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-	     <receiver android:name=".StartServiceIntentReceiver">
+	    <receiver android:name=".StartServiceIntentReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
             <intent-filter>
                 <action android:name="fr.srombauts.sjlb.ACTION_REFRESH_ALARM" />
             </intent-filter>
-	     </receiver>
-	     <service android:name=".SJLBService"/>
+	    </receiver>
+	    <service android:name=".SJLBService"/>
+        <provider android:name="fr.srombauts.sjlb.PMContentProvider"
+                  android:authorities="fr.srombauts.sjlb" 
+        />
+        <provider android:name="fr.srombauts.sjlb.MsgContentProvider"
+                  android:authorities="fr.srombauts.sjlb" 
+        />
     </application>
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
