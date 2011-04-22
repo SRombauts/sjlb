@@ -2,4 +2,5 @@
 <resources>
     <string name="hello">Hello World!</string>
     <string name="app_name">SJLB</string>
+    <string name="sjlb_uri">http://sjlb.dyndns.org/newsjlb/android.php</string>
 </resources>

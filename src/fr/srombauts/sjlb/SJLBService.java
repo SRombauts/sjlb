@@ -1,5 +1,20 @@
 package fr.srombauts.sjlb;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,60 +28,136 @@ import android.util.Log;
 
 
 class SJLBServiceTask implements Runnable {
-	private static final int     HELLO_ID = 1;
-	private static final String  LOG_TAG  = "SJLBService";
-	
-	private Context  mContext          = null;
-	private Handler  mServiceHandler   = null;
-	private int      mCountDown  = 0;
-	private long     mInterval   = 0L;
+    private static final int     HELLO_ID = 1;
+    private static final String  LOG_TAG  = "SJLBService";
+
+    private static final long    REFRESH_INTERVAL_NORMAL    = 20*60*1000L;
+    private static final long    REFRESH_INTERVAL_ON_ERROR  =  1*60*1000L;
+    
+    static final private String NODE_NAME_NB_PRIVATE_MSG    = "nb_pm";
+    static final private String NODE_NAME_NB_MSG            = "nb_msg";
+                        
+    private Context mContext        = null;
+    private Handler mServiceHandler = null;
+    private int     mNbPM           = 0;
+    private int     mNbPMSaved      = 0;
+    private int     mNbMsg          = 0;
+    private int     mNbMsgSaved     = 0;
   
-	public SJLBServiceTask(int countDown, long interval, Handler serviceHandler, Context context) {
-		this.mCountDown       = countDown;
-		this.mInterval        = interval;
-		this.mServiceHandler  = serviceHandler;
-		this.mContext         = context;
-	}
+    public SJLBServiceTask(Handler serviceHandler, Context context) {
+        this.mServiceHandler  = serviceHandler;
+        this.mContext         = context;
+    }
 
-	public void run() {
-		Log.d(LOG_TAG, "Counter: " + mCountDown);
-		if (--mCountDown > 0) {
-		    mServiceHandler.postDelayed(this, mInterval);
-		}
-		notifyUser (mCountDown);
-	}
+    public void run() {
+        boolean bRet;
+        
+        Log.d(LOG_TAG, "run");
 
-	private void notifyUser (int countDown) {
-		// Get a reference to the NotificationManager:
-		String 				ns                     = Context.NOTIFICATION_SERVICE;
-		NotificationManager mNotificationManager   = (NotificationManager) mContext.getSystemService(ns);
+        bRet = refreshInfos ();
+        
+        if (bRet) {
+            if (   (mNbPMSaved  != mNbPM)
+                || (mNbMsgSaved != mNbMsg) )
+            {
+                notifyUser ();
+    
+                mNbPMSaved = mNbPM;
+                mNbMsgSaved = mNbMsg;
+            }
+            
+            mServiceHandler.postDelayed(this, REFRESH_INTERVAL_NORMAL);
+        }
+        else
+        {
+            mServiceHandler.postDelayed(this, REFRESH_INTERVAL_ON_ERROR);
+        }
+    }
 
-		// Instantiate the Notification:
+    private boolean refreshInfos () {
+        boolean bRet = false;
+        
+        try
+        {
+            // Etablissement de la connexion http et récupération de la page Web
+            String              quakeFeed       = mContext.getString(R.string.sjlb_uri);
+            URL                 url             = new URL(quakeFeed);
+            URLConnection       connection      = url.openConnection();
+            HttpURLConnection   httpConnection  = (HttpURLConnection)connection;
+            
+            if (HttpURLConnection.HTTP_OK == httpConnection.getResponseCode()) {
+                // Parse de la page XML
+                InputStream             in  = httpConnection.getInputStream();
+                DocumentBuilderFactory  dbf = DocumentBuilderFactory.newInstance();
+                DocumentBuilder         db  = dbf.newDocumentBuilder();
+                Document                dom = db.parse(in);
+                Element                 docElement = dom.getDocumentElement();
+                
+                // Récupère le nombre de PM
+                Element eltNbPM = (Element)docElement.getElementsByTagName(NODE_NAME_NB_PRIVATE_MSG).item(0);
+                String  strNbPM = eltNbPM.getFirstChild().getNodeValue();
+                mNbPM = Integer.parseInt(strNbPM);
+                
+                // Récupère le nombre de Messages
+                Element eltNbMsg = (Element)docElement.getElementsByTagName(NODE_NAME_NB_MSG).item(0);
+                String  strNbMsg = eltNbMsg.getFirstChild().getNodeValue();
+                mNbMsg = Integer.parseInt(strNbMsg);
+                
+                bRet = true;
+            }
+           
+           
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } /* catch (ParseException e) {
+            e.printStackTrace();
+        } */
+        
+        return bRet;
+    }
+    
+    /**
+     *  Notifie à l'utilisateur les évolutions du nombre de messages non lus
+     */
+    private void notifyUser () {
+        // Get a reference to the NotificationManager:
+        String              ns                     = Context.NOTIFICATION_SERVICE;
+        NotificationManager mNotificationManager   = (NotificationManager) mContext.getSystemService(ns);
+
+        // Instantiate the Notification:
         int          icon        = android.R.drawable.stat_notify_sync;
-        CharSequence tickerText  = "Hello";
+        CharSequence tickerText  = "SJLB";
         long         when        = System.currentTimeMillis();
 
         Notification notification = new Notification(icon, tickerText, when);
 
         // Define the Notification's expanded message and Intent:
         Context         context              = mContext.getApplicationContext();
-        CharSequence    contentTitle         = "My notification";
-        CharSequence    contentText          = "Hello World!";
+        CharSequence    contentTitle         = "Unread Messages";
+        CharSequence    contentText          = mNbPM + " private messages and " + mNbMsg + " messages";
         Intent          notificationIntent   = new Intent(mContext, SJLB.class);
         PendingIntent   contentIntent        = PendingIntent.getService(mContext, 0, notificationIntent, 0);
 
+        notification.number     = mNbPM + mNbMsg;
+        notification.defaults   = Notification.DEFAULT_ALL;
+        notification.vibrate    = new long[]{200, 200};
+        
         notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
 
         // Pass the Notification to the NotificationManager:
-        mNotificationManager.notify(HELLO_ID, notification);      
-  }
+        mNotificationManager.notify(HELLO_ID, notification);
+    }
 }
 
 
 public class SJLBService extends Service {
     private static final String  LOG_TAG              = "SJLBService";
-    private static final int     COUNTDOWN_LIMIT      = 100;
-    private static final long    COUNTDOWN_INTERVAL   = 3*1000L;
 
     private Handler mServiceHandler = new Handler();
 
@@ -74,8 +165,10 @@ public class SJLBService extends Service {
   public int onStartCommand(Intent intent, int flags, int startId) {
     super.onStartCommand(intent, flags, startId);
     Log.d(LOG_TAG, "onStart");
-    SJLBServiceTask task = new SJLBServiceTask(COUNTDOWN_LIMIT, COUNTDOWN_INTERVAL, mServiceHandler, this);
-    mServiceHandler.postDelayed(task, COUNTDOWN_INTERVAL);
+    
+    SJLBServiceTask task = new SJLBServiceTask(mServiceHandler, this);
+    mServiceHandler.post(task);
+
     // We want this service to continue running until it is explicitly
     // stopped, so return sticky.
     return START_STICKY;
