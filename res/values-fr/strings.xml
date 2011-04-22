@@ -8,6 +8,7 @@
     <string name="menu_show_pm">    Messages privés </string>
     <string name="menu_show_msg">   Messages du forum </string>
     <string name="menu_reset">      Supprimer tous msg </string>
+    <string name="menu_prefs">      Préférences </string>
     <string name="menu_quit">       Quitter </string>
     
     <string name="refreshing"> En cours de rafraichissement... </string>

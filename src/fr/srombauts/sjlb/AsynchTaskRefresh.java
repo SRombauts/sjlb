@@ -2,10 +2,13 @@ package fr.srombauts.sjlb;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -30,7 +33,7 @@ import android.util.Log;
 /**
  * Travail en tâche de fond, chargée de récupérer le fichier XML listant les messages non lus
  */
-class RefreshTask extends AsyncTask<Void, Void, Void> {
+class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
 
     public static final  int     NOTIFICATION_NEW_PM_ID     = 1;
     public static final  int     NOTIFICATION_NEW_MSG_ID    = 2;
@@ -48,25 +51,25 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
     static final private String ATTR_NAME_PRIVATE_MSG_PSEUDO    = "pseudo";
     
 
-    private RefreshService mContext        = null;
+    private ServiceRefresh mContext        = null;
     private int         mIdLogin        = 0;
     private int         mNbPM           = 0;
     private int         mNbNewPM        = 0;
     private int         mNbMsg          = 0;
     private int         mNbNewMsg       = 0;
 
-    private PMContentProvider   mPMDBAdapter = null;
-    private MsgContentProvider  mMsgDBAdapter = null;
+    private ContentProviderPM   mPMDBAdapter = null;
+    private ContentProviderMsg  mMsgDBAdapter = null;
       
     /**
      * Constructeur utilisé pour mémorisée la référence sur le service appelant
      * @param context
      */
-    public RefreshTask(RefreshService context) {
+    public AsynchTaskRefresh(ServiceRefresh context) {
         mContext        = context;
                                 
-        mPMDBAdapter  = new PMContentProvider(context);
-        mMsgDBAdapter = new MsgContentProvider(context);
+        mPMDBAdapter  = new ContentProviderPM(context);
+        mMsgDBAdapter = new ContentProviderMsg(context);
     }
 
     protected void onPreExecute() {
@@ -215,7 +218,31 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
             {
                 // Etablissement de la connexion http et récupération de la page Web
                 // TODO SRO : utiliser les préférences pour sauvegarder le login/mot de passe :
-                URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_pm_uri) + "?login=Seb&password=4df51b1810f131b7f6a794900d93d58e");
+                String              login           = "Seb";
+                String              password        = "mmdpsjlb";
+                String              passwordHashed  = "";
+                String              passwordMD5     = "4df51b1810f131b7f6a794900d93d58e";
+
+                // Create MD5 Hash  
+                try
+                {
+                    MessageDigest digest = java.security.MessageDigest.getInstance("MD5");  
+                    digest.update(password.getBytes());  
+                    byte[] messageDigest = digest.digest();
+                    BigInteger number = new BigInteger(1,messageDigest);
+                    passwordHashed = number.toString(16);
+               
+                    while (passwordHashed.length() < 32)
+                        passwordHashed = "0" + passwordHashed;
+                    
+                } catch (NoSuchAlgorithmException e) {  
+                    e.printStackTrace();  
+                }
+                
+                Log.d(LOG_TAG, "login=" + login + " password=" + passwordMD5);
+                Log.d(LOG_TAG, "login=" + login + " password=" + passwordHashed);
+                
+                URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_pm_uri) + "?login=" + login + "&password=" + passwordMD5);
                 URLConnection       connection      = urlAPI.openConnection();
                 HttpURLConnection   httpConnection  = (HttpURLConnection)connection;
                 
@@ -232,7 +259,7 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
                     NodeList    listPM = docElement.getElementsByTagName(NODE_NAME_PRIVATE_MSG);
                     if (null != listPM)
                     {
-                        // TODO Vider la table des messages privés
+                        // Vide la table des messages privés
                         mPMDBAdapter.clearPM ();
                         
                         mNbPM = listPM.getLength();
@@ -244,16 +271,17 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
                             String  strIdPM     = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_ID);
                             int     idPM        = Integer.parseInt(strIdPM);
                             String  strDate     = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_DATE);
-                            Date    date        = new Date(Integer.parseInt(strDate)*1000);
+                            long    longDate    = (long)Integer.parseInt(strDate);
+                            Date    date        = new Date(longDate*1000);
                             String  strIdAuthor = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_ID_AUTHOR);
                             int     idAuthor    = Integer.parseInt(strIdAuthor);
                             String  strAuthor   = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_PSEUDO);
                             
-                            Log.d(LOG_TAG, "PM " + idPM + " " + strAuthor + " ("+ idAuthor +") " + strDate + " : "  + strText);
+                            Log.d(LOG_TAG, "PM " + idPM + " " + strAuthor + " ("+ idAuthor +") " + date + " (" + strDate + ") : "  + strText);
                             
                             PrivateMessage newPM = new PrivateMessage(idPM, date, strAuthor, strText);
                             
-                            /** TODO Renseigne la bdd */
+                            // Renseigne la bdd
                             Boolean bInserted = mPMDBAdapter.insertPM(newPM);
                             if (bInserted) {
                                 Log.d(LOG_TAG, "PM " + idPM + " inserted");                                
@@ -314,7 +342,7 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
         CharSequence    contentText         = mNbNewPM + " " + mContext.getString(R.string.notification_text_pm);
 
         // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
-        Intent          notificationIntent  = new Intent(mContext, SJLBPrivateMessages.class);
+        Intent          notificationIntent  = new Intent(mContext, ActivityPrivateMessages.class);
         PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
 
         notification.number     = mNbNewPM;

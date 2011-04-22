@@ -16,7 +16,7 @@ import android.util.Log;
  * 
  * @author 10/06/2010 srombauts
  */
-public class StartServiceIntentReceiver extends BroadcastReceiver {
+public class IntentReceiverStartService extends BroadcastReceiver {
     public  static final String ACTION_REFRESH_ALARM = "fr.srombauts.sjlb.ACTION_REFRESH_ALARM";
 
     private static final String LOG_TAG = "StartServiceIntentReceiver";
@@ -44,11 +44,11 @@ public class StartServiceIntentReceiver extends BroadcastReceiver {
      */
     private void startService (Context context) {
         Intent  intentService = new Intent();
-        intentService.setClassName( "fr.srombauts.sjlb", "fr.srombauts.sjlb.RefreshService");
+        intentService.setClassName( "fr.srombauts.sjlb", "fr.srombauts.sjlb.ServiceRefresh");
         ComponentName cname = context.startService(intentService);
         if (cname == null)
-            Log.e(LOG_TAG, "SJLBService was not started");
+            Log.e(LOG_TAG, "SJLB Service was not started");
         else
-            Log.d(LOG_TAG, "SJLBService started");
+            Log.d(LOG_TAG, "SJLB Service started");
     }
 }

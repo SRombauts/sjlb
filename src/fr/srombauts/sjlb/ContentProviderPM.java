@@ -14,7 +14,7 @@ import android.net.Uri;
  * 
  * @author seb
  */
-public class PMContentProvider extends ContentProvider {
+public class ContentProviderPM extends ContentProvider {
 
     private static final int PM_ALL         = 1;
     private static final int PM_ID          = 2;
@@ -32,13 +32,13 @@ public class PMContentProvider extends ContentProvider {
     }
     
     // TODO ce constructeur semble nécessaire : pour une instanciation de content provider  on dirait ?!
-    public PMContentProvider () {
+    public ContentProviderPM () {
         
     }
     
     // TODO : ce constructeur est conservé tant qu'on conserve un accès directe à cette classe
     //           (au lieu d'utiliser uniquement comme content provider)
-    public PMContentProvider (Context aContext) {
+    public ContentProviderPM (Context aContext) {
         mDBHelper   = new DBOpenHelper(aContext, SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
     }
 
@@ -107,7 +107,7 @@ public class PMContentProvider extends ContentProvider {
     public boolean insertPM(PrivateMessage aPM) {
       ContentValues newPMValues = new ContentValues();
       newPMValues.put(SJLB.PM.ID,        aPM.getId());
-      newPMValues.put(SJLB.PM.DATE,      aPM.getDate().getTime());
+      newPMValues.put(SJLB.PM.DATE,      aPM.getDate());
       newPMValues.put(SJLB.PM.AUTHOR,    aPM.getAuthor());
       newPMValues.put(SJLB.PM.TEXT,      aPM.getText());
       return mDBHelper.getWritableDatabase().insert(SJLB.PM.TABLE_NAME, null, newPMValues) > 0;
@@ -116,7 +116,7 @@ public class PMContentProvider extends ContentProvider {
     // complète un PM à partir de son ID
     public boolean updatePM(PrivateMessage aPM) {
       ContentValues newPMValues = new ContentValues();
-      newPMValues.put(SJLB.PM.DATE,      aPM.getDate().getTime());
+      newPMValues.put(SJLB.PM.DATE,      aPM.getDate());
       newPMValues.put(SJLB.PM.AUTHOR,    aPM.getAuthor());
       newPMValues.put(SJLB.PM.TEXT,      aPM.getText());
       return mDBHelper.getWritableDatabase().update(SJLB.PM.TABLE_NAME, newPMValues, SJLB.PM.ID + "=" + aPM.getId(), null) > 0;

@@ -14,8 +14,11 @@ public class PrivateMessage {
     private String  mText;
 
     public PrivateMessage(int aId, Date aDate, String aAuthor, String aText) {
+        SimpleDateFormat    sdf         = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+        String              dateString  = sdf.format(aDate);
+
         mId     = aId;
-        mDate   = aDate;
+        mDate   = dateString;
         mAuthor = aAuthor;
         mText   = aText;
     }
@@ -23,7 +26,7 @@ public class PrivateMessage {
     public int getId () {
         return mId;
     }
-    public Date getDate () {
+    public String getDate () {
         return mDate;
     }
     public String getAuthor () {
@@ -37,9 +40,6 @@ public class PrivateMessage {
      * Retourne une description résumée en une unique chaine
      */
     public String toString () {
-        SimpleDateFormat    sdf         = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-        String              dateString  = sdf.format(mDate);
-                
-        return mAuthor + " (" + dateString + ") : " + mText;
+        return mAuthor + " (" + mDate + ") : " + mText;
     }
 }

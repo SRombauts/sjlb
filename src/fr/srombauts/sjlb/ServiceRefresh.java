@@ -14,10 +14,10 @@ import android.util.Log;
  * Service en tâche de fond, chargé de lancer périodirquement la tâche de rafraichissement
  * @author srombauts
  */
-public class RefreshService extends Service {
+public class ServiceRefresh extends Service {
     private static final String  LOG_TAG = "SJLBService";
 
-    private RefreshTask     mRefreshTask    = null;
+    private AsynchTaskRefresh     mRefreshTask    = null;
 
     private AlarmManager    mAlarmManager   = null;
     private PendingIntent   mAlarmIntent    = null;    
@@ -26,7 +26,7 @@ public class RefreshService extends Service {
      * Lancement de l'alarme périodique
      */
     public void onCreate() {
-        String ALARM_ACTION = StartServiceIntentReceiver.ACTION_REFRESH_ALARM;
+        String ALARM_ACTION = IntentReceiverStartService.ACTION_REFRESH_ALARM;
         Intent intentToFire = new Intent(ALARM_ACTION);
         mAlarmIntent    = PendingIntent.getBroadcast(this, 0, intentToFire, 0);
         mAlarmManager   = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
@@ -48,7 +48,7 @@ public class RefreshService extends Service {
             || (mRefreshTask.getStatus() == AsyncTask.Status.FINISHED))
         {
             // lance un rafraichissement de la liste des messages non lus
-            mRefreshTask = new RefreshTask(this);
+            mRefreshTask = new AsynchTaskRefresh(this);
             mRefreshTask.execute((Void[]) null);
         }
         

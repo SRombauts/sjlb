@@ -19,7 +19,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
  * Activité présentant la liste des messages privés
  * @author 14/06/2010 srombauts
  */
-public class SJLBPrivateMessages extends Activity {
+public class ActivityPrivateMessages extends Activity {
     static final private int    DIALOG_ID_PM_DELETE         = 1;
     
     private Cursor              mCursor                     = null;
@@ -78,7 +78,7 @@ public class SJLBPrivateMessages extends Activity {
         // Annule l'éventuelle notification de PM non lus
         String              ns                      = Context.NOTIFICATION_SERVICE;
         NotificationManager notificationManager     = (NotificationManager) getSystemService(ns);
-        notificationManager.cancel(RefreshTask.NOTIFICATION_NEW_PM_ID);
+        notificationManager.cancel(AsynchTaskRefresh.NOTIFICATION_NEW_PM_ID);
     }
 
     /**

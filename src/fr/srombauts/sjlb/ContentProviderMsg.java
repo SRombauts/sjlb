@@ -14,7 +14,7 @@ import android.net.Uri;
  * 
  * @author seb
  */
-public class MsgContentProvider extends ContentProvider {
+public class ContentProviderMsg extends ContentProvider {
 
     private static final int MSG_ALL         = 1;
     private static final int MSG_ID          = 2;
@@ -33,7 +33,7 @@ public class MsgContentProvider extends ContentProvider {
     
     // TODO : ce constructeur est conservé tant qu'on conserve un accès directe à cette classe
     //           (au lieu d'utiliser uniquement comme content provider)
-    public MsgContentProvider (Context aContext) {
+    public ContentProviderMsg (Context aContext) {
         mDBHelper   = new DBOpenHelper(aContext, SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
     }
 

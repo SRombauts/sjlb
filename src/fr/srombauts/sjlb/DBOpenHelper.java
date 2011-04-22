@@ -13,6 +13,7 @@ import android.util.Log;
  * @author 17/06/2010 srombauts
  */
 public class DBOpenHelper extends SQLiteOpenHelper {
+    private static final String  LOG_TAG = "DBAdapter";
 
     private static final String DATABASE_MSG_CREATE = "create table " + SJLB.Msg.TABLE_NAME + " ("
                                                    + SJLB.Msg.ID + " integer primary key, "
@@ -40,14 +41,14 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     
     // Création des tables de la base si celle si est inexistante (ou n'était pas à jour)
     public void onCreate(SQLiteDatabase aDatabase) {
-        Log.w("DBAdapter", DATABASE_MSG_CREATE);
+        Log.w(LOG_TAG, DATABASE_MSG_CREATE);
         aDatabase.execSQL(DATABASE_MSG_CREATE);
         aDatabase.execSQL(DATABASE_PM_CREATE);
     }
 
     // Upgrade de la version du schéma de base : détruit et recréé !
     public void onUpgrade(SQLiteDatabase aDatabase, int aOldVersion, int aNewVersion) {
-        Log.w("DBAdapter", "Upgrading from version" + aOldVersion 
+        Log.w(LOG_TAG, "Upgrading from version" + aOldVersion 
                                 + " to " + aNewVersion + ", wich will destroy all data");
         aDatabase.execSQL(DATABASE_MSG_DROP);
         aDatabase.execSQL(DATABASE_PM_DROP);

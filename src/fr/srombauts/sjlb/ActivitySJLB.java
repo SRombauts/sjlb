@@ -14,14 +14,15 @@ import android.widget.Toast;
  * Activité du menu principal, qui lance le service si besoin et permet de naviguer entre PM et Msg
  * @author 27/06/2010 srombauts
  */
-public class SJLBMain extends Activity {
+public class ActivitySJLB extends Activity {
     private static final String LOG_TAG = "SJLBMain";
 
     static final private int MENU_ID_SHOW_PM    = Menu.FIRST;
     static final private int MENU_ID_SHOW_MSG   = Menu.FIRST + 1;
     static final private int MENU_ID_UPDATE     = Menu.FIRST + 2;
     static final private int MENU_ID_RESET      = Menu.FIRST + 3;
-    static final private int MENU_ID_QUIT       = Menu.FIRST + 4;
+    static final private int MENU_ID_PREFS      = Menu.FIRST + 4;
+    static final private int MENU_ID_QUIT       = Menu.FIRST + 5;
     
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +42,7 @@ public class SJLBMain extends Activity {
         menu.add(0, MENU_ID_SHOW_MSG, Menu.NONE, R.string.menu_show_msg);
         menu.add(0, MENU_ID_UPDATE,   Menu.NONE, R.string.menu_update);
         menu.add(0, MENU_ID_RESET,    Menu.NONE, R.string.menu_reset);
+        menu.add(0, MENU_ID_PREFS,    Menu.NONE, R.string.menu_prefs);
         menu.add(0, MENU_ID_QUIT,     Menu.NONE, R.string.menu_quit);
         
         return true;
@@ -53,30 +55,40 @@ public class SJLBMain extends Activity {
         super.onOptionsItemSelected(item);
         
         switch (item.getItemId()) {
-            case (MENU_ID_SHOW_PM):
-                Intent intent = new Intent(this, SJLBPrivateMessages.class);
+            case (MENU_ID_SHOW_PM): {
+                Intent intent = new Intent(this, ActivityPrivateMessages.class);
                 startActivity(intent);
                 break;
+            }
             /* TODO à complèter
-            case (MENU_ID_SHOW_MSG):
+            case (MENU_ID_SHOW_MSG): {
                 Intent intent = new Intent(this, SJLBForumMessages.class);
 
-                break; */
-            case (MENU_ID_UPDATE):
+                break;
+            }*/
+            case (MENU_ID_UPDATE): {
                 // Toast notification de début de rafraichissement (pour le debug uniquement !)
                 Toast.makeText(this, getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
                 // TODO voir si c'est la meilleurs manière de faire...
                 startService ();
                 break;
-            case (MENU_ID_RESET):
-                PMContentProvider   pms = new PMContentProvider (this);
+            }
+            case (MENU_ID_RESET): {
+                ContentProviderPM   pms = new ContentProviderPM (this);
                 pms.clearPM();
-                MsgContentProvider  msgs = new MsgContentProvider (this);
+                ContentProviderMsg  msgs = new ContentProviderMsg (this);
                 msgs.clearMsg();
                 break;
-            case (MENU_ID_QUIT):
+            }
+            case (MENU_ID_PREFS): {
+                Intent intent = new Intent(this, ActivityPreferences.class);
+                startActivity(intent);
+                break;
+            }
+            case (MENU_ID_QUIT): {
                 finish ();
                 break;
+            }
             default:
                 return false;
         }
@@ -88,11 +100,11 @@ public class SJLBMain extends Activity {
      */
     private void startService () {
         Intent  intentService = new Intent();
-        intentService.setClassName( "fr.srombauts.sjlb", "fr.srombauts.sjlb.RefreshService");
+        intentService.setClassName( "fr.srombauts.sjlb", "fr.srombauts.sjlb.ServiceRefresh");
         ComponentName cname = startService(intentService);
         if (cname == null)
-            Log.e(LOG_TAG, "SJLBService was not started");
+            Log.e(LOG_TAG, "SJLB Service was not started");
         else
-            Log.d(LOG_TAG, "SJLBService started");
+            Log.d(LOG_TAG, "SJLB Service started");
     }
 }

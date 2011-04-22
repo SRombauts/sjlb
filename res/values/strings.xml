@@ -10,6 +10,7 @@
     <string name="menu_show_msg">   Forum messages </string>
     <string name="menu_update">     Refresh </string>
     <string name="menu_reset">      Reset data </string>
+    <string name="menu_prefs">      Preferences </string>
     <string name="menu_quit">       Quit </string>
     
     <string name="refreshing"> Refreshing... </string>
