@@ -15,11 +15,11 @@ public class SJLBPrivateMessages extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        // TODO SRO : Lance le service ssi pas déjà lancé
-        //startService ();
+        // TODO SRO Lance le service ssi pas déjà lancé
+        startService ();
         
-        // quitte immédiatement
-        //finish ();
+        // TODO SRO quitte immédiatement
+        finish ();
     }
     
     private void startService () {

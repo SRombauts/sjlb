@@ -38,7 +38,8 @@ import android.widget.Toast;
  */
 class RefreshTask extends AsyncTask<Void, Void, Void> {
 
-    private static final int     NOTIFICATION_NEW_MSG_ID    = 1;
+    private static final int     NOTIFICATION_NEW_PM_ID     = 1;
+    private static final int     NOTIFICATION_NEW_MSG_ID    = 2;
     private static final String  LOG_TAG                    = "RefreshTask";
 
     static final private String NODE_NAME_LOGIN_ID          = "id_login";
@@ -68,9 +69,8 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
     }
 
     protected void onPreExecute() {
-        // Toast notification de début de rafraichissement
-        // TODO SRO : juste pour le debug
-        Toast.makeText(mContext, mContext.getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
+        // Toast notification de début de rafraichissement (pour le debug uniquement !)
+        // Toast.makeText(mContext, mContext.getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
     }
     
     
@@ -181,22 +181,62 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
       super.onPostExecute(result);
       
       // s'il y a de nouveaux messages non lus :
-      if (   (0 < mNbNewPM)
-          || (0 < mNbNewMsg) )
+      if (0 < mNbNewPM)
       {
-          // Notification dans la barre de status + Toast
-          notifyUser ();
+          // Notification dans la barre de status
+          notifyUserPM ();
+      }
+      if (0 < mNbNewMsg)
+      {
+          // Notification dans la barre de status
+          notifyUserMsg ();
       }
 
       // Le service peut dès lors être interrompu une fois qu'il a effectué le rafraichissement
       mContext.stopSelf ();
     }
-    
+
+    /**
+     *  Notifie à l'utilisateur les évolutions du nombre de messages privés non lus
+     */
+    private void notifyUserPM () {
+        Log.d(LOG_TAG, "notifyUserPM");
+
+        // Get a reference to the NotificationManager:
+        String              ns                     = Context.NOTIFICATION_SERVICE;
+        NotificationManager mNotificationManager   = (NotificationManager) mContext.getSystemService(ns);
+
+        // Instantiate the Notification:
+        int          icon        = android.R.drawable.stat_notify_sync;
+        CharSequence tickerText  = mContext.getString(R.string.app_name) + ": " + mContext.getString(R.string.notification_title_pm);
+        long         when        = System.currentTimeMillis();
+
+        Notification notification = new Notification(icon, tickerText, when);
+
+        // Define the Notification's expanded message and Intent:
+        Context         context             = mContext.getApplicationContext();
+        CharSequence    contentTitle        = mContext.getString(R.string.notification_title_pm);
+        // TODO SRO : faire le cumul avec les chiffres de l'éventuelle notification déjà actuellement affichée 
+        CharSequence    contentText         = mNbNewPM + " " + mContext.getString(R.string.notification_text_pm);
+
+        Intent          notificationIntent  = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(mContext.getString(R.string.sjlb_forum_uri)));
+        PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
+
+        notification.number     = mNbNewPM;
+        notification.defaults   = Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND;
+        notification.vibrate    = new long[]{100, 100, 100};
+
+        notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
+
+        // Pass the Notification to the NotificationManager:
+        mNotificationManager.notify(NOTIFICATION_NEW_PM_ID, notification);
+    }    
+
     /**
      *  Notifie à l'utilisateur les évolutions du nombre de messages non lus
      */
-    private void notifyUser () {
-        Log.d(LOG_TAG, "notifyUser");
+    private void notifyUserMsg () {
+        Log.d(LOG_TAG, "notifyUserMsg");
         
         // Get a reference to the NotificationManager:
         String              ns                     = Context.NOTIFICATION_SERVICE;
@@ -204,63 +244,29 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
 
         // Instantiate the Notification:
         int          icon        = android.R.drawable.stat_notify_sync;
-        CharSequence tickerText  = mContext.getString(R.string.app_name) + ": " + mContext.getString(R.string.notification_title);
+        CharSequence tickerText  = mContext.getString(R.string.app_name) + ": " + mContext.getString(R.string.notification_title_msg);
         long         when        = System.currentTimeMillis();
 
         Notification notification = new Notification(icon, tickerText, when);
 
         // Define the Notification's expanded message and Intent:
         Context         context             = mContext.getApplicationContext();
-        CharSequence    contentTitle        = mContext.getString(R.string.notification_title);
+        CharSequence    contentTitle        = mContext.getString(R.string.notification_title_msg);
         // TODO SRO : faire le cumul avec les chiffres de l'éventuelle notification déjà actuellement affichée 
-        CharSequence    contentText         = mNbNewPM + " " + mContext.getString(R.string.notification_text_1) + " " + mNbNewMsg + " " + mContext.getString(R.string.notification_text_2);
+        CharSequence    contentText         = mNbNewMsg + " " + mContext.getString(R.string.notification_text_msg);
 
         Intent          notificationIntent  = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(mContext.getString(R.string.sjlb_forum_uri)));
         PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
 
-        notification.number     = mNbNewPM + mNbNewMsg;
-        notification.defaults   = Notification.DEFAULT_ALL;
+        notification.number     = mNbNewMsg;
+        notification.defaults   = Notification.DEFAULT_LIGHTS + Notification.DEFAULT_SOUND;
         notification.vibrate    = new long[]{100, 100, 100};
         
         notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
 
         // Pass the Notification to the NotificationManager:
         mNotificationManager.notify(NOTIFICATION_NEW_MSG_ID, notification);
-    }
-
-    
-    /**
-     * Notifications de l'utilisateur sur fin de refresh
-     * 
-     * @param aNbquakes
-     *//*
-    private void notifyUser (int aNbquakes) {
-        // Toast Notification
-        Toast.makeText(mContext, mContext.getString(R.string.refresh_done), Toast.LENGTH_SHORT).show();
-        
-        // Status Bar Notification
-        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification        notification        = new Notification(R.drawable.status_icon, mContext.getString(R.string.app_name), System.currentTimeMillis());
-        
-        // Son et lumière
-        notification.defaults |= Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND; // DEFAULT_LIGHTS est inclu de base
-        notification.vibrate = new long[] { 200, 400 };
-        
-        // Ajoute en surimpression de l'icone de status l'affichage du nombre de tremblements de terre
-        // TODO n'afficher que le nombre de nouveau tremblements de terre
-        notification.number = aNbquakes;
-        
-        CharSequence    contentTitle        = mContext.getString(R.string.app_name);
-        String          contentText         = aNbquakes + " " + mContext.getString(R.string.quakes);
-        Intent          notificationIntent  = new Intent(mContext, EarthquakeViewer.class);
-        PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
-
-        notification.setLatestEventInfo(mContext, contentTitle, contentText, contentIntent);
-        
-        // Notification
-        notificationManager.notify(STATUS_NOTIFICATION_ID, notification);        
     }    
-    */
 }
 
 

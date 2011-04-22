@@ -5,9 +5,10 @@
 
     <string name="refreshing"> Refreshing... </string>
 
-    <string name="notification_title"> Unread Messages </string>
-    <string name="notification_text_1"> new pm and </string>
-    <string name="notification_text_2"> new unread message(s) </string>
+    <string name="notification_title_pm"> Unread Messages </string>
+    <string name="notification_title_msg"> Unread Messages </string>
+    <string name="notification_text_pm"> new pm </string>
+    <string name="notification_text_msg"> new unread message(s) </string>
     
     <string name="sjlb_forum_uri">  http://sjlb.dyndns.org/newsjlb/Site/Forum.php   </string>
     

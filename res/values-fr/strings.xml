@@ -2,9 +2,10 @@
 <resources>
     <string name="refreshing"> En cours de rafraichissement... </string>
 
-    <string name="notification_title"> Messages non lus </string>
-    <string name="notification_text_1"> nouveaux pm et </string>
-    <string name="notification_text_2"> nouveaux message(s) </string>
+    <string name="notification_title_pm"> Nouveaux Messages Privés </string>
+    <string name="notification_title_msg"> Nouveaux Messages </string>
+    <string name="notification_text_pm"> nouveau(x) message(s) privé(s) </string>
+    <string name="notification_text_msg"> nouveau(x) message(s) </string>
     
     <string name="sjlb_forum_uri">      http://sjlb.dyndns.org/newsjlb/Site/Forum.php   </string>
     
