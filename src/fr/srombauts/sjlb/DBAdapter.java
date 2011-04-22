@@ -15,7 +15,7 @@ import android.util.Log;
  * 
  * @author seb
  */
-public class SJLBDBAdapter {
+public class DBAdapter {
     private static final String DATABASE_NAME       = "SJLB.db";
     private static final int    DATABASE_VERSION    = 1;
     
@@ -35,7 +35,7 @@ public class SJLBDBAdapter {
     private final Context       mContext;
     private SJLBDBOpenHelper    mDBHelper;
     
-    public SJLBDBAdapter (Context aContext) {
+    public DBAdapter (Context aContext) {
         mContext    = aContext;
         mDBHelper   = new SJLBDBOpenHelper(aContext, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -146,7 +146,7 @@ public class SJLBDBAdapter {
 
         // Upgrade : détruit et recrer !
         public void onUpgrade(SQLiteDatabase aDatabase, int aOldVersion, int aNewVersion) {
-            Log.w("SJLBDBAdapter", "Upgrading from version" + aOldVersion 
+            Log.w("DBAdapter", "Upgrading from version" + aOldVersion 
                                     + " to " + aNewVersion + ", wich will destroy all data");
             aDatabase.execSQL(DATABASE_PM_DROP);
             aDatabase.execSQL(DATABASE_MSG_DROP);

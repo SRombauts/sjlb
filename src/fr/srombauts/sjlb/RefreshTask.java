@@ -54,7 +54,7 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
     private int         mNbMsg          = 0;
     private int         mNbNewMsg       = 0;
 
-    private SJLBDBAdapter mSJLBDBAdapter;
+    private DBAdapter mSJLBDBAdapter;
       
     /**
      * Constructeur utilisé pour mémorisée la référence sur le service appelant
@@ -63,7 +63,7 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
     public RefreshTask(SJLBService context) {
         this.mContext           = context;
                                 
-        mSJLBDBAdapter          = new SJLBDBAdapter(context);
+        mSJLBDBAdapter          = new DBAdapter(context);
         mSJLBDBAdapter.open();
     }
 
@@ -220,7 +220,7 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
 
         notification.number     = mNbNewPM + mNbNewMsg;
         notification.defaults   = Notification.DEFAULT_ALL;
-        notification.vibrate    = new long[]{200, 200};
+        notification.vibrate    = new long[]{100, 100, 100};
         
         notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
 

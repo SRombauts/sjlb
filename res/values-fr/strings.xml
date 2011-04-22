@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="refreshing"> En cours de rafraichissement... </string>
+
+    <string name="notification_title"> Messages non lus </string>
+    <string name="notification_text_1"> nouveaux pm et </string>
+    <string name="notification_text_2"> nouveaux message(s) </string>
+    
+    <string name="sjlb_forum_uri">      http://sjlb.dyndns.org/newsjlb/Site/Forum.php   </string>
+    
+    <string name="sjlb_polling_uri">    http://sjlb.dyndns.org/newsjlb/Android/Polling.php      </string>
+    <string name="sjlb_pm_uri">         http://sjlb.dyndns.org/newsjlb/Android/PrivateMessages.php      </string>
+</resources>
