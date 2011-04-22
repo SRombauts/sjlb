@@ -124,10 +124,10 @@ public class SJLBDBAdapter {
                                                        + KEY_PM_TEXT + "text);";
         
         private static final String DATABASE_MSG_CREATE = "create table " + DATABASE_MSG_TABLE + " ("
-                                                       + KEY_PM_ID + " integer primary key, "
-                                                       + KEY_PM_DATE + " long, "
-                                                       + KEY_PM_AUTHOR + " text, "
-                                                       + KEY_PM_TEXT + "text);";
+                                                       + KEY_MSG_ID + " integer primary key, "
+                                                       + KEY_MSG_DATE + " long, "
+                                                       + KEY_MSG_AUTHOR + " text, "
+                                                       + KEY_MSG_TEXT + "text);";
 
         private static final String DATABASE_PM_DROP    = "DROP TABLE IF EXISTS " + DATABASE_PM_TABLE;
         private static final String DATABASE_MSG_DROP   = "DROP TABLE IF EXISTS " + DATABASE_MSG_TABLE;

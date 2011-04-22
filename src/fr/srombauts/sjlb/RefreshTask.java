@@ -1,0 +1,266 @@
+package fr.srombauts.sjlb;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.location.Location;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.Toast;
+
+
+
+/**
+ * Classe de travail en tâche de fond, chargée de récupérer le fichier XML listant les messages non lus
+ */
+class RefreshTask extends AsyncTask<Void, Void, Void> {
+
+    private static final int     NOTIFICATION_NEW_MSG_ID    = 1;
+    private static final String  LOG_TAG                    = "RefreshTask";
+
+    static final private String NODE_NAME_LOGIN_ID          = "id_login";
+    static final private String NODE_NAME_PRIVATE_MSG       = "pm";
+    static final private String NODE_NAME_PRIVATE_MSG_ID    = "id";
+    static final private String NODE_NAME_FORUM_MSG         = "msg";
+    static final private String NODE_NAME_FORUM_MSG_ID      = "id";
+
+    private SJLBService mContext        = null;
+    private int         mIdLogin        = 0;
+    private int         mNbPM           = 0;
+    private int         mNbNewPM        = 0;
+    private int         mNbMsg          = 0;
+    private int         mNbNewMsg       = 0;
+
+    private SJLBDBAdapter mSJLBDBAdapter;
+      
+    /**
+     * Constructeur utilisé pour mémorisée la référence sur le service appelant
+     * @param context
+     */
+    public RefreshTask(SJLBService context) {
+        this.mContext           = context;
+                                
+        mSJLBDBAdapter          = new SJLBDBAdapter(context);
+        mSJLBDBAdapter.open();
+    }
+
+    protected void onPreExecute() {
+        // Toast notification de début de rafraichissement
+        // TODO SRO : juste pour le debug
+        Toast.makeText(mContext, mContext.getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
+    }
+    
+    
+    /**
+     * Lance la récupération et le parse de la liste XML des messages non lus
+     * 
+     * Ce travail s'exécute en tâche de fond, et n'a donc pas le droit d'effectuer d'actions sur la GUI
+     */
+    protected Void doInBackground(Void... params) {
+        
+        Log.d(LOG_TAG, "refreshInfos");
+
+        mNbNewPM    = 0;
+        mNbNewMsg   = 0;
+        
+        try
+        {
+            // Etablissement de la connexion http et récupération de la page Web
+            // TODO SRO : utiliser les préférences pour sauvegarder le login/mot de passe :
+            URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_polling_uri) + "?login=Seb&password=4df51b1810f131b7f6a794900d93d58e");
+            URLConnection       connection      = urlAPI.openConnection();
+            HttpURLConnection   httpConnection  = (HttpURLConnection)connection;
+            
+            if (HttpURLConnection.HTTP_OK == httpConnection.getResponseCode()) {
+                // Parse de la page XML
+                InputStream             in  = httpConnection.getInputStream();
+                
+                DocumentBuilderFactory  dbf = DocumentBuilderFactory.newInstance();
+                DocumentBuilder         db  = dbf.newDocumentBuilder();
+                Document                dom = db.parse(in);
+                Element                 docElement = dom.getDocumentElement();
+                
+                // Récupère l'id de l'utilsateur loggé
+                Element eltIdLogin  = (Element)docElement.getElementsByTagName(NODE_NAME_LOGIN_ID).item(0);
+                String  strIdLogin  = eltIdLogin.getFirstChild().getNodeValue();
+                mIdLogin            = Integer.parseInt(strIdLogin);
+                
+                // Récupère la liste des PM
+                Element     eltPM  = (Element)docElement.getElementsByTagName(NODE_NAME_PRIVATE_MSG).item(0);
+                NodeList    listPM = eltPM.getElementsByTagName(NODE_NAME_PRIVATE_MSG_ID);
+                if (null != listPM)
+                {
+                    mNbPM = listPM.getLength();
+                    for (int i = 0; i < mNbPM; i++) {
+                        Element pm      = (Element)listPM.item(i);
+                        String  strIdPM = pm.getFirstChild().getNodeValue();
+                        int     idPM    = Integer.parseInt(strIdPM);
+                        
+                        // Renseigne la bdd si PM inconnu
+                        long nbInserted = mSJLBDBAdapter.insertPM(idPM);
+                        if (-1 != nbInserted) {
+                            mNbNewPM++;
+                        }
+                    }
+                }
+                
+                // Récupère la liste des Messages
+                Element     eltMsg  = (Element)docElement.getElementsByTagName(NODE_NAME_FORUM_MSG).item(0);
+                NodeList    listMsg = eltMsg.getElementsByTagName(NODE_NAME_FORUM_MSG_ID);
+                if (null != listMsg)
+                {
+                    mNbMsg = listMsg.getLength();
+                    for (int i = 0; i < mNbMsg; i++) {
+                        Element pm      = (Element)listMsg.item(i);
+                        String  strIdMsg = pm.getFirstChild().getNodeValue();
+                        int     idMsg    = Integer.parseInt(strIdMsg);
+                        
+                        // Renseigne la bdd si Message inconnu
+                        long nbInserted = mSJLBDBAdapter.insertMsg(idMsg);
+                        if (-1 != nbInserted) {
+                            mNbNewMsg++;
+                        }
+                    }
+                }
+            }
+           
+           
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } /* catch (ParseException e) {
+            e.printStackTrace();
+        } */
+        
+        return null;
+    }
+    
+    /**
+     * Progression...
+     *
+     * Cette méthode est synchronisée donc une action sur la GUI serait autorisée 
+     */
+    protected void onProgressUpdate(Void... values) {
+      super.onProgressUpdate(values);
+    }
+    
+    /**
+     * Fin de refresh
+     *
+     * Cette méthode est synchronisée donc on met à jour l'affichage de la liste 
+     */
+    protected void onPostExecute(Void result) {
+      super.onPostExecute(result);
+      
+      // s'il y a de nouveaux messages non lus :
+      if (   (0 < mNbNewPM)
+          || (0 < mNbNewMsg) )
+      {
+          // Notification dans la barre de status + Toast
+          notifyUser ();
+      }
+
+      // Le service peut dès lors être interrompu une fois qu'il a effectué le rafraichissement
+      mContext.stopSelf ();
+    }
+    
+    /**
+     *  Notifie à l'utilisateur les évolutions du nombre de messages non lus
+     */
+    private void notifyUser () {
+        Log.d(LOG_TAG, "notifyUser");
+        
+        // Get a reference to the NotificationManager:
+        String              ns                     = Context.NOTIFICATION_SERVICE;
+        NotificationManager mNotificationManager   = (NotificationManager) mContext.getSystemService(ns);
+
+        // Instantiate the Notification:
+        int          icon        = android.R.drawable.stat_notify_sync;
+        CharSequence tickerText  = mContext.getString(R.string.app_name) + ": " + mContext.getString(R.string.notification_title);
+        long         when        = System.currentTimeMillis();
+
+        Notification notification = new Notification(icon, tickerText, when);
+
+        // Define the Notification's expanded message and Intent:
+        Context         context             = mContext.getApplicationContext();
+        CharSequence    contentTitle        = mContext.getString(R.string.notification_title);
+        // TODO SRO : faire le cumul avec les chiffres de l'éventuelle notification déjà actuellement affichée 
+        CharSequence    contentText         = mNbNewPM + " " + mContext.getString(R.string.notification_text_1) + " " + mNbNewMsg + " " + mContext.getString(R.string.notification_text_2);
+
+        Intent          notificationIntent  = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(mContext.getString(R.string.sjlb_forum_uri)));
+        PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
+
+        notification.number     = mNbNewPM + mNbNewMsg;
+        notification.defaults   = Notification.DEFAULT_ALL;
+        notification.vibrate    = new long[]{200, 200};
+        
+        notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
+
+        // Pass the Notification to the NotificationManager:
+        mNotificationManager.notify(NOTIFICATION_NEW_MSG_ID, notification);
+    }
+
+    
+    /**
+     * Notifications de l'utilisateur sur fin de refresh
+     * 
+     * @param aNbquakes
+     *//*
+    private void notifyUser (int aNbquakes) {
+        // Toast Notification
+        Toast.makeText(mContext, mContext.getString(R.string.refresh_done), Toast.LENGTH_SHORT).show();
+        
+        // Status Bar Notification
+        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        Notification        notification        = new Notification(R.drawable.status_icon, mContext.getString(R.string.app_name), System.currentTimeMillis());
+        
+        // Son et lumière
+        notification.defaults |= Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND; // DEFAULT_LIGHTS est inclu de base
+        notification.vibrate = new long[] { 200, 400 };
+        
+        // Ajoute en surimpression de l'icone de status l'affichage du nombre de tremblements de terre
+        // TODO n'afficher que le nombre de nouveau tremblements de terre
+        notification.number = aNbquakes;
+        
+        CharSequence    contentTitle        = mContext.getString(R.string.app_name);
+        String          contentText         = aNbquakes + " " + mContext.getString(R.string.quakes);
+        Intent          notificationIntent  = new Intent(mContext, EarthquakeViewer.class);
+        PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
+
+        notification.setLatestEventInfo(mContext, contentTitle, contentText, contentIntent);
+        
+        // Notification
+        notificationManager.notify(STATUS_NOTIFICATION_ID, notification);        
+    }    
+    */
+}
+
+
