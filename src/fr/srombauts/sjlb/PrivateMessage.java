@@ -1,5 +1,6 @@
 package fr.srombauts.sjlb;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -32,4 +33,13 @@ public class PrivateMessage {
         return mText;
     }
     
+    /**
+     * Retourne une description résumée en une unique chaine
+     */
+    public String toString () {
+        SimpleDateFormat    sdf         = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+        String              dateString  = sdf.format(mDate);
+                
+        return mAuthor + " (" + dateString + ") : " + mText;
+    }
 }

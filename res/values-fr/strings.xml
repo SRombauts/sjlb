@@ -2,6 +2,8 @@
 <resources>
     <string name="refreshing"> En cours de rafraichissement... </string>
 
+    <string name="pm_description"> Messages Privés </string>
+
     <string name="notification_title_pm"> Nouveaux Messages Privés </string>
     <string name="notification_title_msg"> Nouveaux Messages </string>
     <string name="notification_text_pm"> nouveau(x) message(s) privé(s) </string>

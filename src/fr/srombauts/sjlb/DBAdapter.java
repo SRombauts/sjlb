@@ -55,8 +55,8 @@ public class DBAdapter {
     
     /**
      * Insert un nouveau PM juste par son ID (ne fonctionne que si PM non déjà connu)
-     * @param aId
-     * @return l'identifiant de la ligne insérée en BDD si succès
+     * @param aId l'Id du PM à insérer
+     * @return true si succès
      */
     public long insertPM(int aId) {
       ContentValues newPMValues = new ContentValues();
@@ -64,9 +64,18 @@ public class DBAdapter {
       return mDatabase.insert(DATABASE_PM_TABLE, null, newPMValues);
     }
 
-    // retire un PM juste par son ID
-    public boolean removePM(long aId) {
-      return mDatabase.delete(DATABASE_PM_TABLE, KEY_PM_ID + "=" + aId, null) > 0;
+    /**
+     * Insert un nouveau PM complet (ne fonctionne que si PM non déjà connu)
+     * @param aPM le PM à insérer
+     * @return true si succès
+     */
+    public boolean insertPM(PrivateMessage aPM) {
+      ContentValues newPMValues = new ContentValues();
+      newPMValues.put(KEY_PM_ID,        aPM.getId());
+      newPMValues.put(KEY_PM_DATE,      aPM.getDate().getTime());
+      newPMValues.put(KEY_PM_AUTHOR,    aPM.getAuthor());
+      newPMValues.put(KEY_PM_TEXT,      aPM.getText());
+      return mDatabase.insert(DATABASE_PM_TABLE, null, newPMValues) > 0;
     }
 
     // complète un PM à partir de son ID
@@ -76,6 +85,16 @@ public class DBAdapter {
       newPMValues.put(KEY_PM_AUTHOR,    aPM.getAuthor());
       newPMValues.put(KEY_PM_TEXT,      aPM.getText());
       return mDatabase.update(DATABASE_PM_TABLE, newPMValues, KEY_PM_ID + "=" + aPM.getId(), null) > 0;
+    }
+    
+    // retire un PM juste par son ID
+    public boolean removePM(long aId) {
+      return mDatabase.delete(DATABASE_PM_TABLE, KEY_PM_ID + "=" + aId, null) > 0;
+    }
+
+    // vide la table des PM
+    public boolean clearPM() {
+      return mDatabase.delete(DATABASE_PM_TABLE, null, null) > 0;
     }
     
     // récupère un cursor avec la liste de tous les PM
@@ -107,7 +126,6 @@ public class DBAdapter {
       newMsgValues.put(KEY_MSG_ID, aId);
       return mDatabase.insert(DATABASE_MSG_TABLE, null, newMsgValues);
     }
-
     
     
     /**
@@ -121,13 +139,13 @@ public class DBAdapter {
                                                        + KEY_PM_ID + " integer primary key, "
                                                        + KEY_PM_DATE + " long, "
                                                        + KEY_PM_AUTHOR + " text, "
-                                                       + KEY_PM_TEXT + "text);";
+                                                       + KEY_PM_TEXT + " text);";
         
         private static final String DATABASE_MSG_CREATE = "create table " + DATABASE_MSG_TABLE + " ("
                                                        + KEY_MSG_ID + " integer primary key, "
                                                        + KEY_MSG_DATE + " long, "
                                                        + KEY_MSG_AUTHOR + " text, "
-                                                       + KEY_MSG_TEXT + "text);";
+                                                       + KEY_MSG_TEXT + " text);";
 
         private static final String DATABASE_PM_DROP    = "DROP TABLE IF EXISTS " + DATABASE_PM_TABLE;
         private static final String DATABASE_MSG_DROP   = "DROP TABLE IF EXISTS " + DATABASE_MSG_TABLE;
@@ -140,11 +158,13 @@ public class DBAdapter {
         }
         
         public void onCreate(SQLiteDatabase aDatabase) {
+            Log.w("DBAdapter", DATABASE_PM_CREATE);
+            Log.w("DBAdapter", DATABASE_MSG_CREATE);
             aDatabase.execSQL(DATABASE_PM_CREATE);
             aDatabase.execSQL(DATABASE_MSG_CREATE);
         }
 
-        // Upgrade : détruit et recrer !
+        // Upgrade : détruit et recréé !
         public void onUpgrade(SQLiteDatabase aDatabase, int aOldVersion, int aNewVersion) {
             Log.w("DBAdapter", "Upgrading from version" + aOldVersion 
                                     + " to " + aNewVersion + ", wich will destroy all data");

@@ -48,6 +48,12 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
     static final private String NODE_NAME_FORUM_MSG         = "msg";
     static final private String NODE_NAME_FORUM_MSG_ID      = "id";
 
+    static final private String ATTR_NAME_PRIVATE_MSG_ID        = "id";
+    static final private String ATTR_NAME_PRIVATE_MSG_DATE      = "date";
+    static final private String ATTR_NAME_PRIVATE_MSG_ID_AUTHOR = "id_auteur";
+    static final private String ATTR_NAME_PRIVATE_MSG_PSEUDO    = "pseudo";
+    
+
     private SJLBService mContext        = null;
     private int         mIdLogin        = 0;
     private int         mNbPM           = 0;
@@ -81,6 +87,23 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
      */
     protected Void doInBackground(Void... params) {
         
+        // Recherche d'éventuelles nouveautés
+        refreshInfos ();
+        
+        // Notifications des éventuelles nouveautés
+        publishProgress ();
+        
+        // et récupération de ces éventuels nouveaux contenus
+        fetchPM ();
+        // TODO : fetchMsg ();
+        
+        return null;
+    }
+    
+    /**
+     * Récupération des listes d'identifiants de messages non lus
+     */
+    void refreshInfos () {
         Log.d(LOG_TAG, "refreshInfos");
 
         mNbNewPM    = 0;
@@ -134,8 +157,8 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
                 {
                     mNbMsg = listMsg.getLength();
                     for (int i = 0; i < mNbMsg; i++) {
-                        Element pm      = (Element)listMsg.item(i);
-                        String  strIdMsg = pm.getFirstChild().getNodeValue();
+                        Element msg      = (Element)listMsg.item(i);
+                        String  strIdMsg = msg.getFirstChild().getNodeValue();
                         int     idMsg    = Integer.parseInt(strIdMsg);
                         
                         // Renseigne la bdd si Message inconnu
@@ -145,8 +168,8 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
                         }
                     }
                 }
+                
             }
-           
            
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -158,27 +181,17 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
             e.printStackTrace();
         } /* catch (ParseException e) {
             e.printStackTrace();
-        } */
-        
-        return null;
+        } */        
     }
     
+    
     /**
-     * Progression...
+     * Publication en cours de travail
      *
-     * Cette méthode est synchronisée donc une action sur la GUI serait autorisée 
+     * Cette méthode est synchronisée donc une action sur la GUI est autorisée 
      */
     protected void onProgressUpdate(Void... values) {
       super.onProgressUpdate(values);
-    }
-    
-    /**
-     * Fin de refresh
-     *
-     * Cette méthode est synchronisée donc on met à jour l'affichage de la liste 
-     */
-    protected void onPostExecute(Void result) {
-      super.onPostExecute(result);
       
       // s'il y a de nouveaux messages non lus :
       if (0 < mNbNewPM)
@@ -191,6 +204,93 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
           // Notification dans la barre de status
           notifyUserMsg ();
       }
+    }
+    
+    
+    /**
+     * Récupération du contenu des messages privés
+     */
+    void fetchPM () {
+        Log.d(LOG_TAG, "fetchPM");
+        
+        // s'il y a de nouveaux messages non lus :
+        if (0 < mNbNewPM)
+        {
+            try
+            {
+                // Etablissement de la connexion http et récupération de la page Web
+                // TODO SRO : utiliser les préférences pour sauvegarder le login/mot de passe :
+                URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_pm_uri) + "?login=Seb&password=4df51b1810f131b7f6a794900d93d58e");
+                URLConnection       connection      = urlAPI.openConnection();
+                HttpURLConnection   httpConnection  = (HttpURLConnection)connection;
+                
+                if (HttpURLConnection.HTTP_OK == httpConnection.getResponseCode()) {
+                    // Parse de la page XML
+                    InputStream             in  = httpConnection.getInputStream();
+                    
+                    DocumentBuilderFactory  dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder         db  = dbf.newDocumentBuilder();
+                    Document                dom = db.parse(in);
+                    Element                 docElement = dom.getDocumentElement();
+                    
+                    // Récupère la liste des PM
+                    NodeList    listPM = docElement.getElementsByTagName(NODE_NAME_PRIVATE_MSG);
+                    if (null != listPM)
+                    {
+                        // TODO Vider la table des messages privés
+                        mSJLBDBAdapter.clearPM ();
+                        
+                        mNbPM = listPM.getLength();
+                        for (int i = 0; i < mNbPM; i++) {
+                            Element pm      = (Element)listPM.item(i);
+                            
+                            String  strText     = pm.getFirstChild().getNodeValue();
+
+                            String  strIdPM     = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_ID);
+                            int     idPM        = Integer.parseInt(strIdPM);
+                            String  strDate     = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_DATE);
+                            Date    date        = new Date(Integer.parseInt(strDate)*1000);
+                            String  strIdAuthor = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_ID_AUTHOR);
+                            int     idAuthor    = Integer.parseInt(strIdAuthor);
+                            String  strAuthor   = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_PSEUDO);
+                            
+                            Log.d(LOG_TAG, "PM " + idPM + " " + strAuthor + " ("+ idAuthor +") " + strDate + " : "  + strText);
+                            
+                            PrivateMessage newPM = new PrivateMessage(idPM, date, strAuthor, strText);
+                            
+                            /** TODO Renseigne la bdd */
+                            Boolean bInserted = mSJLBDBAdapter.insertPM(newPM);
+                            if (bInserted) {
+                                Log.d(LOG_TAG, "PM " + idPM + " inserted");                                
+                            }
+                            /**/
+                        }
+                    }
+                    
+                }
+               
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            } catch (SAXException e) {
+                e.printStackTrace();
+            } /* catch (ParseException e) {
+                e.printStackTrace();
+            } */
+        }
+    }
+    
+    
+    /**
+     * Fin de refresh
+     *
+     * Cette méthode est synchronisée donc on met à jour l'affichage de la liste 
+     */
+    protected void onPostExecute(Void result) {
+      super.onPostExecute(result);
 
       // Le service peut dès lors être interrompu une fois qu'il a effectué le rafraichissement
       mContext.stopSelf ();
@@ -224,7 +324,7 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
 
         notification.number     = mNbNewPM;
         notification.defaults   = Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND;
-        notification.vibrate    = new long[]{100, 100, 100};
+        notification.vibrate    = new long[]{0, 200, 500, 200};
 
         notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
 
@@ -260,7 +360,7 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
 
         notification.number     = mNbNewMsg;
         notification.defaults   = Notification.DEFAULT_LIGHTS + Notification.DEFAULT_SOUND;
-        notification.vibrate    = new long[]{100, 100, 100};
+        notification.vibrate    = new long[]{0, 200, 300, 200, 300, 200};
         
         notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
 

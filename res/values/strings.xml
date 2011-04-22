@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello"> Not used </string>
     <string name="app_name"> SJLB </string>
+
+    <string name="pm_description"> Private Messages </string>
 
     <string name="refreshing"> Refreshing... </string>
 
