@@ -25,8 +25,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 
@@ -109,66 +111,95 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         
         try
         {
-            // Etablissement de la connexion http et récupération de la page Web
-            // TODO SRO : utiliser les préférences pour sauvegarder le login/mot de passe :
-            URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_polling_uri) + "?login=Seb&password=4df51b1810f131b7f6a794900d93d58e");
-            URLConnection       connection      = urlAPI.openConnection();
-            HttpURLConnection   httpConnection  = (HttpURLConnection)connection;
+            // Utilise les préférences pour sauvegarder le login/mot de passe :
+            SharedPreferences   Prefs       = PreferenceManager.getDefaultSharedPreferences(mContext);
             
-            if (HttpURLConnection.HTTP_OK == httpConnection.getResponseCode()) {
-                // Parse de la page XML
-                InputStream             in  = httpConnection.getInputStream();
-                
-                DocumentBuilderFactory  dbf = DocumentBuilderFactory.newInstance();
-                DocumentBuilder         db  = dbf.newDocumentBuilder();
-                Document                dom = db.parse(in);
-                Element                 docElement = dom.getDocumentElement();
-                
-                // Récupère l'id de l'utilsateur loggé
-                Element eltIdLogin  = (Element)docElement.getElementsByTagName(NODE_NAME_LOGIN_ID).item(0);
-                String  strIdLogin  = eltIdLogin.getFirstChild().getNodeValue();
-                mIdLogin            = Integer.parseInt(strIdLogin);
-                
-                // Récupère la liste des PM
-                Element     eltPM  = (Element)docElement.getElementsByTagName(NODE_NAME_PRIVATE_MSG).item(0);
-                NodeList    listPM = eltPM.getElementsByTagName(NODE_NAME_PRIVATE_MSG_ID);
-                if (null != listPM)
+            String              login       = Prefs.getString("PREF_LOGIN",    ""); // "Seb";
+            String              password    = Prefs.getString("PREF_PASSWORD", ""); // "mmdpsjlb";
+            String              passwordMD5 = ""; // "4df51b1810f131b7f6a794900d93d58e";
+
+            if (   ("" != login)
+                && ("" != password) )
+            {
+                // Create MD5 Hash  
+                try
                 {
-                    mNbPM = listPM.getLength();
-                    for (int i = 0; i < mNbPM; i++) {
-                        Element pm      = (Element)listPM.item(i);
-                        String  strIdPM = pm.getFirstChild().getNodeValue();
-                        int     idPM    = Integer.parseInt(strIdPM);
-                        
-                        // Renseigne la bdd si PM inconnu
-                        long nbInserted = mPMDBAdapter.insertPM(idPM);
-                        if (-1 != nbInserted) {
-                            mNbNewPM++;
+                    MessageDigest digest = java.security.MessageDigest.getInstance("MD5");  
+                    digest.update(password.getBytes());  
+                    byte[] messageDigest = digest.digest();
+                    BigInteger number = new BigInteger(1,messageDigest);
+                    passwordMD5 = number.toString(16);
+               
+                    while (passwordMD5.length() < 32) {
+                        passwordMD5 = "0" + passwordMD5;
+                    }
+                    
+                } catch (NoSuchAlgorithmException e) {  
+                    e.printStackTrace();  
+                }
+                
+                Log.d(LOG_TAG, "login=" + login + " password=4df51b1810f131b7f6a794900d93d58e");
+                Log.d(LOG_TAG, "login=" + login + " password=" + passwordMD5);
+                
+                URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_pm_uri) + "?login=" + login + "&password=" + passwordMD5);
+                URLConnection       connection      = urlAPI.openConnection();
+                HttpURLConnection   httpConnection  = (HttpURLConnection)connection;
+                
+                // Etablissement de la connexion http et récupération de la page Web
+                if (HttpURLConnection.HTTP_OK == httpConnection.getResponseCode()) {
+                    // Parse de la page XML
+                    InputStream             in  = httpConnection.getInputStream();
+                    
+                    DocumentBuilderFactory  dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder         db  = dbf.newDocumentBuilder();
+                    Document                dom = db.parse(in);
+                    Element                 docElement = dom.getDocumentElement();
+                    
+                    // Récupère l'id de l'utilsateur loggé
+                    Element eltIdLogin  = (Element)docElement.getElementsByTagName(NODE_NAME_LOGIN_ID).item(0);
+                    String  strIdLogin  = eltIdLogin.getFirstChild().getNodeValue();
+                    mIdLogin            = Integer.parseInt(strIdLogin);
+                    
+                    // Récupère la liste des PM
+                    Element     eltPM  = (Element)docElement.getElementsByTagName(NODE_NAME_PRIVATE_MSG).item(0);
+                    NodeList    listPM = eltPM.getElementsByTagName(NODE_NAME_PRIVATE_MSG_ID);
+                    if (null != listPM)
+                    {
+                        mNbPM = listPM.getLength();
+                        for (int i = 0; i < mNbPM; i++) {
+                            Element pm      = (Element)listPM.item(i);
+                            String  strIdPM = pm.getFirstChild().getNodeValue();
+                            int     idPM    = Integer.parseInt(strIdPM);
+                            
+                            // Renseigne la bdd si PM inconnu
+                            long nbInserted = mPMDBAdapter.insertPM(idPM);
+                            if (-1 != nbInserted) {
+                                mNbNewPM++;
+                            }
+                        }
+                    }
+                    
+                    // Récupère la liste des Messages
+                    Element     eltMsg  = (Element)docElement.getElementsByTagName(NODE_NAME_FORUM_MSG).item(0);
+                    NodeList    listMsg = eltMsg.getElementsByTagName(NODE_NAME_FORUM_MSG_ID);
+                    if (null != listMsg)
+                    {
+                        mNbMsg = listMsg.getLength();
+                        for (int i = 0; i < mNbMsg; i++) {
+                            Element msg      = (Element)listMsg.item(i);
+                            String  strIdMsg = msg.getFirstChild().getNodeValue();
+                            int     idMsg    = Integer.parseInt(strIdMsg);
+                            
+                            // Renseigne la bdd si Message inconnu
+                            long nbInserted = mMsgDBAdapter.insertMsg(idMsg);
+                            if (-1 != nbInserted) {
+                                mNbNewMsg++;
+                            }
                         }
                     }
                 }
-                
-                // Récupère la liste des Messages
-                Element     eltMsg  = (Element)docElement.getElementsByTagName(NODE_NAME_FORUM_MSG).item(0);
-                NodeList    listMsg = eltMsg.getElementsByTagName(NODE_NAME_FORUM_MSG_ID);
-                if (null != listMsg)
-                {
-                    mNbMsg = listMsg.getLength();
-                    for (int i = 0; i < mNbMsg; i++) {
-                        Element msg      = (Element)listMsg.item(i);
-                        String  strIdMsg = msg.getFirstChild().getNodeValue();
-                        int     idMsg    = Integer.parseInt(strIdMsg);
-                        
-                        // Renseigne la bdd si Message inconnu
-                        long nbInserted = mMsgDBAdapter.insertMsg(idMsg);
-                        if (-1 != nbInserted) {
-                            mNbNewMsg++;
-                        }
-                    }
-                }
-                
             }
-           
+               
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -216,81 +247,86 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         {
             try
             {
-                // Etablissement de la connexion http et récupération de la page Web
-                // TODO SRO : utiliser les préférences pour sauvegarder le login/mot de passe :
-                String              login           = "Seb";
-                String              password        = "mmdpsjlb";
-                String              passwordHashed  = "";
-                String              passwordMD5     = "4df51b1810f131b7f6a794900d93d58e";
+                // Utilise les préférences pour sauvegarder le login/mot de passe :
+                SharedPreferences   Prefs       = PreferenceManager.getDefaultSharedPreferences(mContext);
+                
+                String              login       = Prefs.getString("PREF_LOGIN",    ""); // "Seb";
+                String              password    = Prefs.getString("PREF_PASSWORD", ""); // "mmdpsjlb";
+                String              passwordMD5 = ""; // "4df51b1810f131b7f6a794900d93d58e";
 
-                // Create MD5 Hash  
-                try
+                if (   ("" != login)
+                    && ("" != password) )
                 {
-                    MessageDigest digest = java.security.MessageDigest.getInstance("MD5");  
-                    digest.update(password.getBytes());  
-                    byte[] messageDigest = digest.digest();
-                    BigInteger number = new BigInteger(1,messageDigest);
-                    passwordHashed = number.toString(16);
-               
-                    while (passwordHashed.length() < 32)
-                        passwordHashed = "0" + passwordHashed;
-                    
-                } catch (NoSuchAlgorithmException e) {  
-                    e.printStackTrace();  
-                }
-                
-                Log.d(LOG_TAG, "login=" + login + " password=" + passwordMD5);
-                Log.d(LOG_TAG, "login=" + login + " password=" + passwordHashed);
-                
-                URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_pm_uri) + "?login=" + login + "&password=" + passwordMD5);
-                URLConnection       connection      = urlAPI.openConnection();
-                HttpURLConnection   httpConnection  = (HttpURLConnection)connection;
-                
-                if (HttpURLConnection.HTTP_OK == httpConnection.getResponseCode()) {
-                    // Parse de la page XML
-                    InputStream             in  = httpConnection.getInputStream();
-                    
-                    DocumentBuilderFactory  dbf = DocumentBuilderFactory.newInstance();
-                    DocumentBuilder         db  = dbf.newDocumentBuilder();
-                    Document                dom = db.parse(in);
-                    Element                 docElement = dom.getDocumentElement();
-                    
-                    // Récupère la liste des PM
-                    NodeList    listPM = docElement.getElementsByTagName(NODE_NAME_PRIVATE_MSG);
-                    if (null != listPM)
+                    // Create MD5 Hash  
+                    try
                     {
-                        // Vide la table des messages privés
-                        mPMDBAdapter.clearPM ();
+                        MessageDigest digest = java.security.MessageDigest.getInstance("MD5");  
+                        digest.update(password.getBytes());  
+                        byte[] messageDigest = digest.digest();
+                        BigInteger number = new BigInteger(1,messageDigest);
+                        passwordMD5 = number.toString(16);
+                   
+                        while (passwordMD5.length() < 32) {
+                            passwordMD5 = "0" + passwordMD5;
+                        }
                         
-                        mNbPM = listPM.getLength();
-                        for (int i = 0; i < mNbPM; i++) {
-                            Element pm      = (Element)listPM.item(i);
+                    } catch (NoSuchAlgorithmException e) {  
+                        e.printStackTrace();  
+                    }
+                    
+                    Log.d(LOG_TAG, "login=" + login + " password=4df51b1810f131b7f6a794900d93d58e");
+                    Log.d(LOG_TAG, "login=" + login + " password=" + passwordMD5);
+                    
+                    URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_pm_uri) + "?login=" + login + "&password=" + passwordMD5);
+                    URLConnection       connection      = urlAPI.openConnection();
+                    HttpURLConnection   httpConnection  = (HttpURLConnection)connection;
+                    
+                    // Etablissement de la connexion http et récupération de la page Web
+                    if (HttpURLConnection.HTTP_OK == httpConnection.getResponseCode()) {
+                        // Parse de la page XML
+                        InputStream             in  = httpConnection.getInputStream();
+                        
+                        DocumentBuilderFactory  dbf = DocumentBuilderFactory.newInstance();
+                        DocumentBuilder         db  = dbf.newDocumentBuilder();
+                        Document                dom = db.parse(in);
+                        Element                 docElement = dom.getDocumentElement();
+                        
+                        // Récupère la liste des PM
+                        NodeList    listPM = docElement.getElementsByTagName(NODE_NAME_PRIVATE_MSG);
+                        if (null != listPM)
+                        {
+                            // Vide la table des messages privés
+                            mPMDBAdapter.clearPM ();
                             
-                            String  strText     = pm.getFirstChild().getNodeValue();
-
-                            String  strIdPM     = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_ID);
-                            int     idPM        = Integer.parseInt(strIdPM);
-                            String  strDate     = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_DATE);
-                            long    longDate    = (long)Integer.parseInt(strDate);
-                            Date    date        = new Date(longDate*1000);
-                            String  strIdAuthor = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_ID_AUTHOR);
-                            int     idAuthor    = Integer.parseInt(strIdAuthor);
-                            String  strAuthor   = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_PSEUDO);
-                            
-                            Log.d(LOG_TAG, "PM " + idPM + " " + strAuthor + " ("+ idAuthor +") " + date + " (" + strDate + ") : "  + strText);
-                            
-                            PrivateMessage newPM = new PrivateMessage(idPM, date, strAuthor, strText);
-                            
-                            // Renseigne la bdd
-                            Boolean bInserted = mPMDBAdapter.insertPM(newPM);
-                            if (bInserted) {
-                                Log.d(LOG_TAG, "PM " + idPM + " inserted");                                
+                            mNbPM = listPM.getLength();
+                            for (int i = 0; i < mNbPM; i++) {
+                                Element pm      = (Element)listPM.item(i);
+                                
+                                String  strText     = pm.getFirstChild().getNodeValue();
+    
+                                String  strIdPM     = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_ID);
+                                int     idPM        = Integer.parseInt(strIdPM);
+                                String  strDate     = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_DATE);
+                                long    longDate    = (long)Integer.parseInt(strDate);
+                                Date    date        = new Date(longDate*1000);
+                                String  strIdAuthor = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_ID_AUTHOR);
+                                int     idAuthor    = Integer.parseInt(strIdAuthor);
+                                String  strAuthor   = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_PSEUDO);
+                                
+                                Log.d(LOG_TAG, "PM " + idPM + " " + strAuthor + " ("+ idAuthor +") " + date + " (" + strDate + ") : "  + strText);
+                                
+                                PrivateMessage newPM = new PrivateMessage(idPM, date, strAuthor, strText);
+                                
+                                // Renseigne la bdd
+                                Boolean bInserted = mPMDBAdapter.insertPM(newPM);
+                                if (bInserted) {
+                                    Log.d(LOG_TAG, "PM " + idPM + " inserted");                                
+                                }
                             }
                         }
                     }
-                    
                 }
-               
+                
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
