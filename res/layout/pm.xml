@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+   	>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        >
+        <TextView
+            android:id="@+id/pmAuthor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4px"
+            android:textSize="22px"
+            android:textColor="#FFF"
+            android:background="#000"
+            />
+        <TextView
+            android:id="@+id/pmDate"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="4px"
+            android:textSize="22px"
+            android:textColor="#FFF"
+            android:background="#000"
+            />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/pmText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="8px"
+        android:textSize="26px"
+        android:textColor="#FFF"
+        android:background="#000"
+        />
+</LinearLayout>

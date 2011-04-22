@@ -138,7 +138,7 @@ public class PMContentProvider extends ContentProvider {
     // récupère un cursor avec la liste de tous les PM
     public Cursor getAllPM () {
         return mDBHelper.getReadableDatabase().query(   SJLB.PM.TABLE_NAME,
-                                                       new String[] { SJLB.PM.ID, SJLB.PM.DATE, SJLB.PM.AUTHOR, SJLB.PM.DATE},
+                                                       new String[] { SJLB.PM.ID, SJLB.PM.DATE, SJLB.PM.AUTHOR, SJLB.PM.TEXT},
                                                        null, null, null, null, null);
     }
     

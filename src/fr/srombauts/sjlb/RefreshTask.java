@@ -6,10 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,12 +22,9 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
-
 
 
 /**
@@ -38,8 +32,8 @@ import android.widget.Toast;
  */
 class RefreshTask extends AsyncTask<Void, Void, Void> {
 
-    private static final int     NOTIFICATION_NEW_PM_ID     = 1;
-    private static final int     NOTIFICATION_NEW_MSG_ID    = 2;
+    public static final  int     NOTIFICATION_NEW_PM_ID     = 1;
+    public static final  int     NOTIFICATION_NEW_MSG_ID    = 2;
     private static final String  LOG_TAG                    = "RefreshTask";
 
     static final private String NODE_NAME_LOGIN_ID          = "id_login";
@@ -303,8 +297,8 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
         Log.d(LOG_TAG, "notifyUserPM");
 
         // Get a reference to the NotificationManager:
-        String              ns                     = Context.NOTIFICATION_SERVICE;
-        NotificationManager mNotificationManager   = (NotificationManager) mContext.getSystemService(ns);
+        String              ns                      = Context.NOTIFICATION_SERVICE;
+        NotificationManager notificationManager     = (NotificationManager) mContext.getSystemService(ns);
 
         // Instantiate the Notification:
         int          icon        = android.R.drawable.stat_notify_sync;
@@ -319,7 +313,9 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
         // TODO SRO : faire le cumul avec les chiffres de l'éventuelle notification déjà actuellement affichée 
         CharSequence    contentText         = mNbNewPM + " " + mContext.getString(R.string.notification_text_pm);
 
-        Intent          notificationIntent  = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(mContext.getString(R.string.sjlb_forum_uri)));
+        // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
+        //Intent          notificationIntent  = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(mContext.getString(R.string.sjlb_forum_uri)));
+        Intent          notificationIntent  = new Intent(mContext, SJLBPrivateMessages.class);
         PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
 
         notification.number     = mNbNewPM;
@@ -329,7 +325,7 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
         notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
 
         // Pass the Notification to the NotificationManager:
-        mNotificationManager.notify(NOTIFICATION_NEW_PM_ID, notification);
+        notificationManager.notify(NOTIFICATION_NEW_PM_ID, notification);
     }    
 
     /**
@@ -339,8 +335,8 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
         Log.d(LOG_TAG, "notifyUserMsg");
         
         // Get a reference to the NotificationManager:
-        String              ns                     = Context.NOTIFICATION_SERVICE;
-        NotificationManager mNotificationManager   = (NotificationManager) mContext.getSystemService(ns);
+        String              ns                      = Context.NOTIFICATION_SERVICE;
+        NotificationManager notificationManager     = (NotificationManager) mContext.getSystemService(ns);
 
         // Instantiate the Notification:
         int          icon        = android.R.drawable.stat_notify_sync;
@@ -365,7 +361,7 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
         notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
 
         // Pass the Notification to the NotificationManager:
-        mNotificationManager.notify(NOTIFICATION_NEW_MSG_ID, notification);
+        notificationManager.notify(NOTIFICATION_NEW_MSG_ID, notification);
     }    
 }
 

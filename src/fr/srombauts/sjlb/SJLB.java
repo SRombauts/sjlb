@@ -48,7 +48,7 @@ public final class SJLB {
          * L'id du PM
          * <P>Type: INTEGER</P>
          */
-        public static final String  ID                  = "id";
+        public static final String  ID                  = "_id";
         
         /**
          * Date en secondes depuis le 1er janvier 1970
@@ -103,7 +103,7 @@ public final class SJLB {
          * L'id du PM
          * <P>Type: INTEGER</P>
          */
-        public static final String  ID                  = "id";
+        public static final String  ID                  = "_id";
         
         /**
          * Date en secondes depuis le 1er janvier 1970

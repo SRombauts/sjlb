@@ -3,7 +3,9 @@ package fr.srombauts.sjlb;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -26,37 +28,38 @@ public class SJLBPrivateMessages extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        mIntentService.setClassName( "fr.srombauts.sjlb", "fr.srombauts.sjlb.SJLBService");
+        // Annule l'éventuelle notification de PM non lus
+        String              ns                      = Context.NOTIFICATION_SERVICE;
+        NotificationManager notificationManager     = (NotificationManager) getSystemService(ns);
+        notificationManager.cancel(RefreshTask.NOTIFICATION_NEW_PM_ID);
 
         // Lance le service ssi pas déjà lancé
         startService ();
 
-        /**
         // Récupére un curseur sur les données (les messages Privés) 
-        Cursor cursor = getContentResolver().query(SJLB.PM.CONTENT_URI, new String[] {SJLB.PM.ID, SJLB.PM.AUTHOR, SJLB.PM.DATE, SJLB.PM.TEXT}, null, null, null);
-        startManagingCursor(cursor);
+        Cursor cursor = managedQuery(SJLB.PM.CONTENT_URI,
+        							 null,
+        							 null, null, null);
 
-        // THE DESIRED COLUMNS TO BE BOUND
-        String[] columns = new String[] { SJLB.PM.ID, SJLB.PM.AUTHOR, SJLB.PM.DATE, SJLB.PM.TEXT };
+        // Les colonnes à mapper :
+        String[]    from = new String[] { SJLB.PM.AUTHOR, SJLB.PM.DATE, SJLB.PM.TEXT };
         
-        // THE XML DEFINED VIEWS WHICH THE DATA WILL BE BOUND TO
-        //int[] to = new int[] { R.id.name_entry, R.id.number_entry };
+        // Les ID des views sur lesqules les mapper :
+        int[]       to   = new int[]    { R.id.pmAuthor, R.id.pmDate, R.id.pmText };
 
-        // TODO CREATE THE ADAPTER USING THE CURSOR POINTING TO THE DESIRED DATA AS WELL AS THE LAYOUT INFORMATION
-        mAdapter = new SimpleCursorAdapter(this, R.id.privateMessagesListView, cursor, columns, null);
-        // TODO SRO setListAdapter(mAdapter);
+        // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
+        mAdapter = new SimpleCursorAdapter(	this,
+        									R.layout.pm,
+        									cursor,
+        									from,
+        									to);
         
         mPrivateMessagesListView = (ListView)findViewById(R.id.privateMessagesListView);
-        // TODO SRO : à tester
         mPrivateMessagesListView.setAdapter (mAdapter);
-        mAdapter.notifyDataSetChanged ();
-        */        
-        
-        // TODO SRO quitte immédiatement
-        //finish ();
     }
     
     private void startService () {
+        mIntentService.setClassName( "fr.srombauts.sjlb", "fr.srombauts.sjlb.SJLBService");
 	    ComponentName cname = startService(mIntentService);
 	    if (cname == null)
             Log.e(LOG_TAG, "SJLBService was not started");
