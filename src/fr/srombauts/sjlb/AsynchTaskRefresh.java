@@ -180,6 +180,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             }
                         }
                     }
+                    // TODO SRO : détecter aussi les cas où l'on dispose de PLUS de PM en local qu'il n'en reste sur le site !
                     
                     // Récupère la liste des Messages
                     Element     eltMsg  = (Element)docElement.getElementsByTagName(NODE_NAME_FORUM_MSG).item(0);
@@ -248,6 +249,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         Log.d(LOG_TAG, "fetchPM...");
         
         // s'il y a de nouveaux messages non lus :
+        // TODO SRO : pas bon, il faut aussi le faire lorsqu'il y a MOINS de messages que la fois précédentes !
         if (0 < mNbNewPM)
         {
             try
@@ -373,7 +375,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         NotificationManager notificationManager     = (NotificationManager) mContext.getSystemService(ns);
 
         // Instantiate the Notification:
-        int          icon        = android.R.drawable.stat_notify_sync;
+        int          icon        = R.drawable.status_icon;
         CharSequence tickerText  = mContext.getString(R.string.app_name) + ": " + mContext.getString(R.string.notification_title_pm);
         long         when        = System.currentTimeMillis();
 
@@ -410,7 +412,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         NotificationManager notificationManager     = (NotificationManager) mContext.getSystemService(ns);
 
         // Instantiate the Notification:
-        int          icon        = android.R.drawable.stat_notify_sync;
+        int          icon        = R.drawable.status_icon;
         CharSequence tickerText  = mContext.getString(R.string.app_name) + ": " + mContext.getString(R.string.notification_title_msg);
         long         when        = System.currentTimeMillis();
 
