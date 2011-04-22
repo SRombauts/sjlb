@@ -26,6 +26,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ParseException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -104,7 +105,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
      * Récupération des listes d'identifiants de messages non lus
      */
     void refreshInfos () {
-        Log.d(LOG_TAG, "refreshInfos");
+        Log.d(LOG_TAG, "refreshInfos...");
 
         mNbNewPM    = 0;
         mNbNewMsg   = 0;
@@ -116,8 +117,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             String              login       = Prefs.getString(SJLB.PREFS.LOGIN,    ""); // "Seb";
             String              password    = Prefs.getString(SJLB.PREFS.PASSWORD, ""); // "mmdpsjlb";
 
-            if (   ("" != login)
-                && ("" != password) )
+            if (   (false == login.contentEquals(""))
+                && (false == password.contentEquals("")) )
             {
                 // Génère le hash MD5 du mot de passe
                 String          passwordMD5 = ""; // "4df51b1810f131b7f6a794900d93d58e";
@@ -137,10 +138,11 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                     e.printStackTrace();  
                 }
                 
-                Log.d(LOG_TAG, "login=Seb password=4df51b1810f131b7f6a794900d93d58e");
-                Log.d(LOG_TAG, "login=" + login + " password=" + passwordMD5);
+//                Log.d(LOG_TAG, "login=Seb password=4df51b1810f131b7f6a794900d93d58e");
+//                Log.d(LOG_TAG, "login=" + login + " password=" + passwordMD5 + "(" + password + ")");
+//                Log.d(LOG_TAG, "urlAPI: " + mContext.getString(R.string.sjlb_polling_uri) + "?login=" + login + "&password=" + passwordMD5);
                 
-                URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_pm_uri) + "?login=" + login + "&password=" + passwordMD5);
+                URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_polling_uri) + "?login=" + login + "&password=" + passwordMD5);
                 URLConnection       connection      = urlAPI.openConnection();
                 HttpURLConnection   httpConnection  = (HttpURLConnection)connection;
                 
@@ -155,6 +157,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                     Element                 docElement = dom.getDocumentElement();
                     
                     // Récupère l'id de l'utilsateur loggé
+                    // TODO SRO : traiter ici les cas de noeuds "null" (cas du login/mdp erroné par exemple) ! 
                     Element eltIdLogin  = (Element)docElement.getElementsByTagName(NODE_NAME_LOGIN_ID).item(0);
                     String  strIdLogin  = eltIdLogin.getFirstChild().getNodeValue();
                     mIdLogin            = Integer.parseInt(strIdLogin);
@@ -196,22 +199,23 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             }
                         }
                     }
+                    Log.d(LOG_TAG, "refreshInfos... ok");
                 }
             }
                
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
             e.printStackTrace();
         } catch (ClassCastException e) {        
             e.printStackTrace();
-        } /* catch (ParseException e) {
+        } catch (ParseException e) {
             e.printStackTrace();
-        } */
+        }
     }
     
     
@@ -241,7 +245,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
      * Récupération du contenu des messages privés
      */
     void fetchPM () {
-        Log.d(LOG_TAG, "fetchPM");
+        Log.d(LOG_TAG, "fetchPM...");
         
         // s'il y a de nouveaux messages non lus :
         if (0 < mNbNewPM)
@@ -253,8 +257,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 String              login       = Prefs.getString(SJLB.PREFS.LOGIN,    ""); // "Seb";
                 String              password    = Prefs.getString(SJLB.PREFS.PASSWORD, ""); // "mmdpsjlb";
 
-                if (   ("" != login)
-                    && ("" != password) )
+                if (   (false == login.contentEquals(""))
+                    && (false == password.contentEquals("")) )
                 {
                     // Génère le hash MD5 du mot de passe
                     String          passwordMD5 = ""; // "4df51b1810f131b7f6a794900d93d58e";
@@ -274,8 +278,9 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                         e.printStackTrace();  
                     }
                     
-                    Log.d(LOG_TAG, "login=Seb password=4df51b1810f131b7f6a794900d93d58e");
-                    Log.d(LOG_TAG, "login=" + login + " password=" + passwordMD5);
+//                    Log.d(LOG_TAG, "login=Seb password=4df51b1810f131b7f6a794900d93d58e");
+//                    Log.d(LOG_TAG, "login=" + login + " password=" + passwordMD5 + " (" + password + ")");
+//                    Log.d(LOG_TAG, "urlAPI: " + mContext.getString(R.string.sjlb_pm_uri) + "?login=" + login + "&password=" + passwordMD5);
                     
                     URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_pm_uri) + "?login=" + login + "&password=" + passwordMD5);
                     URLConnection       connection      = urlAPI.openConnection();
@@ -324,22 +329,23 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                                 }
                             }
                         }
+                        Log.d(LOG_TAG, "fetchPM... ok");                        
                     }
                 }
                 
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ParserConfigurationException e) {
                 e.printStackTrace();
             } catch (SAXException e) {
                 e.printStackTrace();
             } catch (ClassCastException e) {        
                 e.printStackTrace();
-            } /* catch (ParseException e) {
+            } catch (ParseException e) {
                 e.printStackTrace();
-            } */
+            }
         }
     }
     
