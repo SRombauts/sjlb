@@ -7,7 +7,12 @@
     <TextView  
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
-        android:text="@string/msg_todo"
+        android:text="@string/pm_description"
+    />
+    <ListView
+        android:id="@+id/privateMessagesListView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
     />
     
 </LinearLayout>

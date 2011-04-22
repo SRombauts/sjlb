@@ -14,25 +14,32 @@ public final class R {
         public static final int icon=0x7f020000;
     }
     public static final class id {
-        public static final int pmAuthor=0x7f050001;
-        public static final int pmDate=0x7f050002;
-        public static final int pmText=0x7f050003;
-        public static final int privateMessagesListView=0x7f050000;
+        public static final int pmAuthor=0x7f050000;
+        public static final int pmDate=0x7f050001;
+        public static final int pmText=0x7f050002;
+        public static final int privateMessagesListView=0x7f050003;
     }
     public static final class layout {
         public static final int main=0x7f030000;
         public static final int pm=0x7f030001;
+        public static final int pm_list=0x7f030002;
     }
     public static final class string {
         public static final int app_name=0x7f040000;
-        public static final int notification_text_msg=0x7f040006;
-        public static final int notification_text_pm=0x7f040005;
-        public static final int notification_title_msg=0x7f040004;
-        public static final int notification_title_pm=0x7f040003;
-        public static final int pm_description=0x7f040001;
-        public static final int refreshing=0x7f040002;
-        public static final int sjlb_forum_uri=0x7f040007;
-        public static final int sjlb_pm_uri=0x7f040009;
-        public static final int sjlb_polling_uri=0x7f040008;
+        public static final int menu_quit=0x7f040007;
+        public static final int menu_reset=0x7f040006;
+        public static final int menu_show_msg=0x7f040004;
+        public static final int menu_show_pm=0x7f040003;
+        public static final int menu_update=0x7f040005;
+        public static final int msg_todo=0x7f040001;
+        public static final int notification_text_msg=0x7f04000c;
+        public static final int notification_text_pm=0x7f04000b;
+        public static final int notification_title_msg=0x7f04000a;
+        public static final int notification_title_pm=0x7f040009;
+        public static final int pm_description=0x7f040002;
+        public static final int refreshing=0x7f040008;
+        public static final int sjlb_forum_uri=0x7f04000d;
+        public static final int sjlb_pm_uri=0x7f04000f;
+        public static final int sjlb_polling_uri=0x7f04000e;
     }
 }

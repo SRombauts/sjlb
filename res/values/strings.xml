@@ -2,12 +2,20 @@
 <resources>
     <string name="app_name"> SJLB </string>
 
+    <string name="msg_todo"> Use menu </string>
+
     <string name="pm_description"> Private Messages </string>
 
+    <string name="menu_show_pm">    Private messages </string>
+    <string name="menu_show_msg">   Forum messages </string>
+    <string name="menu_update">     Refresh </string>
+    <string name="menu_reset">      Reset data </string>
+    <string name="menu_quit">       Quit </string>
+    
     <string name="refreshing"> Refreshing... </string>
 
-    <string name="notification_title_pm"> Unread Messages </string>
-    <string name="notification_title_msg"> Unread Messages </string>
+    <string name="notification_title_pm"> Unread Private Messages </string>
+    <string name="notification_title_msg"> Unread Post Messages </string>
     <string name="notification_text_pm"> new pm </string>
     <string name="notification_text_msg"> new unread message(s) </string>
     

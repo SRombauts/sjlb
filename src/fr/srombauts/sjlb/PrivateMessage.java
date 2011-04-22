@@ -9,7 +9,7 @@ import java.util.Date;
  */
 public class PrivateMessage {
     private int     mId;
-    private Date    mDate;
+    private String  mDate;
     private String  mAuthor;
     private String  mText;
 

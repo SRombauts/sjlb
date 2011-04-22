@@ -16,13 +16,13 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_MSG_CREATE = "create table " + SJLB.Msg.TABLE_NAME + " ("
                                                    + SJLB.Msg.ID + " integer primary key, "
-                                                   + SJLB.Msg.DATE + " long, "
+                                                   + SJLB.Msg.DATE + " text, "
                                                    + SJLB.Msg.AUTHOR + " text, "
                                                    + SJLB.Msg.TEXT + " text);";
 
     private static final String DATABASE_PM_CREATE = "create table " + SJLB.PM.TABLE_NAME + " ("
     + SJLB.PM.ID + " integer primary key, "
-    + SJLB.PM.DATE + " long, "
+    + SJLB.PM.DATE + " text, "
     + SJLB.PM.AUTHOR + " text, "
     + SJLB.PM.TEXT + " text);";
 

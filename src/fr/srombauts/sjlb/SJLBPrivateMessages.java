@@ -1,12 +1,18 @@
 package fr.srombauts.sjlb;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 
 /**
@@ -14,6 +20,8 @@ import android.widget.SimpleCursorAdapter;
  * @author 14/06/2010 srombauts
  */
 public class SJLBPrivateMessages extends Activity {
+    static final private int    DIALOG_ID_PM_DELETE         = 1;
+    
     private Cursor              mCursor                     = null;
     private SimpleCursorAdapter mAdapter                    = null;
     private ListView            mPrivateMessagesListView    = null;
@@ -22,7 +30,7 @@ public class SJLBPrivateMessages extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.pm_list);
         
         // Récupére un curseur sur les données (les messages Privés) 
         mCursor = managedQuery( SJLB.PM.CONTENT_URI,
@@ -45,6 +53,16 @@ public class SJLBPrivateMessages extends Activity {
         mPrivateMessagesListView = (ListView)findViewById(R.id.privateMessagesListView);
         mPrivateMessagesListView.setAdapter (mAdapter);
         
+        mPrivateMessagesListView.setOnItemLongClickListener(
+            new OnItemLongClickListener(){
+                public boolean onItemLongClick(AdapterView<?> adapter, View view, int index, long arg3) {
+                    mCursor.moveToPosition(index);
+                    showDialog(DIALOG_ID_PM_DELETE);
+                    return true;
+                }
+            }
+        );
+        
     }
     
     protected void onResume () {
@@ -63,5 +81,43 @@ public class SJLBPrivateMessages extends Activity {
         notificationManager.cancel(RefreshTask.NOTIFICATION_NEW_PM_ID);
     }
 
+    /**
+     * Création de la boîte de dialogue
+     */
+    public Dialog onCreateDialog (int id) {
+        switch(id) {
+            case(DIALOG_ID_PM_DELETE): {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                // TODO internationaliser :
+                builder.setMessage("Are you sure you want to delete this PM ?")
+                       .setCancelable(false)
+                       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                           public void onClick(DialogInterface dialog, int id) {
+                                ;
+                           }
+                       })
+                       .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                           public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                           }
+                       });
+                AlertDialog alert = builder.create();
+                return alert;
+            }
+        }
+        return null;
+    }
+    
 
+    /**
+     * Apparition de la boîte de dialogue
+     */
+    public void onPrepareDialog (int id, Dialog dialog) {
+        switch(id) {
+            case(DIALOG_ID_PM_DELETE): {
+                // TODO SRO : modifier le contenu de la boîte de dialogue pour montrer le texte du pm
+                break;
+            }
+        }        
+    }
 }

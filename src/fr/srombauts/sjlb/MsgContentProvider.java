@@ -6,11 +6,7 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.net.Uri;
-import android.util.Log;
 
 
 /**
@@ -117,4 +113,9 @@ public class MsgContentProvider extends ContentProvider {
         return cursor;
     }
    
+    // vide la table des PM
+    public boolean clearMsg() {
+      return mDBHelper.getWritableDatabase().delete(SJLB.Msg.TABLE_NAME, null, null) > 0;
+    }
+    
 }

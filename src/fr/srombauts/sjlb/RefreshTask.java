@@ -314,7 +314,6 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
         CharSequence    contentText         = mNbNewPM + " " + mContext.getString(R.string.notification_text_pm);
 
         // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
-        //Intent          notificationIntent  = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(mContext.getString(R.string.sjlb_forum_uri)));
         Intent          notificationIntent  = new Intent(mContext, SJLBPrivateMessages.class);
         PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
 
