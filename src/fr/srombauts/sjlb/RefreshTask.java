@@ -28,7 +28,7 @@ import android.util.Log;
 
 
 /**
- * Classe de travail en tâche de fond, chargée de récupérer le fichier XML listant les messages non lus
+ * Travail en tâche de fond, chargée de récupérer le fichier XML listant les messages non lus
  */
 class RefreshTask extends AsyncTask<Void, Void, Void> {
 
@@ -48,7 +48,7 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
     static final private String ATTR_NAME_PRIVATE_MSG_PSEUDO    = "pseudo";
     
 
-    private SJLBService mContext        = null;
+    private RefreshService mContext        = null;
     private int         mIdLogin        = 0;
     private int         mNbPM           = 0;
     private int         mNbNewPM        = 0;
@@ -62,7 +62,7 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
      * Constructeur utilisé pour mémorisée la référence sur le service appelant
      * @param context
      */
-    public RefreshTask(SJLBService context) {
+    public RefreshTask(RefreshService context) {
         mContext        = context;
                                 
         mPMDBAdapter  = new PMContentProvider(context);

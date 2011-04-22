@@ -4,12 +4,14 @@
       android:versionCode="10"
       android:versionName="0.1.0">
     <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
-        <activity android:name=".SJLBPrivateMessages"
+        <activity android:name=".SJLBMain"
                   android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".SJLBPrivateMessages">
         </activity>
 	    <receiver android:name=".StartServiceIntentReceiver">
             <intent-filter>
@@ -19,7 +21,8 @@
                 <action android:name="fr.srombauts.sjlb.ACTION_REFRESH_ALARM" />
             </intent-filter>
 	    </receiver>
-	    <service android:name=".SJLBService"/>
+	    <service android:name=".RefreshService">
+        </service>
         <provider android:name="fr.srombauts.sjlb.PMContentProvider"
                   android:authorities="fr.srombauts.sjlb" 
         />

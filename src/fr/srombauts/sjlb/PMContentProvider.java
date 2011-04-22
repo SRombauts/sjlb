@@ -25,7 +25,7 @@ public class PMContentProvider extends ContentProvider {
     private static final int PM_ID          = 2;
     private static final int PM_LIVE_FOLDER = 3;
 
-    private SJLBDBOpenHelper    mDBHelper   = null;
+    private DBOpenHelper    mDBHelper   = null;
 
     // Le matcher d'URI pour fournir une API de type ContentProvider
     private static final UriMatcher sUriMatcher;
@@ -42,7 +42,7 @@ public class PMContentProvider extends ContentProvider {
     // TODO : ce constructeur est conservé tant qu'on conserve un accès directe à cette classe
     //           (au lieu d'utiliser uniquement comme content provider)
     public PMContentProvider (Context aContext) {
-        mDBHelper   = new SJLBDBOpenHelper(aContext, SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
+        mDBHelper   = new DBOpenHelper(aContext, SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class PMContentProvider extends ContentProvider {
         if (null == mDBHelper)
         {
             // est ce que getContext fonctionne dans ce contexte là ?
-            mDBHelper   = new SJLBDBOpenHelper(getContext(), SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
+            mDBHelper   = new DBOpenHelper(getContext(), SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
         }
         return true;
     }

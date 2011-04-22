@@ -10,7 +10,11 @@ import android.os.IBinder;
 import android.util.Log;
 
 
-public class SJLBService extends Service {
+/**
+ * Service en tâche de fond, chargé de lancer périodirquement la tâche de rafraichissement
+ * @author srombauts
+ */
+public class RefreshService extends Service {
     private static final String  LOG_TAG = "SJLBService";
 
     private RefreshTask     mRefreshTask    = null;
@@ -22,12 +26,13 @@ public class SJLBService extends Service {
      * Lancement de l'alarme périodique
      */
     public void onCreate() {
-        String ALARM_ACTION = StartServiceIntentReceiver.ACTION_REFRESH_EARTHQUAKE_ALARM;
+        String ALARM_ACTION = StartServiceIntentReceiver.ACTION_REFRESH_ALARM;
         Intent intentToFire = new Intent(ALARM_ACTION);
         mAlarmIntent    = PendingIntent.getBroadcast(this, 0, intentToFire, 0);
         mAlarmManager   = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-        // Lancement de l'alarme périodique (imprécise car plus économique)
-        // TODO SRO : ELAPSED_REALTIME_WAKEUP
+        // Lancement de l'alarme périodique  :
+        // - imprécise car plus économique,
+        // - et pas ELAPSED_REALTIME_WAKEUP car ainsi n'utilise que les réveils  demandés par d'autres applis (gmail...)
         mAlarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 0, AlarmManager.INTERVAL_FIFTEEN_MINUTES, mAlarmIntent);
     }    
 

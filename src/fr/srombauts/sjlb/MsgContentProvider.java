@@ -24,7 +24,7 @@ public class MsgContentProvider extends ContentProvider {
     private static final int MSG_ID          = 2;
     private static final int MSG_LIVE_FOLDER = 3;
 
-    private SJLBDBOpenHelper    mDBHelper   = null;
+    private DBOpenHelper    mDBHelper   = null;
 
     // Le matcher d'URI pour fournir une API de type ContentProvider
     private static final UriMatcher sUriMatcher;
@@ -38,7 +38,7 @@ public class MsgContentProvider extends ContentProvider {
     // TODO : ce constructeur est conservé tant qu'on conserve un accès directe à cette classe
     //           (au lieu d'utiliser uniquement comme content provider)
     public MsgContentProvider (Context aContext) {
-        mDBHelper   = new SJLBDBOpenHelper(aContext, SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
+        mDBHelper   = new DBOpenHelper(aContext, SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class MsgContentProvider extends ContentProvider {
         // TODO : Est ce que cette bidouille sert à qqch !?
         if (null == mDBHelper)
         {
-            mDBHelper   = new SJLBDBOpenHelper(getContext(), SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
+            mDBHelper   = new DBOpenHelper(getContext(), SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
         }
         return true;
     }
