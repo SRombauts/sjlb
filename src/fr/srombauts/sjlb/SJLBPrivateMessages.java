@@ -7,7 +7,6 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.SimpleCursorAdapter;
 
 public class SJLBPrivateMessages extends Activity {
     private static final String LOG_TAG = "SJLBPrivateMessages";
@@ -35,7 +34,7 @@ public class SJLBPrivateMessages extends Activity {
         
         /** TODO Récupérer un curseur sur les données (les messages Privés) **/ 
         Cursor cursor;// TODO SRO : = getContentResolver().query(People.CONTENT_URI, new String[] {People._ID, People.NAME, People.NUMBER}, null, null, null);
-        startManagingCursor(cursor);
+        //startManagingCursor(cursor);
 
         // TODO THE DESIRED COLUMNS TO BE BOUND
         String[] columns = new String[] { /*TODO PrivateMessage.AUTHOR, PrivateMessage.TEXT*/ };
@@ -45,7 +44,7 @@ public class SJLBPrivateMessages extends Activity {
 
         
         // TODO CREATE THE ADAPTER USING THE CURSOR POINTING TO THE DESIRED DATA AS WELL AS THE LAYOUT INFORMATION
-        SimpleCursorAdapter mAdapter = new SimpleCursorAdapter(this, R.id.privateMessagesListView, cursor, columns, null/*to*/);
+        //SimpleCursorAdapter mAdapter = new SimpleCursorAdapter(this, R.id.privateMessagesListView, cursor, columns, null/*to*/);
         //setListAdapter(mAdapter);
         
         

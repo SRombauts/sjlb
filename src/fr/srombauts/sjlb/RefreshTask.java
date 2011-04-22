@@ -61,16 +61,16 @@ class RefreshTask extends AsyncTask<Void, Void, Void> {
     private int         mNbMsg          = 0;
     private int         mNbNewMsg       = 0;
 
-    private DBAdapter mSJLBDBAdapter;
+    private SJLBContentProvider mSJLBDBAdapter;
       
     /**
      * Constructeur utilisé pour mémorisée la référence sur le service appelant
      * @param context
      */
     public RefreshTask(SJLBService context) {
-        this.mContext           = context;
+        mContext        = context;
                                 
-        mSJLBDBAdapter          = new DBAdapter(context);
+        mSJLBDBAdapter  = new SJLBContentProvider();
         mSJLBDBAdapter.open();
     }
 
