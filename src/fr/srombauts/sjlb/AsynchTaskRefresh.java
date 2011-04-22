@@ -113,15 +113,14 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         {
             // Utilise les préférences pour sauvegarder le login/mot de passe :
             SharedPreferences   Prefs       = PreferenceManager.getDefaultSharedPreferences(mContext);
-            
-            String              login       = Prefs.getString("PREF_LOGIN",    ""); // "Seb";
-            String              password    = Prefs.getString("PREF_PASSWORD", ""); // "mmdpsjlb";
-            String              passwordMD5 = ""; // "4df51b1810f131b7f6a794900d93d58e";
+            String              login       = Prefs.getString(SJLB.PREFS.LOGIN,    ""); // "Seb";
+            String              password    = Prefs.getString(SJLB.PREFS.PASSWORD, ""); // "mmdpsjlb";
 
             if (   ("" != login)
                 && ("" != password) )
             {
-                // Create MD5 Hash  
+                // Génère le hash MD5 du mot de passe
+                String          passwordMD5 = ""; // "4df51b1810f131b7f6a794900d93d58e";
                 try
                 {
                     MessageDigest digest = java.security.MessageDigest.getInstance("MD5");  
@@ -138,7 +137,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                     e.printStackTrace();  
                 }
                 
-                Log.d(LOG_TAG, "login=" + login + " password=4df51b1810f131b7f6a794900d93d58e");
+                Log.d(LOG_TAG, "login=Seb password=4df51b1810f131b7f6a794900d93d58e");
                 Log.d(LOG_TAG, "login=" + login + " password=" + passwordMD5);
                 
                 URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_pm_uri) + "?login=" + login + "&password=" + passwordMD5);
@@ -208,9 +207,11 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             e.printStackTrace();
         } catch (SAXException e) {
             e.printStackTrace();
+        } catch (ClassCastException e) {        
+            e.printStackTrace();
         } /* catch (ParseException e) {
             e.printStackTrace();
-        } */        
+        } */
     }
     
     
@@ -249,15 +250,14 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             {
                 // Utilise les préférences pour sauvegarder le login/mot de passe :
                 SharedPreferences   Prefs       = PreferenceManager.getDefaultSharedPreferences(mContext);
-                
-                String              login       = Prefs.getString("PREF_LOGIN",    ""); // "Seb";
-                String              password    = Prefs.getString("PREF_PASSWORD", ""); // "mmdpsjlb";
-                String              passwordMD5 = ""; // "4df51b1810f131b7f6a794900d93d58e";
+                String              login       = Prefs.getString(SJLB.PREFS.LOGIN,    ""); // "Seb";
+                String              password    = Prefs.getString(SJLB.PREFS.PASSWORD, ""); // "mmdpsjlb";
 
                 if (   ("" != login)
                     && ("" != password) )
                 {
-                    // Create MD5 Hash  
+                    // Génère le hash MD5 du mot de passe
+                    String          passwordMD5 = ""; // "4df51b1810f131b7f6a794900d93d58e";
                     try
                     {
                         MessageDigest digest = java.security.MessageDigest.getInstance("MD5");  
@@ -274,7 +274,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                         e.printStackTrace();  
                     }
                     
-                    Log.d(LOG_TAG, "login=" + login + " password=4df51b1810f131b7f6a794900d93d58e");
+                    Log.d(LOG_TAG, "login=Seb password=4df51b1810f131b7f6a794900d93d58e");
                     Log.d(LOG_TAG, "login=" + login + " password=" + passwordMD5);
                     
                     URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_pm_uri) + "?login=" + login + "&password=" + passwordMD5);
@@ -334,6 +334,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             } catch (ParserConfigurationException e) {
                 e.printStackTrace();
             } catch (SAXException e) {
+                e.printStackTrace();
+            } catch (ClassCastException e) {        
                 e.printStackTrace();
             } /* catch (ParseException e) {
                 e.printStackTrace();

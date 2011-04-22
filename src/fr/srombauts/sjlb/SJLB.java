@@ -4,7 +4,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
- * Définitions pour le Content Provider SJLB
+ * Définitions pour le Content Provider et l'application SJLB
  */
 public final class SJLB {
     // Interdiction de l'instanciation
@@ -14,6 +14,36 @@ public final class SJLB {
 
     public static final String DATABASE_NAME       = "SJLB.db";
     public static final int    DATABASE_VERSION    = 1;
+    
+    /**
+     * Clef des préférences
+     */
+    public static final class PREFS {
+        // Interdiction de l'instanciation
+        private PREFS() {}
+
+        /**
+         * La clef stockant le nom d'utilisateur (login)
+         */
+        public static final String LOGIN        = "PREF_LOGIN";
+
+        /**
+         * La clef stockant le mot de passe utilisateur (caché, mais non hashé donc en clair)
+         */
+        public static final String PASSWORD     = "PREF_PASSWORD";
+        
+        /**
+         * La clef activant le rafraichissement automatique cyclique en tache de fond (si non, rafraichissement uniquement au lancement de l'appli)
+         */
+        public static final String AUTO_UPDATE  = "PREF_AUTO_UPDATE";
+
+        /**
+         * La clef spécifiant la fréquence (la période) des rafraichissement automatique le cas échéant
+         */
+        public static final String UPDATE_FREQ  = "PREF_UPDATE_FREQ";
+        
+    }
+    
     
     /**
      * Table des messages privés

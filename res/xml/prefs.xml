@@ -10,8 +10,8 @@
         android:key="PREF_PASSWORD"
         android:title="Pasword"
         android:summary="User password"
-        android:defaultValue=""
         android:password="true"
+        android:defaultValue=""
         />
     <CheckBoxPreference
         android:key="PREF_AUTO_UPDATE"
