@@ -21,6 +21,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -28,10 +29,10 @@ import android.util.Log;
 
 
 class SJLBServiceTask implements Runnable {
-    private static final int     HELLO_ID = 1;
-    private static final String  LOG_TAG  = "SJLBService";
+    private static final int     NOTIFICATION_NEW_MSG_ID    = 1;
+    private static final String  LOG_TAG                    = "SJLBServiceTask";
 
-    private static final long    REFRESH_INTERVAL_NORMAL    = 20*60*1000L;
+    private static final long    REFRESH_INTERVAL_NORMAL    =  5*60*1000L;
     private static final long    REFRESH_INTERVAL_ON_ERROR  =  1*60*1000L;
     
     static final private String NODE_NAME_NB_PRIVATE_MSG    = "nb_pm";
@@ -57,14 +58,15 @@ class SJLBServiceTask implements Runnable {
         bRet = refreshInfos ();
         
         if (bRet) {
-            if (   (mNbPMSaved  != mNbPM)
-                || (mNbMsgSaved != mNbMsg) )
+            // TODO SRO : tests en cours, bidouille à remplacer par une base de données stockant les ID des derniers messages non lus
+            if (   (mNbPMSaved  < mNbPM)
+                || (mNbMsgSaved < mNbMsg) )
             {
                 notifyUser ();
     
-                mNbPMSaved = mNbPM;
-                mNbMsgSaved = mNbMsg;
             }
+            mNbPMSaved  = mNbPM;
+            mNbMsgSaved = mNbMsg;
             
             mServiceHandler.postDelayed(this, REFRESH_INTERVAL_NORMAL);
         }
@@ -77,17 +79,20 @@ class SJLBServiceTask implements Runnable {
     private boolean refreshInfos () {
         boolean bRet = false;
         
+        Log.d(LOG_TAG, "refreshInfos");
+        
         try
         {
             // Etablissement de la connexion http et récupération de la page Web
-            String              quakeFeed       = mContext.getString(R.string.sjlb_uri);
-            URL                 url             = new URL(quakeFeed);
-            URLConnection       connection      = url.openConnection();
+            // TODO SRO : utiliser les préférences pour sauvegarder le login/mot de passe :
+            URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_api_uri) + "?login=Seb&password=4df51b1810f131b7f6a794900d93d58e");
+            URLConnection       connection      = urlAPI.openConnection();
             HttpURLConnection   httpConnection  = (HttpURLConnection)connection;
             
             if (HttpURLConnection.HTTP_OK == httpConnection.getResponseCode()) {
                 // Parse de la page XML
                 InputStream             in  = httpConnection.getInputStream();
+                
                 DocumentBuilderFactory  dbf = DocumentBuilderFactory.newInstance();
                 DocumentBuilder         db  = dbf.newDocumentBuilder();
                 Document                dom = db.parse(in);
@@ -126,6 +131,8 @@ class SJLBServiceTask implements Runnable {
      *  Notifie à l'utilisateur les évolutions du nombre de messages non lus
      */
     private void notifyUser () {
+        Log.d(LOG_TAG, "notifyUser");
+        
         // Get a reference to the NotificationManager:
         String              ns                     = Context.NOTIFICATION_SERVICE;
         NotificationManager mNotificationManager   = (NotificationManager) mContext.getSystemService(ns);
@@ -138,11 +145,12 @@ class SJLBServiceTask implements Runnable {
         Notification notification = new Notification(icon, tickerText, when);
 
         // Define the Notification's expanded message and Intent:
-        Context         context              = mContext.getApplicationContext();
-        CharSequence    contentTitle         = "Unread Messages";
-        CharSequence    contentText          = mNbPM + " private messages and " + mNbMsg + " messages";
-        Intent          notificationIntent   = new Intent(mContext, SJLB.class);
-        PendingIntent   contentIntent        = PendingIntent.getService(mContext, 0, notificationIntent, 0);
+        Context         context             = mContext.getApplicationContext();
+        CharSequence    contentTitle        = "Unread Messages";
+        CharSequence    contentText         = mNbPM + " private messages and " + mNbMsg + " messages";
+
+        Intent          notificationIntent  = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(mContext.getString(R.string.sjlb_forum_uri)));
+        PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
 
         notification.number     = mNbPM + mNbMsg;
         notification.defaults   = Notification.DEFAULT_ALL;
@@ -151,37 +159,38 @@ class SJLBServiceTask implements Runnable {
         notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
 
         // Pass the Notification to the NotificationManager:
-        mNotificationManager.notify(HELLO_ID, notification);
+        mNotificationManager.notify(NOTIFICATION_NEW_MSG_ID, notification);
     }
 }
 
 
 public class SJLBService extends Service {
-    private static final String  LOG_TAG              = "SJLBService";
+    private static final String  LOG_TAG = "SJLBService";
 
     private Handler mServiceHandler = new Handler();
 
   @Override
-  public int onStartCommand(Intent intent, int flags, int startId) {
-    super.onStartCommand(intent, flags, startId);
-    Log.d(LOG_TAG, "onStart");
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+        Log.d(LOG_TAG, "onStartCommand");
+
+        // Création et exécution de la tâche
+        SJLBServiceTask task = new SJLBServiceTask(mServiceHandler, this);
+        mServiceHandler.post(task);
     
-    SJLBServiceTask task = new SJLBServiceTask(mServiceHandler, this);
-    mServiceHandler.post(task);
+        // We want this service to continue running until it is explicitly
+        // stopped, so return sticky.
+        return START_STICKY;
+    }
 
-    // We want this service to continue running until it is explicitly
-    // stopped, so return sticky.
-    return START_STICKY;
-  }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(LOG_TAG, "onDestroy");
+    }
 
-  @Override
-  public void onDestroy() {
-    super.onDestroy();
-    Log.d(LOG_TAG, "onDestroy");
-  }
-
-  @Override
-  public IBinder onBind(Intent intent) {
-    return null;
-  }
+    @Override
+    public IBinder onBind(Intent intent) {
+         return null;
+    }
 }

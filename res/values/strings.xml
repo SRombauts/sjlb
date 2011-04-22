@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World!</string>
-    <string name="app_name">SJLB</string>
-    <string name="sjlb_uri">http://sjlb.dyndns.org/newsjlb/android.php</string>
+    <string name="hello"> Not used </string>
+    <string name="app_name"> SJLB</string>
+    <string name="sjlb_api_uri">    http://sjlb.dyndns.org/newsjlb/android.php      </string>
+    <string name="sjlb_forum_uri">  http://sjlb.dyndns.org/newsjlb/Site/Forum.php   </string>
 </resources>
