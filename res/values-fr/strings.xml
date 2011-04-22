@@ -11,7 +11,8 @@
     <string name="menu_prefs">      Préférences </string>
     <string name="menu_quit">       Quitter </string>
     
-    <string name="refreshing"> En cours de rafraichissement... </string>
+    <string name="refreshing">         En cours de rafraichissement... </string>
+    <string name="refresh_impossible"> Impossible de rafraichir, nécessite login et mot de passe ! </string>
 
     <string name="notification_title_pm">   Nouveau(x) Message(s) Privé(s) </string>
     <string name="notification_title_msg">  Nouveau(x) Post(s) du forum </string>

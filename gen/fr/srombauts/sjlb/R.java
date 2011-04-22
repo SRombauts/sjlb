@@ -38,15 +38,16 @@ public final class R {
         public static final int menu_show_pm=0x7f060003;
         public static final int menu_update=0x7f060005;
         public static final int msg_todo=0x7f060001;
-        public static final int notification_text_msg=0x7f06000d;
-        public static final int notification_text_pm=0x7f06000c;
-        public static final int notification_title_msg=0x7f06000b;
-        public static final int notification_title_pm=0x7f06000a;
+        public static final int notification_text_msg=0x7f06000e;
+        public static final int notification_text_pm=0x7f06000d;
+        public static final int notification_title_msg=0x7f06000c;
+        public static final int notification_title_pm=0x7f06000b;
         public static final int pm_description=0x7f060002;
+        public static final int refresh_impossible=0x7f06000a;
         public static final int refreshing=0x7f060009;
-        public static final int sjlb_forum_uri=0x7f06000e;
-        public static final int sjlb_pm_uri=0x7f060010;
-        public static final int sjlb_polling_uri=0x7f06000f;
+        public static final int sjlb_forum_uri=0x7f06000f;
+        public static final int sjlb_pm_uri=0x7f060011;
+        public static final int sjlb_polling_uri=0x7f060010;
     }
     public static final class xml {
         public static final int prefs=0x7f040000;

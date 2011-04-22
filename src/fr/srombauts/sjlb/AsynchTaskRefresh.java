@@ -76,6 +76,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     }
 
     protected void onPreExecute() {
+        // SRO : comme on tourne dans un service en tache de fond, on ne veut pas gêner l'utilisateur avec une notification
         // Toast notification de début de rafraichissement (pour le debug uniquement !)
         // Toast.makeText(mContext, mContext.getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
     }
@@ -91,7 +92,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         // Recherche d'éventuelles nouveautés
         refreshInfos ();
         
-        // Notifications des éventuelles nouveautés
+        // Notifications des éventuelles nouveautés par appel à onProgressUpdate()
         publishProgress ();
         
         // et récupération de ces éventuels nouveaux contenus
@@ -112,16 +113,16 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         
         try
         {
-            // Utilise les préférences pour sauvegarder le login/mot de passe :
+            // Utilise les préférences pour récupérer le login/mot de passe :
             SharedPreferences   Prefs       = PreferenceManager.getDefaultSharedPreferences(mContext);
-            String              login       = Prefs.getString(SJLB.PREFS.LOGIN,    ""); // "Seb";
-            String              password    = Prefs.getString(SJLB.PREFS.PASSWORD, ""); // "mmdpsjlb";
+            String              login       = Prefs.getString(SJLB.PREFS.LOGIN,    "");
+            String              password    = Prefs.getString(SJLB.PREFS.PASSWORD, "");
 
             if (   (false == login.contentEquals(""))
                 && (false == password.contentEquals("")) )
             {
                 // Génère le hash MD5 du mot de passe
-                String          passwordMD5 = ""; // "4df51b1810f131b7f6a794900d93d58e";
+                String          passwordMD5 = "";
                 try
                 {
                     MessageDigest digest = java.security.MessageDigest.getInstance("MD5");  
@@ -180,7 +181,16 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             }
                         }
                     }
-                    // TODO SRO : détecter aussi les cas où l'on dispose de PLUS de PM en local qu'il n'en reste sur le site !
+                    // Détection du cas où l'on dispose de PLUS de PM en BDD locale qu'il n'en reste sur le site !
+                    if (0 == mNbNewPM )
+                    {
+                        int nbPMInBdd = (int)mPMDBAdapter.countPM();
+                        if (mNbPM < nbPMInBdd)
+                        {
+                            // nombre négatif !
+                            mNbNewPM = mNbPM - nbPMInBdd;
+                        }
+                    }
                     
                     // Récupère la liste des Messages
                     Element     eltMsg  = (Element)docElement.getElementsByTagName(NODE_NAME_FORUM_MSG).item(0);
@@ -228,12 +238,13 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     protected void onProgressUpdate(Void... values) {
       super.onProgressUpdate(values);
       
-      // s'il y a de nouveaux messages non lus :
+      // s'il y a de nouveaux PM :
       if (0 < mNbNewPM)
       {
           // Notification dans la barre de status
           notifyUserPM ();
       }
+      // s'il y a de nouveaux messages non lus :
       if (0 < mNbNewMsg)
       {
           // Notification dans la barre de status
@@ -248,22 +259,21 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     void fetchPM () {
         Log.d(LOG_TAG, "fetchPM...");
         
-        // s'il y a de nouveaux messages non lus :
-        // TODO SRO : pas bon, il faut aussi le faire lorsqu'il y a MOINS de messages que la fois précédentes !
-        if (0 < mNbNewPM)
+        // s'il y a de nouveaux PM (ou au contraire s'il y en a moins) :
+        if (0 != mNbNewPM)
         {
             try
             {
-                // Utilise les préférences pour sauvegarder le login/mot de passe :
+                // Utilise les préférences pour récupérer le login/mot de passe :
                 SharedPreferences   Prefs       = PreferenceManager.getDefaultSharedPreferences(mContext);
-                String              login       = Prefs.getString(SJLB.PREFS.LOGIN,    ""); // "Seb";
-                String              password    = Prefs.getString(SJLB.PREFS.PASSWORD, ""); // "mmdpsjlb";
+                String              login       = Prefs.getString(SJLB.PREFS.LOGIN,    "");
+                String              password    = Prefs.getString(SJLB.PREFS.PASSWORD, "");
 
                 if (   (false == login.contentEquals(""))
                     && (false == password.contentEquals("")) )
                 {
                     // Génère le hash MD5 du mot de passe
-                    String          passwordMD5 = ""; // "4df51b1810f131b7f6a794900d93d58e";
+                    String          passwordMD5 = "";
                     try
                     {
                         MessageDigest digest = java.security.MessageDigest.getInstance("MD5");  

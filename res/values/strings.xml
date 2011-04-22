@@ -13,7 +13,8 @@
     <string name="menu_prefs">      Preferences </string>
     <string name="menu_quit">       Quit </string>
     
-    <string name="refreshing"> Refreshing... </string>
+    <string name="refreshing">         Refreshing... </string>
+    <string name="refresh_impossible"> Unable to refresh, need login/password ! </string>
 
     <string name="notification_title_pm"> Unread Private Messages </string>
     <string name="notification_title_msg"> Unread Post Messages </string>

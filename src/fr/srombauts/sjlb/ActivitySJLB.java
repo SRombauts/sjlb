@@ -3,7 +3,9 @@ package fr.srombauts.sjlb;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -67,10 +69,24 @@ public class ActivitySJLB extends Activity {
                 break;
             }*/
             case (MENU_ID_UPDATE): {
-                // Toast notification de début de rafraichissement (pour le debug uniquement !)
-                Toast.makeText(this, getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
-                // TODO voir si c'est la meilleurs manière de faire...
-                startService ();
+                // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
+                SharedPreferences   Prefs       = PreferenceManager.getDefaultSharedPreferences(this);
+                String              login       = Prefs.getString(SJLB.PREFS.LOGIN,    "");
+                String              password    = Prefs.getString(SJLB.PREFS.PASSWORD, "");
+
+                if (   (false == login.contentEquals(""))
+                    && (false == password.contentEquals("")) )
+                {
+                    // Toast notification de début de rafraichissement
+                    Toast.makeText(this, getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
+                    // TODO voir si c'est la meilleurs manière de faire...
+                    startService ();
+                }
+                else
+                {
+                    // Toast notification signalant l'absence de login/password
+                    Toast.makeText(this, getString(R.string.refresh_impossible), Toast.LENGTH_SHORT).show();
+                }
                 break;
             }
             case (MENU_ID_RESET): {
@@ -98,6 +114,7 @@ public class ActivitySJLB extends Activity {
     /**
      * Lance le service de rafraichissemment, si pas déjà lancé
      */
+    // TODO SRO : mutualiser ce code qu'on retrouve partout exactement à l'identique (et encore heureux !)
     private void startService () {
         Intent  intentService = new Intent();
         intentService.setClassName( "fr.srombauts.sjlb", "fr.srombauts.sjlb.ServiceRefresh");

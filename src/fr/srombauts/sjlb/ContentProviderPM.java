@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.net.Uri;
 
@@ -151,4 +152,9 @@ public class ContentProviderPM extends ContentProvider {
         return cursor;
     }
 
+    // compte les PM
+    public long countPM () {
+        return DatabaseUtils.queryNumEntries(mDBHelper.getReadableDatabase(), SJLB.PM.TABLE_NAME);
+    }
+    
 }

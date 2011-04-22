@@ -42,6 +42,7 @@ public class IntentReceiverStartService extends BroadcastReceiver {
     /**
      * Lance le service de rafraichissemment, si pas déjà lancé
      */
+    // TODO SRO : mutualiser ce code qu'on retrouve partout exactement à l'identique (et encore heureux !)
     private void startService (Context context) {
         Intent  intentService = new Intent();
         intentService.setClassName( "fr.srombauts.sjlb", "fr.srombauts.sjlb.ServiceRefresh");
