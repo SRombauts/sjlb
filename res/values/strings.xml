@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello"> Not used </string>
-    <string name="app_name"> SJLB</string>
-    <string name="sjlb_api_uri">    http://sjlb.dyndns.org/newsjlb/android.php      </string>
+    <string name="app_name"> SJLB </string>
+
+    <string name="notification_title"> Unread Messages </string>
+    <string name="notification_text_1"> new pm and </string>
+    <string name="notification_text_2"> new unread message(s) </string>
+    
     <string name="sjlb_forum_uri">  http://sjlb.dyndns.org/newsjlb/Site/Forum.php   </string>
+    
+    <string name="sjlb_polling_uri">    http://sjlb.dyndns.org/newsjlb/Android/Polling.php      </string>
+    <string name="sjlb_pm_uri">         http://sjlb.dyndns.org/newsjlb/Android/PrivateMessages.php      </string>
 </resources>

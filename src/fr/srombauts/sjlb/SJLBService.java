@@ -13,6 +13,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import android.app.Notification;
@@ -32,41 +33,47 @@ class SJLBServiceTask implements Runnable {
     private static final int     NOTIFICATION_NEW_MSG_ID    = 1;
     private static final String  LOG_TAG                    = "SJLBServiceTask";
 
-    private static final long    REFRESH_INTERVAL_NORMAL    =  5*60*1000L;
+    private static final long    REFRESH_INTERVAL_NORMAL    =  10*60*1000L;
     private static final long    REFRESH_INTERVAL_ON_ERROR  =  1*60*1000L;
     
-    static final private String NODE_NAME_NB_PRIVATE_MSG    = "nb_pm";
-    static final private String NODE_NAME_NB_MSG            = "nb_msg";
-                        
+    static final private String NODE_NAME_LOGIN_ID          = "id_login";
+    static final private String NODE_NAME_PRIVATE_MSG       = "pm";
+    static final private String NODE_NAME_PRIVATE_MSG_ID    = "id";
+    static final private String NODE_NAME_FORUM_MSG         = "msg";
+    static final private String NODE_NAME_FORUM_MSG_ID      = "id";
+
     private Context mContext        = null;
     private Handler mServiceHandler = null;
+    private int     mIdLogin        = 0;
     private int     mNbPM           = 0;
-    private int     mNbPMSaved      = 0;
+    private int     mNbNewPM        = 0;
     private int     mNbMsg          = 0;
-    private int     mNbMsgSaved     = 0;
-  
+    private int     mNbNewMsg       = 0;
+
+    private SJLBDBAdapter mSJLBDBAdapter;
+      
     public SJLBServiceTask(Handler serviceHandler, Context context) {
-        this.mServiceHandler  = serviceHandler;
-        this.mContext         = context;
+        this.mServiceHandler    = serviceHandler;
+        this.mContext           = context;
+                                
+        mSJLBDBAdapter          = new SJLBDBAdapter(context);
+        mSJLBDBAdapter.open();
     }
 
     public void run() {
         boolean bRet;
         
         Log.d(LOG_TAG, "run");
-
+        
         bRet = refreshInfos ();
         
         if (bRet) {
             // TODO SRO : tests en cours, bidouille à remplacer par une base de données stockant les ID des derniers messages non lus
-            if (   (mNbPMSaved  < mNbPM)
-                || (mNbMsgSaved < mNbMsg) )
+            if (   (0 < mNbNewPM)
+                || (0 < mNbNewMsg) )
             {
                 notifyUser ();
-    
             }
-            mNbPMSaved  = mNbPM;
-            mNbMsgSaved = mNbMsg;
             
             mServiceHandler.postDelayed(this, REFRESH_INTERVAL_NORMAL);
         }
@@ -80,12 +87,15 @@ class SJLBServiceTask implements Runnable {
         boolean bRet = false;
         
         Log.d(LOG_TAG, "refreshInfos");
+
+        mNbNewPM    = 0;
+        mNbNewMsg   = 0;
         
         try
         {
             // Etablissement de la connexion http et récupération de la page Web
             // TODO SRO : utiliser les préférences pour sauvegarder le login/mot de passe :
-            URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_api_uri) + "?login=Seb&password=4df51b1810f131b7f6a794900d93d58e");
+            URL                 urlAPI          = new URL(mContext.getString(R.string.sjlb_polling_uri) + "?login=Seb&password=4df51b1810f131b7f6a794900d93d58e");
             URLConnection       connection      = urlAPI.openConnection();
             HttpURLConnection   httpConnection  = (HttpURLConnection)connection;
             
@@ -98,15 +108,48 @@ class SJLBServiceTask implements Runnable {
                 Document                dom = db.parse(in);
                 Element                 docElement = dom.getDocumentElement();
                 
-                // Récupère le nombre de PM
-                Element eltNbPM = (Element)docElement.getElementsByTagName(NODE_NAME_NB_PRIVATE_MSG).item(0);
-                String  strNbPM = eltNbPM.getFirstChild().getNodeValue();
-                mNbPM = Integer.parseInt(strNbPM);
+                // Récupère l'id de l'utilsateur loggé
+                Element eltIdLogin  = (Element)docElement.getElementsByTagName(NODE_NAME_LOGIN_ID).item(0);
+                String  strIdLogin  = eltIdLogin.getFirstChild().getNodeValue();
+                mIdLogin            = Integer.parseInt(strIdLogin);
                 
-                // Récupère le nombre de Messages
-                Element eltNbMsg = (Element)docElement.getElementsByTagName(NODE_NAME_NB_MSG).item(0);
-                String  strNbMsg = eltNbMsg.getFirstChild().getNodeValue();
-                mNbMsg = Integer.parseInt(strNbMsg);
+                // Récupère la liste des PM
+                Element     eltPM  = (Element)docElement.getElementsByTagName(NODE_NAME_PRIVATE_MSG).item(0);
+                NodeList    listPM = eltPM.getElementsByTagName(NODE_NAME_PRIVATE_MSG_ID);
+                if (null != listPM)
+                {
+                    mNbPM = listPM.getLength();
+                    for (int i = 0; i < mNbPM; i++) {
+                        Element pm      = (Element)listPM.item(i);
+                        String  strIdPM = pm.getFirstChild().getNodeValue();
+                        int     idPM    = Integer.parseInt(strIdPM);
+                        
+                        // Renseigne la bdd si PM inconnu
+                        long nbInserted = mSJLBDBAdapter.insertPM(idPM);
+                        if (-1 != nbInserted) {
+                            mNbNewPM++;
+                        }
+                    }
+                }
+                
+                // Récupère la liste des Messages
+                Element     eltMsg  = (Element)docElement.getElementsByTagName(NODE_NAME_FORUM_MSG).item(0);
+                NodeList    listMsg = eltMsg.getElementsByTagName(NODE_NAME_FORUM_MSG_ID);
+                if (null != listMsg)
+                {
+                    mNbMsg = listMsg.getLength();
+                    for (int i = 0; i < mNbMsg; i++) {
+                        Element pm      = (Element)listMsg.item(i);
+                        String  strIdMsg = pm.getFirstChild().getNodeValue();
+                        int     idMsg    = Integer.parseInt(strIdMsg);
+                        
+                        // Renseigne la bdd si Message inconnu
+                        long nbInserted = mSJLBDBAdapter.insertMsg(idMsg);
+                        if (-1 != nbInserted) {
+                            mNbNewMsg++;
+                        }
+                    }
+                }
                 
                 bRet = true;
             }
@@ -139,20 +182,20 @@ class SJLBServiceTask implements Runnable {
 
         // Instantiate the Notification:
         int          icon        = android.R.drawable.stat_notify_sync;
-        CharSequence tickerText  = "SJLB";
+        CharSequence tickerText  = mContext.getString(R.string.app_name) + ": " + mContext.getString(R.string.notification_title);
         long         when        = System.currentTimeMillis();
 
         Notification notification = new Notification(icon, tickerText, when);
 
         // Define the Notification's expanded message and Intent:
         Context         context             = mContext.getApplicationContext();
-        CharSequence    contentTitle        = "Unread Messages";
-        CharSequence    contentText         = mNbPM + " private messages and " + mNbMsg + " messages";
+        CharSequence    contentTitle        = mContext.getString(R.string.notification_title);
+        CharSequence    contentText         = mNbNewPM + " " + mContext.getString(R.string.notification_text_1) + " " + mNbNewMsg + " " + mContext.getString(R.string.notification_text_2);
 
         Intent          notificationIntent  = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(mContext.getString(R.string.sjlb_forum_uri)));
         PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
 
-        notification.number     = mNbPM + mNbMsg;
+        notification.number     = mNbNewPM + mNbNewMsg;
         notification.defaults   = Notification.DEFAULT_ALL;
         notification.vibrate    = new long[]{200, 200};
         
@@ -176,6 +219,7 @@ public class SJLBService extends Service {
 
         // Création et exécution de la tâche
         SJLBServiceTask task = new SJLBServiceTask(mServiceHandler, this);
+        // TODO SRO : tests en cours
         mServiceHandler.post(task);
     
         // We want this service to continue running until it is explicitly
