@@ -5,8 +5,10 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 
@@ -26,14 +28,25 @@ public class ServiceRefresh extends Service {
      * Lancement de l'alarme périodique
      */
     public void onCreate() {
+        // Récupère dans les préférences les valeurs de rafraichissement  :
+        SharedPreferences   prefs           = PreferenceManager.getDefaultSharedPreferences(this);
+        Boolean             bAutoUpdate     = prefs.getBoolean(SJLB.PREFS.AUTO_UPDATE,      true);
+        String              freqUpdate      = prefs.getString(SJLB.PREFS.UPDATE_FREQ,       "900");   // 15 min
+        long                freqUpdateMs    = Long.parseLong(freqUpdate) * 1000;
+        
         String ALARM_ACTION = IntentReceiverStartService.ACTION_REFRESH_ALARM;
         Intent intentToFire = new Intent(ALARM_ACTION);
         mAlarmIntent    = PendingIntent.getBroadcast(this, 0, intentToFire, 0);
         mAlarmManager   = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
         // Lancement de l'alarme périodique  :
-        // - imprécise car plus économique,
+        // - imprécise car plus économique, /*AlarmManager.INTERVAL_FIFTEEN_MINUTES == 900000*/
         // - et pas ELAPSED_REALTIME_WAKEUP car ainsi n'utilise que les réveils  demandés par d'autres applis (gmail...)
-        mAlarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 0, AlarmManager.INTERVAL_FIFTEEN_MINUTES, mAlarmIntent);
+        if (false == bAutoUpdate)
+        {
+            // Si pas d'update automatique, l'alarme n'est pas répétée
+            freqUpdateMs = 0;
+        }
+        mAlarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 0, freqUpdateMs, mAlarmIntent);
     }    
 
     /**

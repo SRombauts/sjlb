@@ -9,6 +9,7 @@ package fr.srombauts.sjlb;
 
 public final class R {
     public static final class array {
+        public static final int category_labels=0x7f050002;
         public static final int update_freq_options=0x7f050000;
         public static final int update_freq_values=0x7f050001;
     }
@@ -19,10 +20,12 @@ public final class R {
         public static final int status_icon=0x7f020001;
     }
     public static final class id {
-        public static final int pmAuthor=0x7f070000;
-        public static final int pmDate=0x7f070001;
-        public static final int pmText=0x7f070002;
-        public static final int privateMessagesListView=0x7f070003;
+        public static final int categoriesListView=0x7f070000;
+        public static final int pmAuthor=0x7f070002;
+        public static final int pmDate=0x7f070003;
+        public static final int pmText=0x7f070004;
+        public static final int privateMessagesListView=0x7f070005;
+        public static final int versionView=0x7f070001;
     }
     public static final class layout {
         public static final int main=0x7f030000;
@@ -31,23 +34,24 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f060000;
+        public static final int button_show_pm=0x7f060002;
         public static final int menu_prefs=0x7f060007;
         public static final int menu_quit=0x7f060008;
         public static final int menu_reset=0x7f060006;
         public static final int menu_show_msg=0x7f060004;
         public static final int menu_show_pm=0x7f060003;
         public static final int menu_update=0x7f060005;
-        public static final int msg_todo=0x7f060001;
         public static final int notification_text_msg=0x7f06000e;
         public static final int notification_text_pm=0x7f06000d;
         public static final int notification_title_msg=0x7f06000c;
         public static final int notification_title_pm=0x7f06000b;
-        public static final int pm_description=0x7f060002;
+        public static final int pm_description=0x7f060001;
         public static final int refresh_impossible=0x7f06000a;
         public static final int refreshing=0x7f060009;
+        public static final int sjlb_forum_cat_uri=0x7f060010;
         public static final int sjlb_forum_uri=0x7f06000f;
-        public static final int sjlb_pm_uri=0x7f060011;
-        public static final int sjlb_polling_uri=0x7f060010;
+        public static final int sjlb_pm_uri=0x7f060012;
+        public static final int sjlb_polling_uri=0x7f060011;
     }
     public static final class xml {
         public static final int prefs=0x7f040000;

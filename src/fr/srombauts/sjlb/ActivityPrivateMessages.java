@@ -120,9 +120,9 @@ public class ActivityPrivateMessages extends Activity {
             case (MENU_ID_UPDATE): {
                 // TODO SRO : utiliser une méthode unique au lieu de dupliquer le code ainsi
                 // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
-                SharedPreferences   Prefs       = PreferenceManager.getDefaultSharedPreferences(this);
-                String              login       = Prefs.getString(SJLB.PREFS.LOGIN,    "");
-                String              password    = Prefs.getString(SJLB.PREFS.PASSWORD, "");
+                SharedPreferences   prefs       = PreferenceManager.getDefaultSharedPreferences(this);
+                String              login       = prefs.getString(SJLB.PREFS.LOGIN,    "");
+                String              password    = prefs.getString(SJLB.PREFS.PASSWORD, "");
 
                 if (   (false == login.contentEquals(""))
                     && (false == password.contentEquals("")) )
@@ -130,7 +130,7 @@ public class ActivityPrivateMessages extends Activity {
                     // Toast notification de début de rafraichissement
                     Toast.makeText(this, getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
                     // TODO voir si c'est la meilleurs manière de faire...
-                    startService ();
+                    IntentReceiverStartService.startService (this, LOG_TAG);
                 }
                 else
                 {
@@ -199,17 +199,4 @@ public class ActivityPrivateMessages extends Activity {
         }        
     }
 
-    /**
-     * Lance le service de rafraichissemment, si pas déjà lancé
-     */
-    // TODO SRO : mutualiser ce code qu'on retrouve partout exactement à l'identique (et encore heureux !)
-    private void startService () {
-        Intent  intentService = new Intent();
-        intentService.setClassName( "fr.srombauts.sjlb", "fr.srombauts.sjlb.ServiceRefresh");
-        ComponentName cname = startService(intentService);
-        if (cname == null)
-            Log.e(LOG_TAG, "SJLB Service was not started");
-        else
-            Log.d(LOG_TAG, "SJLB Service started");
-    }
 }

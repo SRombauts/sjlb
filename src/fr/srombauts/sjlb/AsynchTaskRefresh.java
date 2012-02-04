@@ -394,14 +394,13 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         // Define the Notification's expanded message and Intent:
         Context         context             = mContext.getApplicationContext();
         CharSequence    contentTitle        = mContext.getString(R.string.notification_title_pm);
-        // TODO SRO : faire le cumul avec les chiffres de l'éventuelle notification déjà actuellement affichée 
-        CharSequence    contentText         = mNbNewPM + " " + mContext.getString(R.string.notification_text_pm);
+        CharSequence    contentText         = mNbPM + " " + mContext.getString(R.string.notification_text_pm);
 
         // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
         Intent          notificationIntent  = new Intent(mContext, ActivityPrivateMessages.class);
         PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
 
-        notification.number     = mNbNewPM;
+        notification.number     = mNbPM;
         notification.defaults   = Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND;
         notification.vibrate    = new long[]{0, 200, 500, 200};
 
@@ -431,13 +430,12 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         // Define the Notification's expanded message and Intent:
         Context         context             = mContext.getApplicationContext();
         CharSequence    contentTitle        = mContext.getString(R.string.notification_title_msg);
-        // TODO SRO : faire le cumul avec les chiffres de l'éventuelle notification déjà actuellement affichée 
-        CharSequence    contentText         = mNbNewMsg + " " + mContext.getString(R.string.notification_text_msg);
+        CharSequence    contentText         = mNbMsg + " " + mContext.getString(R.string.notification_text_msg);
 
         Intent          notificationIntent  = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(mContext.getString(R.string.sjlb_forum_uri)));
         PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
 
-        notification.number     = mNbNewMsg;
+        notification.number     = mNbMsg;
         notification.defaults   = Notification.DEFAULT_LIGHTS + Notification.DEFAULT_SOUND;
         notification.vibrate    = new long[]{0, 200, 300, 200, 300, 200};
         

@@ -35,21 +35,20 @@ public class IntentReceiverStartService extends BroadcastReceiver {
         else if (   ("android.intent.action.BOOT_COMPLETED".equals(action))
                  || (ACTION_REFRESH_ALARM.equals(action)) )
         {
-            startService(context);
+            startService(context, LOG_TAG);
         }
     }
 
     /**
      * Lance le service de rafraichissemment, si pas déjà lancé
      */
-    // TODO SRO : mutualiser ce code qu'on retrouve partout exactement à l'identique (et encore heureux !)
-    private void startService (Context context) {
+    public static void startService (Context context, String aLogTag) {
         Intent  intentService = new Intent();
         intentService.setClassName( "fr.srombauts.sjlb", "fr.srombauts.sjlb.ServiceRefresh");
         ComponentName cname = context.startService(intentService);
         if (cname == null)
-            Log.e(LOG_TAG, "SJLB Service was not started");
+            Log.e(aLogTag, "SJLB Service was not started");
         else
-            Log.d(LOG_TAG, "SJLB Service started");
+            Log.d(aLogTag, "SJLB Service started");
     }
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="msg_todo"> Utilisez le menu </string>
-
     <string name="pm_description">  Messages Privés </string>
+
+    <string name="button_show_pm">  Messages Privés </string>
 
     <string name="menu_update">     Rafraîchir </string>
     <string name="menu_show_pm">    Messages privés </string>

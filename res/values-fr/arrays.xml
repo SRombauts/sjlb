@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="update_freq_options">
-        <item>15 minutes</item>
-        <item>half hour</item>
-        <item>hour</item>
-        <item>half day</item>
-        <item>day</item>
+        <item>quinze minutes</item>
+        <item>une demi-heure</item>
+        <item>une heure</item>
+        <item>une demi-journée</item>
+        <item>un jour</item>
     </string-array>
     <string-array name="update_freq_values">
         <item>900</item>
@@ -16,10 +16,10 @@
     </string-array>
 
     <string-array name="category_labels">
-        <item>Personnal information</item>
-        <item>Parties and week-end</item>
-        <item>SJLB Web Site</item>
-        <item>Computing Expertise</item>
-        <item>Computing for Newbies</item>
+        <item>Informations personnelles</item>
+        <item>Soirées et week-end</item>
+        <item>Site Web SJLB</item>
+        <item>Expertise Informatique</item>
+        <item>Informatique pour les nuls</item>
     </string-array>
 </resources>

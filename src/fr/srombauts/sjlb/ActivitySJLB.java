@@ -1,15 +1,25 @@
 package fr.srombauts.sjlb;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
 
 /**
@@ -25,13 +35,41 @@ public class ActivitySJLB extends Activity {
     static final private int MENU_ID_RESET      = Menu.FIRST + 3;
     static final private int MENU_ID_PREFS      = Menu.FIRST + 4;
     static final private int MENU_ID_QUIT       = Menu.FIRST + 5;
+
+    // Liste des catégories du forum
+    private ListView        mCategoriesListView = null;
+    ArrayAdapter<String>    mAA;
+    ArrayList<String>       mCategories = new ArrayList<String>();
+    
     
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        // bind la liste des catégories
+        mCategoriesListView     = (ListView)findViewById(R.id.categoriesListView);        
+        TextView    VersionView = (TextView)findViewById(R.id.versionView);
+        
+        // Lit les informations de version du package courant
+        PackageManager  manager = getPackageManager();
+        PackageInfo     info    = null;
+        try {
+            info = manager.getPackageInfo(getPackageName(), 0);
+            VersionView.setText("version " + info.versionName);
+        } catch (NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        
+        mCategoriesListView.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView adpter, View view, int index, long arg3) {
+                // Lance un intent correspondant à la catégorie du forum
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_cat_uri)+(index+1)));
+                startActivity(intent);                
+            }
+        });
+      
         // Lance le service, si pas déjà lancé, et provoque un rafraichissement
-        startService ();
+        IntentReceiverStartService.startService (this, LOG_TAG);
     }
 
     /**
@@ -62,17 +100,20 @@ public class ActivitySJLB extends Activity {
                 startActivity(intent);
                 break;
             }
-            /* TODO à complèter
             case (MENU_ID_SHOW_MSG): {
+                // TODO lien temporaire : à implémenter correctement
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_uri)));
+                startActivity(intent);                
+                /*
                 Intent intent = new Intent(this, SJLBForumMessages.class);
-
+                */
                 break;
-            }*/
+            }
             case (MENU_ID_UPDATE): {
                 // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
-                SharedPreferences   Prefs       = PreferenceManager.getDefaultSharedPreferences(this);
-                String              login       = Prefs.getString(SJLB.PREFS.LOGIN,    "");
-                String              password    = Prefs.getString(SJLB.PREFS.PASSWORD, "");
+                SharedPreferences   prefs       = PreferenceManager.getDefaultSharedPreferences(this);
+                String              login       = prefs.getString(SJLB.PREFS.LOGIN,    "");
+                String              password    = prefs.getString(SJLB.PREFS.PASSWORD, "");
 
                 if (   (false == login.contentEquals(""))
                     && (false == password.contentEquals("")) )
@@ -80,7 +121,7 @@ public class ActivitySJLB extends Activity {
                     // Toast notification de début de rafraichissement
                     Toast.makeText(this, getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
                     // TODO voir si c'est la meilleurs manière de faire...
-                    startService ();
+                    IntentReceiverStartService.startService (this, LOG_TAG);
                 }
                 else
                 {
@@ -111,17 +152,8 @@ public class ActivitySJLB extends Activity {
         return true;
     }
 
-    /**
-     * Lance le service de rafraichissemment, si pas déjà lancé
-     */
-    // TODO SRO : mutualiser ce code qu'on retrouve partout exactement à l'identique (et encore heureux !)
-    private void startService () {
-        Intent  intentService = new Intent();
-        intentService.setClassName( "fr.srombauts.sjlb", "fr.srombauts.sjlb.ServiceRefresh");
-        ComponentName cname = startService(intentService);
-        if (cname == null)
-            Log.e(LOG_TAG, "SJLB Service was not started");
-        else
-            Log.d(LOG_TAG, "SJLB Service started");
+    public void onShowPM (View v) {
+        Intent intent = new Intent(this, ActivityPrivateMessages.class);
+        startActivity(intent);        
     }
 }
