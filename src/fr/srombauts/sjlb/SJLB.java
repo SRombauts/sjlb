@@ -11,7 +11,7 @@ public final class SJLB {
     private SJLB() {}
 
     public static final String DATABASE_NAME        = "SJLB.db";
-    public static final int    DATABASE_VERSION     = 2;
+    public static final int    DATABASE_VERSION     = 3;
     
     /**
      * Clef des préférences
@@ -105,7 +105,7 @@ public final class SJLB {
         /**
          * The default sort order for this table
          */
-        public static final String  DEFAULT_SORT_ORDER  = "modified DESC";
+        public static final String  DEFAULT_SORT_ORDER  = "_id ASC";
 
         /**
          * L'id du PM
@@ -115,7 +115,7 @@ public final class SJLB {
         
         /**
          * Date en secondes depuis le 1er janvier 1970
-         * <P>Type: INTEGER (System.curentTimeMillis()/1000)</P>
+         * <P>Type: TEXT</P>
          */
         public static final String  DATE                = "date";
 
@@ -138,6 +138,85 @@ public final class SJLB {
         public static final String  TEXT                = "text";
     }
     
+    /**
+     * Table des sujets du forum
+     */
+    public static final class Subj implements BaseColumns {
+        // Interdiction de l'instanciation
+        private Subj() {}
+
+        public static final String  TABLE_NAME   = "forum_subjects";
+
+        /**
+         * L'autorité identifiant de manière unique le content provider
+         */        
+        public static final String  AUTHORITY            = "fr.srombauts.sjlb.subj";
+        /**
+         * The content:// style URL for this table
+         */
+        public static final Uri     CONTENT_URI         = Uri.parse("content://" + AUTHORITY + "/subj");
+
+        /**
+         * The MIME type of {@link #CONTENT_URI} providing a directory of notes.
+         */
+        public static final String  CONTENT_TYPE        = "vnd.android.cursor.dir/sjlb.subj";
+
+        /**
+         * The MIME type of a {@link #CONTENT_URI} sub-directory of a single note.
+         */
+        public static final String  CONTENT_ITEM_TYPE   = "vnd.android.cursor.item/sjlb.subj";
+
+        /**
+         * Le matcher d'URI pour tous les Subj
+         */
+        public static final String  MATCHER_ALL         = "subj";
+
+        /**
+         * Le matcher d'URI pour un Subj
+         */
+        public static final String  MATCHER_ONE         = "subj/#";
+
+        /**
+         * Le matcher d'URI pour un live folder de Subj
+         */
+        public static final String  MATCHER_LIVE_FOLDER = "live_folders/subj";
+        
+        /**
+         * The default sort order for this table
+         */
+        public static final String  DEFAULT_SORT_ORDER  = "last_date DESC";
+
+        /**
+         * L'id du PM
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  ID                  = "_id";
+        
+        /**
+         * L'id de la catégorie de ratachement du sujet
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  CAT_ID              = "category_id";
+        
+        /**
+         * L'id du groupe d'utilisateur ayant les droits sur ce sujet
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  GROUP_ID            = "group_id";
+        
+        /**
+         * La date de dernier message du sujet
+         * <P>Type: DATE</P>
+         */
+        public static final String  LAST_DATE           = "last_date";
+        
+        /**
+         * Le texte du PM
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  TEXT                = "text";
+    }
+
 
     /**
      * Table des messages du forum
@@ -185,28 +264,40 @@ public final class SJLB {
         /**
          * The default sort order for this table
          */
-        public static final String  DEFAULT_SORT_ORDER  = "modified DESC";
+        public static final String  DEFAULT_SORT_ORDER  = "date ASC";
 
         /**
-         * L'id du PM
+         * L'id du Msg
          * <P>Type: INTEGER</P>
          */
         public static final String  ID                  = "_id";
         
         /**
          * Date en secondes depuis le 1er janvier 1970
-         * <P>Type: INTEGER (System.curentTimeMillis()/1000)</P>
+         * <P>Type: TEXT</P>
          */
         public static final String  DATE                = "date";
 
         /**
-         * L'auteur/expéditeur du PM
+         * L'auteur/expéditeur du Msg
          * <P>Type: TEXT</P>
          */
         public static final String  AUTHOR              = "author";
 
         /**
-         * Le texte du PM
+         * L'id de l'auteur/expéditeur du Msg
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  AUTHOR_ID           = "author_id";
+
+        /**
+         * L'id de le sujet auquel s'applique le Msg
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  SUBJECT_ID          = "subject_id";
+
+        /**
+         * Le texte du Msg
          * <P>Type: INTEGER</P>
          */
         public static final String  TEXT                = "text";
@@ -259,7 +350,7 @@ public final class SJLB {
         /**
          * The default sort order for this table
          */
-        public static final String  DEFAULT_SORT_ORDER  = "modified DESC";
+        public static final String  DEFAULT_SORT_ORDER  = "_id ASC";
 
         /**
          * L'id de l'utilisateur

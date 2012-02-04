@@ -15,7 +15,7 @@ public class PrivateMessage {
     private String  mText;
 
     public PrivateMessage(int aId, Date aDate, int aAuthorId, String aAuthor, String aText) {
-        SimpleDateFormat    sdf         = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+        SimpleDateFormat    sdf         = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         String              dateString  = sdf.format(aDate);
 
         mId         = aId;

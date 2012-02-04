@@ -3,12 +3,13 @@ package fr.srombauts.sjlb;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,18 +27,19 @@ import android.widget.AdapterView.OnItemClickListener;
  * @author 27/06/2010 srombauts
  */
 public class ActivitySJLB extends Activity {
-    private static final String LOG_TAG = "SJLBMain";
+    private static final String LOG_TAG = "ActivitySJLB";
 
     // Liste des catégories du forum
     private ListView        mCategoriesListView = null;
     ArrayAdapter<String>    mAA;
     ArrayList<String>       mCategories = new ArrayList<String>();
     
-    
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Layout de l'activité
         setContentView(R.layout.main);
-
+        
         // binding de la liste des catégories et du champ de version
         mCategoriesListView     = (ListView)findViewById(R.id.categoriesListView);        
         TextView    VersionView = (TextView)findViewById(R.id.versionView);
@@ -56,13 +58,24 @@ public class ActivitySJLB extends Activity {
             @SuppressWarnings("unchecked")
             public void onItemClick(AdapterView adpter, View view, int index, long arg3) {
                 // Lance un intent correspondant à la catégorie du forum
-                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_cat_uri)+(index+1)));
-                startActivity(intent);                
+                // TODO SRO temporaire : implémenter le lien vers l'activité listant les sujets
+                //Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_cat_uri)+(index+1)));
+                //startActivity(intent);
+                // Lance l'activité correspondante avec en paramètre l'id de la catégorie :
+                Intent intent = new Intent(getContext(), ActivityForumSubjects.class);
+                long selectedCategoryId  = index+1;
+                intent.putExtra(ActivityForumSubjects.START_INTENT_EXTRA_CAT_ID, selectedCategoryId);
+                Log.d (LOG_TAG, "onItemClick: intent.putExtra(" + ActivityForumSubjects.START_INTENT_EXTRA_CAT_ID + ", " + selectedCategoryId + ")");
+                startActivity (intent);
             }
         });
       
         // Lance le service, si pas déjà lancé, et provoque un rafraichissement
         IntentReceiverStartService.startService (this, LOG_TAG);
+    }
+
+    protected Context getContext() {
+        return this;
     }
 
     /**
@@ -99,17 +112,6 @@ public class ActivitySJLB extends Activity {
                 }
                 break;
             }
-            case (R.id.menu_show_msg): {
-                if (null != loginPassword) {
-                    // TODO lien temporaire : à implémenter correctement
-                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_uri)));
-                    startActivity(intent);                
-                } else {
-                    // Toast notification signalant l'absence de login/password
-                    Toast.makeText(this, getString(R.string.authentication_needed), Toast.LENGTH_SHORT).show();
-                }
-                break;
-            }
             case (R.id.menu_update): {
                 if (null != loginPassword) {
                     // Toast notification de début de rafraichissement
@@ -123,8 +125,12 @@ public class ActivitySJLB extends Activity {
                 break;
             }
             case (R.id.menu_reset): {
+                ContentProviderUser users = new ContentProviderUser (this);
+                users.clearUser();
                 ContentProviderPM   pms = new ContentProviderPM (this);
                 pms.clearPM();
+                ContentProviderSubj subjs = new ContentProviderSubj (this);
+                subjs.clearSubj();
                 ContentProviderMsg  msgs = new ContentProviderMsg (this);
                 msgs.clearMsg();
                 break;

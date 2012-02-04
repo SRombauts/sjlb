@@ -1,5 +1,9 @@
 package fr.srombauts.sjlb;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,7 +19,6 @@ import android.net.Uri;
  * @author seb
  */
 public class ContentProviderMsg extends ContentProvider {
-
     private static final int MSG_ALL         = 1;
     private static final int MSG_ID          = 2;
     private static final int MSG_LIVE_FOLDER = 3;
@@ -53,32 +56,42 @@ public class ContentProviderMsg extends ContentProvider {
     }
 
     @Override
-    public String getType(Uri arg0) {
+    public String getType(Uri uri) {
         // TODO SRO Auto-generated method stub
         return null;
     }
 
     @Override
-    public int delete(Uri arg0, String arg1, String[] arg2) {
+    public int delete(Uri uri, String arg1, String[] arg2) {
         // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    public Uri insert(Uri arg0, ContentValues arg1) {
+    public Uri insert(Uri uri, ContentValues arg1) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
-    public Cursor query(Uri arg0, String[] arg1, String arg2, String[] arg3,
-            String arg4) {
-        // TODO prendre en compte les paramètres pour faire la bonne requète !
-        return getAllMsg ();
+	/**
+	 * Requète générique sur les messages
+	 *
+	 * @todo SRO : ajouter un filtrage sur un "id" donné lorsque l'utilisateur fourni une URI de type "content:path/id"
+	 */
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        return mDBHelper.getReadableDatabase().query(
+                    SJLB.Msg.TABLE_NAME,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null, // groupBy
+                    null, // having
+                    (null!=sortOrder)?sortOrder:SJLB.Msg.DEFAULT_SORT_ORDER
+                    );
     }
 
     @Override
-    public int update(Uri arg0, ContentValues arg1, String arg2, String[] arg3) {
+    public int update(Uri uri, ContentValues arg1, String arg2, String[] arg3) {
         // TODO Auto-generated method stub
         return 0;
     }
@@ -87,29 +100,75 @@ public class ContentProviderMsg extends ContentProvider {
         mDBHelper.close();
     }
     
-
     /**
-     * Insert un nouveau message juste par son ID (ne fonctionne que si msg non déjà connu)
-     * @param aId
-     * @return l'identifiant de la ligne insérée en BDD si succès
+     * Insert un nouveau Msg complet (ne fonctionne que si Msg précédemment inconnu)
+     * @param aMsg le Msg à insérer
+     * @return true si succès
      */
-    public long insertMsg(int aId) {
+    public boolean insertMsg(ForumMessage aMsg) {
       ContentValues newMsgValues = new ContentValues();
-      newMsgValues.put(SJLB.Msg.ID, aId);
-      return mDBHelper.getWritableDatabase().insert(SJLB.Msg.TABLE_NAME, null, newMsgValues);
+      newMsgValues.put(SJLB.Msg.ID,        aMsg.getId());
+      newMsgValues.put(SJLB.Msg.DATE,      aMsg.getDate());
+      newMsgValues.put(SJLB.Msg.AUTHOR_ID, aMsg.getAuthorId());
+      newMsgValues.put(SJLB.Msg.AUTHOR,    aMsg.getAuthor());
+      newMsgValues.put(SJLB.Msg.SUBJECT_ID,aMsg.getSubjectId());
+      newMsgValues.put(SJLB.Msg.TEXT,      aMsg.getText());
+      return mDBHelper.getWritableDatabase().insert(SJLB.Msg.TABLE_NAME, null, newMsgValues) > 0;
+    }
+
+    // Met à jout un Msg qui a été édité (ne fonctionne que si Msg déjà connu)
+    public boolean updateMsg(ForumMessage aMsg) {
+      ContentValues newMsgValues = new ContentValues();
+      newMsgValues.put(SJLB.Msg.ID,        aMsg.getId());
+      newMsgValues.put(SJLB.Msg.DATE,      aMsg.getDate());
+      newMsgValues.put(SJLB.Msg.AUTHOR_ID, aMsg.getAuthorId());
+      newMsgValues.put(SJLB.Msg.AUTHOR,    aMsg.getAuthor());
+      newMsgValues.put(SJLB.Msg.SUBJECT_ID,aMsg.getSubjectId());
+      newMsgValues.put(SJLB.Msg.TEXT,      aMsg.getText());
+      return mDBHelper.getWritableDatabase().update(SJLB.Msg.TABLE_NAME, newMsgValues, SJLB.Msg.ID + "=" + aMsg.getId(), null) > 0;
+    }
+    
+    // Récupère la date du dernier message
+    public long getLastMsgDate () {
+        long                nbSeconds = 0;
+        Cursor cur = getAllMsg ();
+        if (0 < cur.getCount())
+        {
+            cur.moveToLast();
+            try {
+                String              strDate = cur.getString(cur.getColumnIndex(SJLB.Msg.DATE));
+                SimpleDateFormat    sdf     = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                Date                date    = sdf.parse(strDate);
+                nbSeconds = (date.getTime()/1000);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return nbSeconds;
     }
     
     // récupère un cursor avec la liste de tous les Msg
     public Cursor getAllMsg () {
+        // TODO SRO : croiser avec la table des sujets pour obtenir l'intitulé du sujet
         return mDBHelper.getReadableDatabase().query(   SJLB.Msg.TABLE_NAME,
-                                                       new String[] { SJLB.Msg.ID, SJLB.Msg.DATE, SJLB.Msg.AUTHOR, SJLB.Msg.DATE},
+                                                       new String[] {   SJLB.Msg.ID,
+                                                                        SJLB.Msg.DATE,
+                                                                        SJLB.Msg.AUTHOR_ID,
+                                                                        SJLB.Msg.AUTHOR,
+                                                                        SJLB.Msg.SUBJECT_ID,
+                                                                        SJLB.Msg.TEXT},
                                                        null, null, null, null, null);
     }
     
     // récupère un cursor sur un Msg particulier
     public Cursor getMsg (int aId) {
+        // TODO SRO : croiser avec la table des sujets pour obtenir l'intitulé du sujet
         Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.Msg.TABLE_NAME,
-                                                                new String[]{SJLB.Msg.DATE, SJLB.Msg.AUTHOR, SJLB.Msg.TEXT},
+                                                                new String[]{   SJLB.Msg.DATE,
+                                                                                SJLB.Msg.AUTHOR_ID,
+                                                                                SJLB.Msg.AUTHOR,
+                                                                                SJLB.Msg.SUBJECT_ID,
+                                                                                SJLB.Msg.TEXT},
                                                                 SJLB.Msg.ID + "=" + aId,
                                                                 null, null, null, null, null);
         if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
@@ -117,8 +176,17 @@ public class ContentProviderMsg extends ContentProvider {
         }
         return cursor;
     }
-   
-    // vide la table des PM
+
+    // teste l'existence d'un Msg particulier
+    public Boolean isExist (int aId) {
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.Msg.TABLE_NAME,
+                                                                new String[]{SJLB.Msg.ID},
+                                                                SJLB.Msg.ID + "=" + aId,
+                                                                null, null, null, null, null);
+        return (0 < cursor.getCount());
+    }
+       
+    // vide la table des Msg
     public boolean clearMsg() {
       return mDBHelper.getWritableDatabase().delete(SJLB.Msg.TABLE_NAME, null, null) > 0;
     }

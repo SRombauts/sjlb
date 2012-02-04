@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="pm_description">  Messages Privés </string>
+    <string name="pm_description">      Messages Privés </string>
+    <string name="subj_description">    Sujets          </string>
+    <string name="msg_description">     Messages        </string>
 
     <string name="button_show_pm">  Messages Privés </string>
     <string name="button_new_pm">   Nouveau message privé </string>
@@ -27,7 +29,6 @@
     <string name="prefs_light_desc">        Selectionner pour activer les notifications par led       </string>
 
     <string name="menu_show_pm">        Messages privés     </string>
-    <string name="menu_show_msg">       Messages du forum   </string>
     <string name="menu_new_pm">         Nouveau message     </string>
     <string name="menu_send_pm">        Envoyer le message  </string>
     <string name="menu_update">         Rafraîchir          </string>
@@ -53,4 +54,5 @@
     <string name="notification_title_msg">  Post(s) non lu(s)   </string>
     <string name="notification_text_pm">    message(s) privé(s) </string>
     <string name="notification_text_msg">   post(s) non lu(s)   </string>
+    <string name="notification_new">        nouveau(x)          </string>
 </resources>

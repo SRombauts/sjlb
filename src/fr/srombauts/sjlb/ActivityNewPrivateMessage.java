@@ -23,6 +23,8 @@ import android.widget.Spinner;
 public class ActivityNewPrivateMessage extends Activity {
     private static final String LOG_TAG = "ActivityNewPM";
     
+    public  static final String START_INTENT_EXTRA_AUTHOR_ID = "AuthorId";
+    
     private Cursor              mCursor         = null;
     private SimpleCursorAdapter mAdapter        = null;
     private Spinner             mUsersSpinner   = null;
@@ -61,7 +63,7 @@ public class ActivityNewPrivateMessage extends Activity {
         if (null != startIntent.getExtras())
         {
             // Sélectionne le destinataire du PM pour répondre
-            int authorId = startIntent.getExtras().getInt("AuthorId");
+            int authorId = startIntent.getExtras().getInt(START_INTENT_EXTRA_AUTHOR_ID);
             mUsersSpinner.setSelection(authorId-1);
         }
         

@@ -2,7 +2,9 @@
 <resources>
     <string name="app_name"> SJLB </string>
 
-    <string name="pm_description">  Private Messages </string>
+    <string name="pm_description">      Private Messages    </string>
+    <string name="subj_description">    Subjects            </string>
+    <string name="msg_description">     Messages            </string>
 
     <string name="button_show_pm">  Private messages </string>
     <string name="button_new_pm">   New Private Message  </string>
@@ -29,7 +31,6 @@
     <string name="prefs_light_desc">        Select to turn on light notification        </string>
 
     <string name="menu_show_pm">        Private Messages    </string>
-    <string name="menu_show_msg">       Forum Messages      </string>
     <string name="menu_new_pm">         New Private Message </string>
     <string name="menu_send_pm">        Send Private Message</string>
     <string name="menu_update">         Refresh             </string>
@@ -55,6 +56,7 @@
     <string name="notification_title_msg">  Unread Message(s)   </string>
     <string name="notification_text_pm">    private message(s)  </string>
     <string name="notification_text_msg">   unread message(s)   </string>
+    <string name="notification_new">        new                 </string>
     
     <string name="sjlb_forum_uri">      http://sjlb.dyndns.org/newsjlb/Site/Forum.php                       </string>
     <string name="sjlb_forum_cat_uri">  http://sjlb.dyndns.org/newsjlb/Site/ForumSujets.php?id_categorie=   </string>
@@ -62,5 +64,6 @@
     <string name="sjlb_polling_uri">    http://sjlb.dyndns.org/newsjlb/Android/Polling.php                  </string>
     <string name="sjlb_users_uri">      http://sjlb.dyndns.org/newsjlb/Android/Users.php                    </string>
     <string name="sjlb_pm_uri">         http://sjlb.dyndns.org/newsjlb/Android/PrivateMessages.php          </string>
+    <string name="sjlb_msg_uri">        http://sjlb.dyndns.org/newsjlb/Android/ForumMessages.php            </string>
 
 </resources>

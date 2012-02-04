@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="fr.srombauts.sjlb"
       android:installLocation="auto"
-      android:versionCode="28"
-      android:versionName="0.2.8">
+      android:versionCode="29"
+      android:versionName="0.2.9">
       
     <application android:icon="@drawable/launcher_icon" android:label="@string/app_name" android:debuggable="false">
         <activity android:name=".ActivitySJLB"
@@ -12,6 +12,10 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".ActivityForumSubjects">
+        </activity>
+        <activity android:name=".ActivityForumMessages">
         </activity>
         <activity android:name=".ActivityPrivateMessages">
         </activity>
@@ -34,6 +38,9 @@
         />
         <provider android:name=".ContentProviderPM"
                   android:authorities="fr.srombauts.sjlb.pm" 
+        />
+        <provider android:name=".ContentProviderSubj"
+                  android:authorities="fr.srombauts.sjlb.subj" 
         />
         <provider android:name=".ContentProviderMsg"
                   android:authorities="fr.srombauts.sjlb.msg" 

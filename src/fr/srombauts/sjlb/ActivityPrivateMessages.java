@@ -42,6 +42,8 @@ public class ActivityPrivateMessages extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Layout de l'activité
         setContentView(R.layout.pm_list);
         
         // Récupére un curseur sur les données (les messages Privés) 
@@ -62,7 +64,7 @@ public class ActivityPrivateMessages extends Activity {
                                             from,
                                             to);
         
-        mPrivateMessagesListView = (ListView)findViewById(R.id.privateMessagesListView);
+        mPrivateMessagesListView = (ListView)findViewById(R.id.pm_listview);
         mPrivateMessagesListView.setAdapter (mAdapter);
         
         registerForContextMenu (mPrivateMessagesListView);        
@@ -253,7 +255,7 @@ public class ActivityPrivateMessages extends Activity {
         Log.d (LOG_TAG, "answerPM (" + aSelectedPmAuthorId + ")" );        
         // Lance l'activité correspondante avec en paramètre l'id du destinataire :
         Intent intent = new Intent(this, ActivityNewPrivateMessage.class);
-        intent.putExtra("AuthorId", aSelectedPmAuthorId);
+        intent.putExtra(ActivityNewPrivateMessage.START_INTENT_EXTRA_AUTHOR_ID, aSelectedPmAuthorId);
         startActivity(intent);        
     }
     

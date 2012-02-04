@@ -114,7 +114,8 @@ public class ContentProviderUser extends ContentProvider {
     // récupère un cursor avec la liste de tous les User
     public Cursor getAllUsers () {
         return mDBHelper.getReadableDatabase().query(   SJLB.User.TABLE_NAME,
-                                                       new String[] {SJLB.User.ID, SJLB.User.PSEUDO},
+                                                       new String[] {   SJLB.User.ID,
+                                                                        SJLB.User.PSEUDO},
                                                        null, null, null, null, null);
     }
     
