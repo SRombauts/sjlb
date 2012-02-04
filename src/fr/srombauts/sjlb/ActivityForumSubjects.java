@@ -1,12 +1,13 @@
 package fr.srombauts.sjlb;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -18,7 +19,7 @@ import android.widget.AdapterView.OnItemClickListener;
  * Activité présentant la liste des sujets de la catégorie sélectionnée
  * @author 22/08/2010 srombauts
  */
-public class ActivityForumSubjects extends Activity {
+public class ActivityForumSubjects extends Activity implements OnItemClickListener, OnTouchListener {
     private static final String LOG_TAG = "ActivitySubj";
     
     public  static final String START_INTENT_EXTRA_CAT_ID       = "CategoryId";
@@ -30,6 +31,12 @@ public class ActivityForumSubjects extends Activity {
     
     private long                mSelectedCategoryId     = 0;
     private String              mSelectedCategoryLabel  = "";
+    
+    private float               mTouchStartPositionX    = 0;
+    private float               mTouchStartPositionY    = 0;
+    
+    private Intent              mSavedIntent            = null;
+    
     
     /** Called when the activity is first created. */
     @Override
@@ -73,36 +80,99 @@ public class ActivityForumSubjects extends Activity {
         mSubjectsListView = (ListView)findViewById(R.id.subj_listview);
         mSubjectsListView.setAdapter (mAdapter);
 
-        // TODO SRO : ne pas créer de lister directement dans le code comme ça !
-        mSubjectsListView.setOnItemClickListener(new OnItemClickListener() {
-            @SuppressWarnings("unchecked")
-            public void onItemClick(AdapterView adapter, View view, int index, long arg3) {
-                // Lance l'activité correspondante avec en paramètre l'id du sujet :
-                Intent intent = new Intent(getContext(), ActivityForumMessages.class);
-                mCursor.moveToPosition(index);
-                long    selectedCategoryId  = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.CAT_ID));
-                long    selectedSubjId      = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.ID));
-                long    selectedGroupId     = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.GROUP_ID));
-                String  selectedSubjLabel   = mCursor.getString(mCursor.getColumnIndexOrThrow(SJLB.Subj.TEXT));
-                intent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_CAT_ID,        selectedCategoryId);
-                intent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_SUBJ_ID,       selectedSubjId);
-                intent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_SUBJ_LABEL,    selectedSubjLabel);
-                intent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_GROUP_ID,      selectedGroupId);
-                Log.d (LOG_TAG, "onItemClick: intent.putExtra(" + selectedSubjId + ", " + selectedSubjLabel + ")");
-                startActivity (intent);
-            }
-        });        
+        // Enregister les listener d'IHM que la classe implémente        
+        mSubjectsListView.setOnItemClickListener(this);
+        mSubjectsListView.setOnTouchListener(this);
+        mSubjectsListView.getRootView().setOnTouchListener(this);
     }
     
-    protected Context getContext() {
-        return this;
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        Log.w (LOG_TAG, "onSaveInstanceState");       
     }
-
+    
     protected void onResume () {
         super.onResume();
         
         mCursor.requery();
         mAdapter.notifyDataSetChanged();
     }
-    
+
+    /**
+     *  Lance l'activité correspondante avec en paramètre l'id du sujet :
+     */
+    @SuppressWarnings("unchecked")
+    public void onItemClick(AdapterView adapter, View view, int index, long arg3) {
+        mSavedIntent = new Intent(this, ActivityForumMessages.class);
+        mCursor.moveToPosition(index);
+        long    selectedCategoryId  = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.CAT_ID));
+        long    selectedSubjId      = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.ID));
+        long    selectedGroupId     = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.GROUP_ID));
+        String  selectedSubjLabel   = mCursor.getString(mCursor.getColumnIndexOrThrow(SJLB.Subj.TEXT));
+        mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_CAT_ID,        selectedCategoryId);
+        mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_SUBJ_ID,       selectedSubjId);
+        mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_SUBJ_LABEL,    selectedSubjLabel);
+        mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_GROUP_ID,      selectedGroupId);
+        Log.d (LOG_TAG, "onItemClick: mSavedIntent.putExtra(" + selectedSubjId + ", " + selectedSubjLabel + ")");
+        startActivity (mSavedIntent);
+    }
+
+    // TODO SRO : callback d'évènement tactiles, à mutualiser entre les activités
+    public boolean onTouch(View aView, MotionEvent aMotionEvent) {
+        boolean     bActionTraitee = false;
+        final int   touchAction = aMotionEvent.getAction();
+        final float touchX      = aMotionEvent.getX();
+        final float touchY      = aMotionEvent.getY();
+        
+        switch (touchAction)
+        {
+            case MotionEvent.ACTION_DOWN: {
+                //Log.d (LOG_TAG, "onTouch (ACTION_DOWN) : touch (" + touchX + ", " + touchY + ")");
+                mTouchStartPositionX = touchX;
+                mTouchStartPositionY = touchY;
+                break;
+            }
+            case MotionEvent.ACTION_UP: {
+                //Log.d (LOG_TAG, "onTouch (ACTION_UP) : touch (" + touchX + ", " + touchY + ")");
+                final float proportionalDeltaX = (touchX - mTouchStartPositionX) / (float)aView.getWidth();
+                final float proportionalDeltaY = (touchY - mTouchStartPositionY) / (float)aView.getHeight();
+                //Log.d (LOG_TAG, "onTouch: deltas proportionnels : (" + proportionalDeltaX + ", " + proportionalDeltaY + ")");
+                
+                // Teste si le mouvement correspond à un mouvement franc
+                if (   (Math.abs(proportionalDeltaX) > 0.2)                                 // mouvement d'ampleur importante
+                    && (Math.abs(proportionalDeltaX)/Math.abs(proportionalDeltaY) > 0.8) )  // mouvement plus latéral que vertical
+                {
+                    //Log.d (LOG_TAG, "onTouch: mouvement lateral franc");
+                    
+                    // Teste sa direction :
+                    if (proportionalDeltaX > 0) {
+                        if (null != mSavedIntent) {
+                            Log.i (LOG_TAG, "onTouch: mouvement vers la droite, on relance le dernier intent sauvegardé");
+                            startActivity (mSavedIntent);
+                            bActionTraitee = true;
+                        } else {
+                           Log.w (LOG_TAG, "onTouch: mouvement vers la droite mais pas d'intent sauvegardé");
+                        }
+                    }
+                    else {
+                        Log.i (LOG_TAG, "onTouch: mouvement vers la gauche, on quitte l'activité");
+                        bActionTraitee = true;
+                        finish ();
+                    }
+                }
+                break;
+            }
+            default: {
+                //Log.d (LOG_TAG, "onTouch autre (" + touchAction  + ") : touch (" + touchX + ", " + touchY + ")");
+            }
+        }
+
+        // Si on n'a pas déjà traité l'action, on passe la main à la Vue sous-jacente
+        if (false == bActionTraitee) {
+            aView.onTouchEvent(aMotionEvent);
+        }
+        
+        // Si on retourne false, on n'est plus notifié des évènements suivants
+        return true;
+    }
+        
 }

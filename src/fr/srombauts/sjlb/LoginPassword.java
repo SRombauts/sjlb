@@ -21,7 +21,11 @@ class LoginPassword {
     private LoginPassword () {
     }
 
-    // Constructeur utilisant les préférences
+    /**
+     * Constructeur utilisant les préférences pour récupérer login/password et hasher ce dernier
+     *
+     * @param[in] aContext Contexte de l'activité/du servicé, nécessaire pour récupérer les préférences de l'application
+     */
     public LoginPassword (Context aContext) throws LoginPasswordException {
         try {
             
@@ -54,5 +58,22 @@ class LoginPassword {
         } catch (NoSuchAlgorithmException e) {  
             e.printStackTrace();  
         }
+    }
+    
+    /**
+     * Regarde si les préférences contienent login/mdp
+     *
+     * @param[in] aContext Contexte de l'activité/du servicé, nécessaire pour récupérer les préférences de l'application
+     *
+     * @return boolean true si login ET mdp sont renseignés
+     */
+    static public boolean AreFilled (Context aContext) {
+            // Récupère le login/mot de passe dans les préférences :
+            SharedPreferences   Prefs       = PreferenceManager.getDefaultSharedPreferences(aContext);
+            String              login       = Prefs.getString(SJLB.PREFS.LOGIN,    "");
+            String              password    = Prefs.getString(SJLB.PREFS.PASSWORD, "");
+            
+            return (   (false == login.contentEquals(""))
+                    && (false == password.contentEquals("")) );
     }
 }

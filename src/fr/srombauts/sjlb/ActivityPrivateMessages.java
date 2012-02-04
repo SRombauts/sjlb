@@ -14,8 +14,10 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnTouchListener;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
@@ -26,7 +28,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
  * Activité présentant la liste des messages privés
  * @author 14/06/2010 srombauts
  */
-public class ActivityPrivateMessages extends Activity {
+public class ActivityPrivateMessages extends Activity implements OnTouchListener {
     private static final String LOG_TAG = "ActivityPM";
     
     static final private int    DIALOG_ID_PM_DELETE_ONE     = 1;
@@ -37,6 +39,9 @@ public class ActivityPrivateMessages extends Activity {
     private ListView            mPrivateMessagesListView    = null;
     
     private long                mSelectedPmId               = 0;
+   
+    private float               mTouchStartPositionX    = 0;
+    private float               mTouchStartPositionY    = 0;
     
     /** Called when the activity is first created. */
     @Override
@@ -70,6 +75,10 @@ public class ActivityPrivateMessages extends Activity {
         mPrivateMessagesListView.setSelection(mPrivateMessagesListView.getCount()-1);
         
         registerForContextMenu (mPrivateMessagesListView);        
+        
+        // Enregister les listener d'IHM que la classe implémente        
+        mPrivateMessagesListView.setOnTouchListener(this);
+        mPrivateMessagesListView.getRootView().setOnTouchListener(this);
     }
     
     protected void onResume () {
@@ -94,6 +103,56 @@ public class ActivityPrivateMessages extends Activity {
         notificationManager.cancel(AsynchTaskRefresh.NOTIFICATION_NEW_PM_ID);
     }
 
+    // TODO SRO : callback d'évènement tactiles, à mutualiser entre les activités
+    public boolean onTouch(View aView, MotionEvent aMotionEvent) {
+        boolean     bActionTraitee = false;
+        final int   touchAction = aMotionEvent.getAction();
+        final float touchX      = aMotionEvent.getX();
+        final float touchY      = aMotionEvent.getY();
+        
+        switch (touchAction)
+        {
+            case MotionEvent.ACTION_DOWN: {
+                //Log.d (LOG_TAG, "onTouch (ACTION_DOWN) : touch (" + touchX + ", " + touchY + ")");
+                mTouchStartPositionX = touchX;
+                mTouchStartPositionY = touchY;
+                break;
+            }
+            case MotionEvent.ACTION_UP: {
+                //Log.d (LOG_TAG, "onTouch (ACTION_UP) : touch (" + touchX + ", " + touchY + ")");
+                final float proportionalDeltaX = (touchX - mTouchStartPositionX) / (float)aView.getWidth();
+                final float proportionalDeltaY = (touchY - mTouchStartPositionY) / (float)aView.getHeight();
+                //Log.d (LOG_TAG, "onTouch: deltas proportionnels : (" + proportionalDeltaX + ", " + proportionalDeltaY + ")");
+                
+                // Teste si le mouvement correspond à un mouvement franc
+                if (   (Math.abs(proportionalDeltaX) > 0.2)                                 // mouvement d'ampleur importante
+                    && (Math.abs(proportionalDeltaX)/Math.abs(proportionalDeltaY) > 0.8) )  // mouvement plus latéral que vertical
+                {
+                    //Log.d (LOG_TAG, "onTouch: mouvement lateral franc");
+                    
+                    // Teste sa direction :
+                    if (proportionalDeltaX < 0) {
+                        Log.i (LOG_TAG, "onTouch: mouvement vers la gauche, on quitte l'activité");
+                        bActionTraitee = true;
+                        finish ();
+                    }
+                }
+                break;
+            }
+            default: {
+                //Log.d (LOG_TAG, "onTouch autre (" + touchAction  + ") : touch (" + touchX + ", " + touchY + ")");
+            }
+        }
+
+        // Si on n'a pas déjà traité l'action, on passe la main à la Vue sous-jacente
+        if (false == bActionTraitee) {
+            aView.onTouchEvent(aMotionEvent);
+        }
+        
+        // Si on retourne false, on n'est plus notifié des évènements suivants
+        return true;
+    }
+    
     /**
      * Création du menu général
      */

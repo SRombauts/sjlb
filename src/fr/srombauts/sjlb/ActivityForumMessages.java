@@ -1,6 +1,8 @@
 package fr.srombauts.sjlb;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -10,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -20,7 +23,7 @@ import android.widget.Toast;
  * Activité présentant la liste des sujets de la catégorie sélectionnée
  * @author 22/08/2010 srombauts
  */
-public class ActivityForumMessages extends Activity {
+public class ActivityForumMessages extends Activity implements OnTouchListener {
     private static final String LOG_TAG = "ActivityMsg";
     
     public  static final String START_INTENT_EXTRA_CAT_ID       = "CategoryId";
@@ -37,6 +40,10 @@ public class ActivityForumMessages extends Activity {
     private String              mSelectedSubjectLabel   = "";
     private long                mSelectedGroupId        = 0;
    
+    private float               mTouchStartPositionX    = 0;
+    private float               mTouchStartPositionY    = 0;
+    
+    
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,13 +89,85 @@ public class ActivityForumMessages extends Activity {
         mMsgListView.setAdapter (mAdapter);
         // Scroll tout en bas de la liste des messages
         mMsgListView.setSelection(mMsgListView.getCount()-1);
+        
+        // Enregister les listener d'IHM que la classe implémente        
+        mMsgListView.setOnTouchListener(this);
+        mMsgListView.getRootView().setOnTouchListener(this);
     }
     
     protected void onResume () {
         super.onResume();
         
+        clearNotificationMsg ();
+        
         mCursor.requery();
         mAdapter.notifyDataSetChanged();
+    }
+    
+    /**
+     * Annule l'éventuelle notification de Msg non lus
+     */
+    private void clearNotificationMsg () {
+        String              ns                      = Context.NOTIFICATION_SERVICE;
+        NotificationManager notificationManager     = (NotificationManager) getSystemService(ns);
+        notificationManager.cancel(AsynchTaskRefresh.NOTIFICATION_NEW_MSG_ID);
+    }
+
+    // TODO SRO : callback d'évènement tactiles, à mutualiser entre les activités
+    public boolean onTouch(View aView, MotionEvent aMotionEvent) {
+        boolean     bActionTraitee = false;
+        final int   touchAction = aMotionEvent.getAction();
+        final float touchX      = aMotionEvent.getX();
+        final float touchY      = aMotionEvent.getY();
+        
+        switch (touchAction)
+        {
+            case MotionEvent.ACTION_DOWN: {
+                //Log.d (LOG_TAG, "onTouch (ACTION_DOWN) : touch (" + touchX + ", " + touchY + ")");
+                mTouchStartPositionX = touchX;
+                mTouchStartPositionY = touchY;
+                break;
+            }
+            case MotionEvent.ACTION_UP: {
+                //Log.d (LOG_TAG, "onTouch (ACTION_UP) : touch (" + touchX + ", " + touchY + ")");
+                final float proportionalDeltaX = (touchX - mTouchStartPositionX) / (float)aView.getWidth();
+                final float proportionalDeltaY = (touchY - mTouchStartPositionY) / (float)aView.getHeight();
+                //Log.d (LOG_TAG, "onTouch: deltas proportionnels : (" + proportionalDeltaX + ", " + proportionalDeltaY + ")");
+                
+                // Teste si le mouvement correspond à un mouvement franc
+                if (   (Math.abs(proportionalDeltaX) > 0.2)                                 // mouvement d'ampleur importante
+                    && (Math.abs(proportionalDeltaX)/Math.abs(proportionalDeltaY) > 0.8) )  // mouvement plus latéral que vertical
+                {
+                    //Log.d (LOG_TAG, "onTouch: mouvement lateral franc");
+                    
+                    // Teste sa direction :
+                    if (proportionalDeltaX > 0) {
+                        Log.d (LOG_TAG, "onTouch: mouvement vers la droite");
+                        
+                        // TODO SRO : action intelligente : passer au prochain sujet contenant des messages non lus ? 
+                        //bActionTraitee = true;
+                        
+                    }
+                    else {
+                        Log.i (LOG_TAG, "onTouch: mouvement vers la gauche, on quitte l'activité");
+                        bActionTraitee = true;
+                        finish ();
+                    }
+                }
+                break;
+            }
+            default: {
+                //Log.d (LOG_TAG, "onTouch autre (" + touchAction  + ") : touch (" + touchX + ", " + touchY + ")");
+            }
+        }
+
+        // Si on n'a pas déjà traité l'action, on passe la main à la Vue sous-jacente
+        if (false == bActionTraitee) {
+            aView.onTouchEvent(aMotionEvent);
+        }
+        
+        // Si on retourne false, on n'est plus notifié des évènements suivants
+        return true;
     }
     
     /**
