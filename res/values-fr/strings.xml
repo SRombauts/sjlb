@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="pm_description">      Messages Privés </string>
-    <string name="subj_description">    Sujets          </string>
-    <string name="msg_description">     Messages        </string>
 
-    <string name="button_show_pm">  Messages Privés </string>
-    <string name="button_new_pm">   Nouveau message privé </string>
-    <string name="button_send_pm">  Envoyer le message privé </string>
+    <string name="button_show_pm">  Messages Privés             </string>
+    <string name="button_send_pm">  Envoyer le message privé    </string>
+    <string name="button_send_msg"> Envoyer le message          </string>
 
     <string name="prefs_authentication">    Authentification                </string>
     <string name="prefs_login_title">       Login                           </string>
@@ -31,6 +29,8 @@
     <string name="menu_show_pm">        Messages privés     </string>
     <string name="menu_new_pm">         Nouveau message     </string>
     <string name="menu_send_pm">        Envoyer le message  </string>
+    <string name="menu_new_msg">        Nouveau message     </string>
+    <string name="menu_send_msg">       Envoyer le message  </string>
     <string name="menu_update">         Rafraîchir          </string>
     <string name="menu_reset">          Vider la base locale</string>
     <string name="menu_delete_all_pm">  Supprimer tous les messages   </string>

@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_new_pm"
-          android:title="@string/menu_new_pm" />
+    <item android:id="@+id/menu_new_msg"
+          android:title="@string/menu_new_msg" />
     <item android:id="@+id/menu_update"
           android:title="@string/menu_update" />
     <item android:id="@+id/menu_prefs"
           android:title="@string/menu_prefs" />
-    <item android:id="@+id/menu_delete_all_pm"
-          android:title="@string/menu_delete_all_pm" />
     <item android:id="@+id/menu_quit"
           android:title="@string/menu_quit" />
 </menu>

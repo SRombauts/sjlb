@@ -5,8 +5,13 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
 
 
 /**
@@ -16,14 +21,20 @@ import android.widget.SimpleCursorAdapter;
 public class ActivityForumMessages extends Activity {
     private static final String LOG_TAG = "ActivityMsg";
     
-    public  static final String START_INTENT_EXTRA_SUBJ_ID = "SubjectId";
+    public  static final String START_INTENT_EXTRA_CAT_ID       = "CategoryId";
+    public  static final String START_INTENT_EXTRA_SUBJ_ID      = "SubjectId";
+    public  static final String START_INTENT_EXTRA_SUBJ_LABEL   = "SubjectLabel";
+    public  static final String START_INTENT_EXTRA_GROUP_ID     = "GroupId";
     
     private Cursor              mCursor         = null;
     private SimpleCursorAdapter mAdapter        = null;
     private ListView            mMsgListView    = null;
     
-    private long                mSelectedSubjectId  = 0;
-    
+    private long                mSelectedCategoryId     = 0;
+    private long                mSelectedSubjectId      = 0;
+    private String              mSelectedSubjectLabel   = "";
+    private long                mSelectedGroupId        = 0;
+   
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -36,9 +47,16 @@ public class ActivityForumMessages extends Activity {
         Intent startIntent = getIntent();
         if (null != startIntent.getExtras())
         {
-            mSelectedSubjectId = startIntent.getExtras().getLong(START_INTENT_EXTRA_SUBJ_ID);
-            Log.i(LOG_TAG, "getExtras (" + START_INTENT_EXTRA_SUBJ_ID + ", " + mSelectedSubjectId + ")");
+            mSelectedCategoryId     = startIntent.getExtras().getLong  (START_INTENT_EXTRA_CAT_ID);
+            mSelectedSubjectId      = startIntent.getExtras().getLong  (START_INTENT_EXTRA_SUBJ_ID);
+            mSelectedSubjectLabel   = startIntent.getExtras().getString(START_INTENT_EXTRA_SUBJ_LABEL);
+            mSelectedGroupId        = startIntent.getExtras().getLong  (START_INTENT_EXTRA_GROUP_ID);
+            Log.i(LOG_TAG, "SelectedSubject (" + mSelectedSubjectId +", " + mSelectedGroupId + " [" + mSelectedCategoryId + "]) : " + mSelectedSubjectLabel);
         }        
+        
+        // Map la description du sujet pour la renseigner
+        TextView SubjectsDescription = (TextView)findViewById(R.id.subject_label);
+        SubjectsDescription.setText(mSelectedSubjectLabel);        
         
         // Récupére un curseur sur les données (les messages) en filtrant sur l'id du sujet sélectionné
         mCursor = managedQuery( SJLB.Msg.CONTENT_URI, null,
@@ -46,10 +64,10 @@ public class ActivityForumMessages extends Activity {
                                 null, null);
 
         // Les colonnes à mapper :
-        String[]    from = new String[] { SJLB.Msg.AUTHOR_ID, SJLB.Msg.AUTHOR, SJLB.Msg.DATE, SJLB.Msg.TEXT };
+        String[]    from = new String[] { SJLB.Msg.AUTHOR, SJLB.Msg.DATE, SJLB.Msg.TEXT };
         
         // Les ID des views sur lesquels les mapper :
-        int[]       to   = new int[]    { R.id.msgAuthorId, R.id.msgAuthor, R.id.msgDate, R.id.msgText };
+        int[]       to   = new int[]    { R.id.msgAuthor, R.id.msgDate, R.id.msgText };
 
         // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
         mAdapter = new SimpleCursorAdapter( this,
@@ -60,6 +78,8 @@ public class ActivityForumMessages extends Activity {
         
         mMsgListView = (ListView)findViewById(R.id.msg_listview);
         mMsgListView.setAdapter (mAdapter);
+        // Scroll tout en bas de la liste des messages
+        mMsgListView.setSelection(mMsgListView.getCount()-1);
     }
     
     protected void onResume () {
@@ -69,4 +89,55 @@ public class ActivityForumMessages extends Activity {
         mAdapter.notifyDataSetChanged();
     }
     
+    /**
+     * Création du menu général
+     */
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.msg, menu);
+        return true;
+    }
+
+    /**
+     * Sur sélection dans le menu
+     */
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        
+        switch (item.getItemId()) {
+            case (R.id.menu_new_msg): {
+                Intent intent = new Intent(this, ActivityNewForumMessage.class);
+                // TODO SRO : passer les paramètre requis !
+                intent.putExtra(ActivityNewForumMessage.START_INTENT_EXTRA_CAT_ID,        mSelectedCategoryId);
+                intent.putExtra(ActivityNewForumMessage.START_INTENT_EXTRA_SUBJ_ID,       mSelectedSubjectId);
+                intent.putExtra(ActivityNewForumMessage.START_INTENT_EXTRA_SUBJ_LABEL,    mSelectedSubjectLabel);
+                intent.putExtra(ActivityNewForumMessage.START_INTENT_EXTRA_GROUP_ID,      mSelectedGroupId);
+                Log.d (LOG_TAG, "onItemClick: intent.putExtra(" + mSelectedSubjectId + ", " + mSelectedSubjectLabel + ")");                
+                startActivity(intent);
+                break;
+            }
+            case (R.id.menu_update): {
+                // Toast notification de début de rafraichissement
+                Toast.makeText(this, getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
+                // TODO voir si c'est la meilleurs manière de faire : donnerait plus de contrôle si l'on pouvait faire un accès direct à la AsynchTask...
+                IntentReceiverStartService.startService (this, LOG_TAG);
+                // TODO SRO : trouver un moyen de rafraichir la liste à l'échéance de la tache de rafraichissement
+                mCursor.requery();
+                mAdapter.notifyDataSetChanged();
+                break;            }
+            case (R.id.menu_prefs): {
+                Intent intent = new Intent(this, ActivityPreferences.class);
+                startActivity(intent);
+                break;
+            }
+            case (R.id.menu_quit): {
+                finish ();
+                break;
+            }
+            default:
+                return false;
+        }
+        return true;
+    }
+   
 }

@@ -5,9 +5,9 @@
     android:layout_height="wrap_content"
 >
     <TextView  
+        android:id="@+id/category_label"
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
-        android:text="@string/subj_description"
     />
     <ListView
         android:id="@+id/subj_listview"

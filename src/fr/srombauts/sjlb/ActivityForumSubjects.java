@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 
@@ -20,13 +21,15 @@ import android.widget.AdapterView.OnItemClickListener;
 public class ActivityForumSubjects extends Activity {
     private static final String LOG_TAG = "ActivitySubj";
     
-    public  static final String START_INTENT_EXTRA_CAT_ID = "CategoryId";
+    public  static final String START_INTENT_EXTRA_CAT_ID       = "CategoryId";
+    public  static final String START_INTENT_EXTRA_CAT_LABEL    = "CategoryLabel";
     
     private Cursor              mCursor             = null;
     private SimpleCursorAdapter mAdapter            = null;
     private ListView            mSubjectsListView   = null;
     
-    private long                mSelectedCategoryId = 0;
+    private long                mSelectedCategoryId     = 0;
+    private String              mSelectedCategoryLabel  = "";
     
     /** Called when the activity is first created. */
     @Override
@@ -40,9 +43,14 @@ public class ActivityForumSubjects extends Activity {
         Intent startIntent = getIntent();
         if (null != startIntent.getExtras())
         {
-            mSelectedCategoryId = startIntent.getExtras().getLong(START_INTENT_EXTRA_CAT_ID);
-            Log.i(LOG_TAG, "getExtras (" + START_INTENT_EXTRA_CAT_ID + ", " + mSelectedCategoryId + ")");
-        }        
+            mSelectedCategoryId     = startIntent.getExtras().getLong(START_INTENT_EXTRA_CAT_ID);
+            mSelectedCategoryLabel  = startIntent.getExtras().getString(START_INTENT_EXTRA_CAT_LABEL);
+            Log.i(LOG_TAG, "SelectedCategory (" + mSelectedCategoryId + ") : " + mSelectedCategoryLabel);
+        }
+        
+        // Map la description de la catégorie pour la renseigner
+        TextView CategoryDescription = (TextView)findViewById(R.id.category_label);
+        CategoryDescription.setText(mSelectedCategoryLabel);        
         
         // Récupére un curseur sur les données (les sujets) en filtrant sur l'id de la catégorie sélectionnée
         mCursor = managedQuery( SJLB.Subj.CONTENT_URI, null,
@@ -71,12 +79,18 @@ public class ActivityForumSubjects extends Activity {
                 // Lance l'activité correspondante avec en paramètre l'id du sujet :
                 Intent intent = new Intent(getContext(), ActivityForumMessages.class);
                 mCursor.moveToPosition(index);
-                long selectedSubjId  = mCursor.getLong(mCursor.getColumnIndex(SJLB.Msg.ID));
-                intent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_SUBJ_ID, selectedSubjId);
-                Log.d (LOG_TAG, "onItemClick: intent.putExtra(" + ActivityForumMessages.START_INTENT_EXTRA_SUBJ_ID + ", " + selectedSubjId + ")");
+                long    selectedCategoryId  = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.CAT_ID));
+                long    selectedSubjId      = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.ID));
+                long    selectedGroupId     = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.GROUP_ID));
+                String  selectedSubjLabel   = mCursor.getString(mCursor.getColumnIndexOrThrow(SJLB.Subj.TEXT));
+                intent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_CAT_ID,        selectedCategoryId);
+                intent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_SUBJ_ID,       selectedSubjId);
+                intent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_SUBJ_LABEL,    selectedSubjLabel);
+                intent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_GROUP_ID,      selectedGroupId);
+                Log.d (LOG_TAG, "onItemClick: intent.putExtra(" + selectedSubjId + ", " + selectedSubjLabel + ")");
                 startActivity (intent);
             }
-        });
+        });        
     }
     
     protected Context getContext() {

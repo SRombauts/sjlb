@@ -113,7 +113,17 @@ public class ContentProviderSubj extends ContentProvider {
       newSubjValues.put(SJLB.Subj.TEXT,      aSubj.getText());
       return mDBHelper.getWritableDatabase().insert(SJLB.Subj.TABLE_NAME, null, newSubjValues) > 0;
     }
-    
+
+    public boolean updateSubj(ForumSubject aSubj) {
+        ContentValues newSubjValues = new ContentValues();
+        newSubjValues.put(SJLB.Subj.ID,        aSubj.getId());
+        newSubjValues.put(SJLB.Subj.CAT_ID,    aSubj.getCategoryId());
+        newSubjValues.put(SJLB.Subj.GROUP_ID,  aSubj.getGroupId());
+        newSubjValues.put(SJLB.Subj.LAST_DATE, aSubj.getLastDate().getTime());
+        newSubjValues.put(SJLB.Subj.TEXT,      aSubj.getText());
+        return mDBHelper.getWritableDatabase().update(SJLB.Subj.TABLE_NAME, newSubjValues, SJLB.Subj.ID + "=" + aSubj.getId(), null) > 0;
+    }
+        
     // vide la table des Subj
     public boolean clearSubj() {
       return mDBHelper.getWritableDatabase().delete(SJLB.Subj.TABLE_NAME, null, null) > 0;
@@ -146,9 +156,18 @@ public class ContentProviderSubj extends ContentProvider {
         return cursor;
     }
 
+    // teste l'existence d'un Sujet particulier
+    public Boolean isExist (int aId) {
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.Subj.TABLE_NAME,
+                                                                new String[]{SJLB.Subj.ID},
+                                                                SJLB.Subj.ID + "=" + aId,
+                                                                null, null, null, null, null);
+        return (0 < cursor.getCount());
+    }
+
     // compte les Subj
     public long countSubj () {
         return DatabaseUtils.queryNumEntries(mDBHelper.getReadableDatabase(), SJLB.Subj.TABLE_NAME);
     }
-    
+
 }

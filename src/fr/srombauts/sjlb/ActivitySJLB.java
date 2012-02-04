@@ -57,15 +57,13 @@ public class ActivitySJLB extends Activity {
         mCategoriesListView.setOnItemClickListener(new OnItemClickListener() {
             @SuppressWarnings("unchecked")
             public void onItemClick(AdapterView adpter, View view, int index, long arg3) {
-                // Lance un intent correspondant à la catégorie du forum
-                // TODO SRO temporaire : implémenter le lien vers l'activité listant les sujets
-                //Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_cat_uri)+(index+1)));
-                //startActivity(intent);
-                // Lance l'activité correspondante avec en paramètre l'id de la catégorie :
+                // Lance l'activité correspondante avec en paramètre l'id et le label de la catégorie sélectionnée
                 Intent intent = new Intent(getContext(), ActivityForumSubjects.class);
+                String[] categoryLabels = getResources().getStringArray(R.array.category_labels);
                 long selectedCategoryId  = index+1;
-                intent.putExtra(ActivityForumSubjects.START_INTENT_EXTRA_CAT_ID, selectedCategoryId);
-                Log.d (LOG_TAG, "onItemClick: intent.putExtra(" + ActivityForumSubjects.START_INTENT_EXTRA_CAT_ID + ", " + selectedCategoryId + ")");
+                intent.putExtra(ActivityForumSubjects.START_INTENT_EXTRA_CAT_ID,    selectedCategoryId);
+                intent.putExtra(ActivityForumSubjects.START_INTENT_EXTRA_CAT_LABEL, categoryLabels[index]);
+                Log.d (LOG_TAG, "onItemClick: intent.putExtra(" + selectedCategoryId + ", " + categoryLabels[index] + ")");
                 startActivity (intent);
             }
         });

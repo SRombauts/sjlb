@@ -4,9 +4,9 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
 >
-    <Spinner
-        android:id="@+id/destinataireListView"
-        android:layout_width="fill_parent"
+    <TextView  
+        android:id="@+id/msg_new_label"
+        android:layout_width="fill_parent" 
         android:layout_height="wrap_content"
     />
     <EditText
@@ -19,8 +19,8 @@
     <Button
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
-        android:text="@string/button_send_pm"
-        android:onClick="onSendPM"
+        android:text="@string/button_send_msg"
+        android:onClick="onSendMsg"
     />
 
 </LinearLayout>

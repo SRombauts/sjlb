@@ -3,12 +3,10 @@
     <string name="app_name"> SJLB </string>
 
     <string name="pm_description">      Private Messages    </string>
-    <string name="subj_description">    Subjects            </string>
-    <string name="msg_description">     Messages            </string>
 
-    <string name="button_show_pm">  Private messages </string>
-    <string name="button_new_pm">   New Private Message  </string>
-    <string name="button_send_pm">  Send Private Message </string>
+    <string name="button_show_pm">  Private messages        </string>
+    <string name="button_send_pm">  Send Private Message    </string>
+    <string name="button_send_msg"> Send Message            </string>
 
     <string name="prefs_authentication">    Authentication  </string>
     <string name="prefs_login_title">       Login           </string>
@@ -33,6 +31,8 @@
     <string name="menu_show_pm">        Private Messages    </string>
     <string name="menu_new_pm">         New Private Message </string>
     <string name="menu_send_pm">        Send Private Message</string>
+    <string name="menu_new_msg">        New Message         </string>
+    <string name="menu_send_msg">       Send Message        </string>
     <string name="menu_update">         Refresh             </string>
     <string name="menu_reset">          Reset Local Data    </string>
     <string name="menu_delete_all_pm">  Delete All PM       </string>

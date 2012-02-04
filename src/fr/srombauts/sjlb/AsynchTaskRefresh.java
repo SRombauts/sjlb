@@ -46,10 +46,10 @@ import android.util.Log;
  * @author 14/06/2010 srombauts
  */
 class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
+    private static final String  LOG_TAG                    = "RefreshTask";
 
     public static final  int     NOTIFICATION_NEW_PM_ID     = 1;
     public static final  int     NOTIFICATION_NEW_MSG_ID    = 2;
-    private static final String  LOG_TAG                    = "RefreshTask";
 
     static final private String NODE_NAME_PRIVATE_MSG       = "pm";
     static final private String NODE_NAME_PRIVATE_MSG_ID    = "id";
@@ -452,8 +452,6 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
      */
     void fetchMsg () {
 
-        long lastMsgDate = mMsgDBAdapter.getLastMsgDate();
-        
         // s'il y a de nouveaux Msg
 //      if (0 < mNbNewMsg) {
         // TODO SRO : en fait même pas, il faudrait simplement toujours demander la liste des derniers messages, elle serait vide
@@ -466,6 +464,9 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 
                 // Utilise les préférences pour récupérer le login/mot de passe :
                 LoginPassword loginPassword = new LoginPassword(mContext);
+
+                // Récupère la date du message le plus récent déjà lu
+                long lastMsgDate = mMsgDBAdapter.getLastMsgDate();
                 
                 // Instancie un client http et un header de requète "POST"  
                 HttpClient  httpClient  = new DefaultHttpClient();  
@@ -517,12 +518,21 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             
                             ForumSubject newSubj = new ForumSubject(idSubj, idCat, idGroup, lastDate, strText);
                             
-                            // Renseigne la bdd
-                            // TODO SRO : SSI le sujet n'existe pas déjà !
-                            Boolean bInserted = mSubjDBAdapter.insertSubj(newSubj);
-                            if (bInserted) {
-                                Log.d(LOG_TAG, "Subj " + idSubj + " inserted");                                
+                            // Renseigne la bdd SSI le sujet n'existe pas, sinon le met simplement à jour
+                            if (mSubjDBAdapter.isExist(idSubj)) {
+                                if (mSubjDBAdapter.updateSubj(newSubj)) {
+                                    Log.d(LOG_TAG, "Subj " + idSubj + " updated");                                
+                                } else {
+                                    Log.e(LOG_TAG, "Subj " + idSubj + " NOT updated !");
+                                }
+                            } else {
+                                if (mSubjDBAdapter.insertSubj(newSubj)) {
+                                    Log.d(LOG_TAG, "Subj " + idSubj + " inserted");                                
+                                } else {
+                                    Log.e(LOG_TAG, "Subj " + idSubj + " NOT inserted !");
+                                }                                
                             }
+                            
                         }
                     }
                     
@@ -553,15 +563,13 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             
                             // Renseigne la bdd SSI le message n'est pas déjà inséré, sinon fait un update
                             if (mMsgDBAdapter.isExist(idMsg)) {
-                                Boolean bInserted = mMsgDBAdapter.updateMsg(newMsg);
-                                if (bInserted) {
+                                if (mMsgDBAdapter.updateMsg(newMsg)) {
                                     Log.d(LOG_TAG, "Msg " + idMsg + " updated");
                                 } else {
                                     Log.e(LOG_TAG, "Msg " + idMsg + " NOT updated !");
                                 }
                             } else {
-                                Boolean bUpdated = mMsgDBAdapter.insertMsg(newMsg);
-                                if (bUpdated) {
+                                if (mMsgDBAdapter.insertMsg(newMsg)) {
                                     Log.d(LOG_TAG, "Msg " + idMsg + " inserted");                                
                                 } else {
                                     Log.e(LOG_TAG, "Msg " + idMsg + " NOT inserted !");

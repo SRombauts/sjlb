@@ -52,10 +52,10 @@ public class ActivityPrivateMessages extends Activity {
                                 null, null, null);
 
         // Les colonnes à mapper :
-        String[]    from = new String[] { SJLB.PM.AUTHOR_ID, SJLB.PM.AUTHOR, SJLB.PM.DATE, SJLB.PM.TEXT };
+        String[]    from = new String[] { SJLB.PM.AUTHOR, SJLB.PM.DATE, SJLB.PM.TEXT };
         
         // Les ID des views sur lesquels les mapper :
-        int[]       to   = new int[]    { R.id.pmAuthorId, R.id.pmAuthor, R.id.pmDate, R.id.pmText };
+        int[]       to   = new int[]    { R.id.pmAuthor, R.id.pmDate, R.id.pmText };
 
         // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
         mAdapter = new SimpleCursorAdapter( this,
@@ -66,6 +66,8 @@ public class ActivityPrivateMessages extends Activity {
         
         mPrivateMessagesListView = (ListView)findViewById(R.id.pm_listview);
         mPrivateMessagesListView.setAdapter (mAdapter);
+        // Scroll tout en bas de la liste des messages
+        mPrivateMessagesListView.setSelection(mPrivateMessagesListView.getCount()-1);
         
         registerForContextMenu (mPrivateMessagesListView);        
     }
@@ -131,13 +133,6 @@ public class ActivityPrivateMessages extends Activity {
                 mCursor.requery();
                 mAdapter.notifyDataSetChanged();
                 break;            }
-            case (R.id.menu_reset): {
-                ContentProviderPM   pms = new ContentProviderPM (this);
-                pms.clearPM();
-                ContentProviderMsg  msgs = new ContentProviderMsg (this);
-                msgs.clearMsg();
-                break;
-            }
             case (R.id.menu_delete_all_pm): {
                 showDialog(DIALOG_ID_PM_DELETE_ALL);
                 break;

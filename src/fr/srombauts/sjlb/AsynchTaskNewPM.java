@@ -32,13 +32,13 @@ import android.widget.Toast;
 
 
 /**
- * Travail en tâche de fond, chargée de récupérer le fichier XML listant les messages non lus
+ * Travail en tâche de fond, chargée d'envoyer un nouveau message privé
  */
 class AsynchTaskNewPM extends AsyncTask<String, Void, Void> {
+    private static final String  LOG_TAG                    = "NewPMTask";
 
     public static final  int     NOTIFICATION_NEW_PM_ID     = 1;
     public static final  int     NOTIFICATION_NEW_MSG_ID    = 2;
-    private static final String  LOG_TAG                    = "DeleteTask";
 
     static final private String NODE_NAME_PRIVATE_MSG       = "pm";
 
@@ -123,7 +123,7 @@ class AsynchTaskNewPM extends AsyncTask<String, Void, Void> {
                 // Récupère le contenu de la réponse
                 InputStream             in          = response.getEntity().getContent();
             
-                Log.d(LOG_TAG, "sendPM... en cours");                        
+                Log.d(LOG_TAG, "sendPM ok");                        
                 
                 // TODO SRO mutualiser ce qui suit pour l'utiliser aussi lors d'un effacement de pm
                 // Parse de la page XML

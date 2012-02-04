@@ -17,8 +17,8 @@ import android.widget.Spinner;
 
 
 /**
- * Activité présentant la liste des messages privés
- * @author 14/06/2010 srombauts
+ * Activité permettant d'envoyer un nouveau message privé
+ * @author 14/08/2010 srombauts
  */
 public class ActivityNewPrivateMessage extends Activity {
     private static final String LOG_TAG = "ActivityNewPM";
@@ -35,7 +35,18 @@ public class ActivityNewPrivateMessage extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Layout de l'activité
         setContentView(R.layout.pm_new);
+
+        // Récupère l'éventuel paramètre de lancement (id de l'auteur du message auquel on souhaite répondre)
+        Intent startIntent = getIntent();
+        if (null != startIntent.getExtras())
+        {
+            // Sélectionne le destinataire du PM pour répondre
+            int authorId = startIntent.getExtras().getInt(START_INTENT_EXTRA_AUTHOR_ID);
+            mUsersSpinner.setSelection(authorId-1);
+        }
         
         // Récupére un curseur sur les données (les utilisateurs) 
         mCursor = managedQuery( SJLB.User.CONTENT_URI,
@@ -57,15 +68,6 @@ public class ActivityNewPrivateMessage extends Activity {
         
         mUsersSpinner = (Spinner)findViewById(R.id.destinataireListView);
         mUsersSpinner.setAdapter (mAdapter);
-        
-        // Récupère l'éventuel paramètre de lancement (id de l'auteur du message auquel on souhaite répondre)
-        Intent startIntent = getIntent();
-        if (null != startIntent.getExtras())
-        {
-            // Sélectionne le destinataire du PM pour répondre
-            int authorId = startIntent.getExtras().getInt(START_INTENT_EXTRA_AUTHOR_ID);
-            mUsersSpinner.setSelection(authorId-1);
-        }
         
         // Binding de la zone de saisie du message
         mText = (EditText)findViewById(R.id.textEditText);
@@ -122,8 +124,8 @@ public class ActivityNewPrivateMessage extends Activity {
     public void onSendPM (View v) {
         long destinataireId = mUsersSpinner.getSelectedItemId();
         Log.d (LOG_TAG, "onSendPM ("+ destinataireId +") : " + mText.getText().toString());
-        // TODO SRO : envoyer le message en le passant en paramètres
         AsynchTaskNewPM TaskSendPM = new AsynchTaskNewPM(this);
+        // Envoie le message en le passant en paramètres
         TaskSendPM.execute(Long.toString(destinataireId), mText.getText().toString());
         finish ();
     }
