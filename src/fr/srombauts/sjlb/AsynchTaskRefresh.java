@@ -199,6 +199,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                     
                     // Parse de la page XML
                     DocumentBuilderFactory  dbf         = DocumentBuilderFactory.newInstance();
+                    dbf.setCoalescing(true);
                     DocumentBuilder         db          = dbf.newDocumentBuilder();
                     Document                dom         = db.parse(in);
                     Element                 docElement  = dom.getDocumentElement();
@@ -278,6 +279,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 
                 // Parse de la page XML
                 DocumentBuilderFactory  dbf         = DocumentBuilderFactory.newInstance();
+                dbf.setCoalescing(true);
                 DocumentBuilder         db          = dbf.newDocumentBuilder();
                 Document                dom         = db.parse(in);
                 Element                 docElement  = dom.getDocumentElement();
@@ -324,11 +326,11 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             mNbNewMsg++;
                         }
                         else {
-                            Log.d(LOG_TAG, "Msg " + idMsg + " déjà récupéré précédemment");
+                            Log.d(LOG_TAG, "Msg " + idMsg + " recuperes precedemment");
                         }
                     }
                 }
-                Log.d(LOG_TAG, "refreshInfos... ok : mNbNewPM="+mNbNewPM+" ("+mNbPM+"), mNbNewMsg="+mNbNewMsg+"("+mNbMsg+")");
+                Log.d(LOG_TAG, "refreshInfos... ok : mNbNewPM="+mNbNewPM+" ("+mNbPM+"), mNbNewMsg="+mNbNewMsg+" ("+mNbMsg+")");
             }
                
         } catch (LoginPasswordException e) {
@@ -385,6 +387,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                     // TODO SRO mutualiser ce qui suit pour l'utiliser aussi lors d'un effacement de pm
                     // Parse de la page XML
                     DocumentBuilderFactory  dbf         = DocumentBuilderFactory.newInstance();
+                    dbf.setCoalescing(true);
                     DocumentBuilder         db          = dbf.newDocumentBuilder();
                     Document                dom         = db.parse(in);
                     Element                 docElement  = dom.getDocumentElement();
@@ -412,7 +415,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             int     idAuthor    = Integer.parseInt(strIdAuthor);
                             String  strAuthor   = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_PSEUDO);
                             
-                            Log.d(LOG_TAG, "PM " + idPM + " " + strAuthor + " ("+ idAuthor +") " + date + " (" + strDate + ") : "  + strText);
+                            Log.d(LOG_TAG, "PM " + idPM + " " + strAuthor + " ("+ idAuthor +") " + strDate + " : '"  + strText + "' (" + strText.length()+ ")");
                             
                             PrivateMessage newPM = new PrivateMessage(idPM, date, idAuthor, strAuthor, strText);
                             
@@ -490,6 +493,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 
                     // Parse de la page XML
                     DocumentBuilderFactory  dbf         = DocumentBuilderFactory.newInstance();
+                    dbf.setCoalescing(true);
                     DocumentBuilder         db          = dbf.newDocumentBuilder();
                     Document                dom         = db.parse(in);
                     Element                 docElement  = dom.getDocumentElement();
@@ -514,7 +518,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             long    longLastDate= (long)Integer.parseInt(strLastDate);
                             Date    lastDate    = new Date(longLastDate*1000);
                             
-                            Log.d(LOG_TAG, "Subj " + idSubj + " " + idCat + " " + idGroup + " (" + lastDate + ") : "  + strText);
+                         // Log.d(LOG_TAG, "Subj " + idSubj + " " + idCat + " " + idGroup + " (" + lastDate + ") : '"  + strText + "'");
                             
                             ForumSubject newSubj = new ForumSubject(idSubj, idCat, idGroup, lastDate, strText);
                             
@@ -557,7 +561,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             String  strIdSubject= Msg.getAttribute(ATTR_NAME_FORUM_MSG_SUBJECT_ID);
                             int     idSubject   = Integer.parseInt(strIdSubject);
                             
-                            Log.d(LOG_TAG, "Msg " + idMsg + " " + strAuthor + " ("+ idAuthor +") " + date + " (" + strDate + ") sujet=" + idSubject + " : "  + strText);
+                         // Log.d(LOG_TAG, "Msg " + idMsg + " " + strAuthor + " ("+ idAuthor +") " + strDate + " sujet=" + idSubject + " : '"  + strText + "' (" + strText.length() + ")");
                             
                             ForumMessage newMsg = new ForumMessage(idMsg, date, idAuthor, strAuthor, idSubject, strText);
                             
@@ -669,8 +673,14 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         CharSequence    contentText         = mNbMsg + " " + mContext.getString(R.string.notification_text_msg) + " (" + mNbNewMsg + mContext.getString(R.string.notification_new) + ")";
         
         // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
+        // => lien Site Web :
         Intent          notificationIntent  = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(mContext.getString(R.string.sjlb_forum_uri)));
         PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
+        // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
+        // => lien activité principale :
+// TODO SRO : pas encore au point
+//        Intent          notificationIntent  = new Intent(mContext, ActivitySJLB.class);
+//        PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
 
         // Préparation du résumé de notification
         // TODO SRO : utiliser une icone pour les PM, et une autre pour les Posts

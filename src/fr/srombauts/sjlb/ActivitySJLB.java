@@ -3,6 +3,7 @@ package fr.srombauts.sjlb;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -13,7 +14,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -41,7 +44,7 @@ public class ActivitySJLB extends Activity {
         setContentView(R.layout.main);
         
         // binding de la liste des catégories et du champ de version
-        mCategoriesListView     = (ListView)findViewById(R.id.categoriesListView);        
+        mCategoriesListView     = (ListView)findViewById(R.id.categoriesListView);
         TextView    VersionView = (TextView)findViewById(R.id.versionView);
         
         // Lit les informations de version du package courant
@@ -54,6 +57,7 @@ public class ActivitySJLB extends Activity {
             e.printStackTrace();
         }
         
+        // TODO SRO : ne pas créer de lister directement dans le code comme ça !
         mCategoriesListView.setOnItemClickListener(new OnItemClickListener() {
             @SuppressWarnings("unchecked")
             public void onItemClick(AdapterView adpter, View view, int index, long arg3) {
@@ -67,15 +71,32 @@ public class ActivitySJLB extends Activity {
                 startActivity (intent);
             }
         });
-      
+        
         // Lance le service, si pas déjà lancé, et provoque un rafraichissement
         IntentReceiverStartService.startService (this, LOG_TAG);
+    }
+
+    protected void onResume () {
+        super.onResume();
+        
+        clearNotificationMsg ();
+    }
+
+    private void clearNotificationMsg () {
+        // Annule l'éventuelle notification de Msg non lus
+        String              ns                      = Context.NOTIFICATION_SERVICE;
+        NotificationManager notificationManager     = (NotificationManager) getSystemService(ns);
+        notificationManager.cancel(AsynchTaskRefresh.NOTIFICATION_NEW_MSG_ID);
     }
 
     protected Context getContext() {
         return this;
     }
 
+    public boolean onTouch (View v, MotionEvent event) {
+        return false;
+    }
+        
     /**
      * Création du menu
      */

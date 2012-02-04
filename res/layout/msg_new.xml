@@ -14,7 +14,7 @@
         android:layout_width="fill_parent"
         android:layout_height="200px"
         android:gravity="top"
-        android:inputType="textCapSentences"
+        android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
     />
     <Button
         android:layout_width="fill_parent" 

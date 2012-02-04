@@ -73,6 +73,7 @@ public class ActivityForumSubjects extends Activity {
         mSubjectsListView = (ListView)findViewById(R.id.subj_listview);
         mSubjectsListView.setAdapter (mAdapter);
 
+        // TODO SRO : ne pas créer de lister directement dans le code comme ça !
         mSubjectsListView.setOnItemClickListener(new OnItemClickListener() {
             @SuppressWarnings("unchecked")
             public void onItemClick(AdapterView adapter, View view, int index, long arg3) {

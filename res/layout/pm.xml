@@ -14,8 +14,7 @@
             android:id="@+id/pmAuthor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="4px"
-            android:textSize="22px"
+            android:textSize="26px"
             android:textColor="#FFF"
             android:background="#000"
             />
@@ -23,18 +22,18 @@
             android:id="@+id/pmDate"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:padding="4px"
-            android:textSize="22px"
+            android:textSize="26px"
             android:textColor="#FFF"
             android:background="#000"
+            android:gravity="right"
             />
     </LinearLayout>
     <TextView
         android:id="@+id/pmText"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="8px"
-        android:textSize="26px"
+        android:paddingTop="8px"
+        android:textSize="24px"
         android:textColor="#FFF"
         android:background="#000"
         />

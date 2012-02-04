@@ -11,7 +11,8 @@ public final class SJLB {
     private SJLB() {}
 
     public static final String DATABASE_NAME        = "SJLB.db";
-    public static final int    DATABASE_VERSION     = 3;
+    public static final int    DATABASE_VERSION     = 4;
+    
     
     /**
      * Clef des préférences
@@ -65,8 +66,55 @@ public final class SJLB {
         // Interdiction de l'instanciation
         private PM() {}
 
-        public static final String  TABLE_NAME   = "private_messages";
+        /**
+         * L'id du PM
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  ID                  = "_id";
         
+        /**
+         * Date en secondes depuis le 1er janvier 1970
+         * <P>Type: TEXT</P>
+         */
+        public static final String  DATE                = "date";
+
+        /**
+         * L'id de l'auteur/expéditeur du PM
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  AUTHOR_ID           = "author_id";
+
+        /**
+         * L'auteur/expéditeur du PM
+         * <P>Type: TEXT</P>
+         */
+        public static final String  AUTHOR              = "author";
+
+        /**
+         * Le texte du PM
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  TEXT                = "text";
+
+        /**
+         * The default sort order for this table
+         */
+        public static final String  DEFAULT_SORT_ORDER  = "_id ASC";
+
+
+
+        public static final String  TABLE_NAME   = "private_messages";
+
+        public static final String  TABLE_CREATE = "create table " + TABLE_NAME + " ("
+                                                    + ID        + " integer primary key, "
+                                                    + DATE      + " text, "
+                                                    + AUTHOR_ID + " integer, "
+                                                    + AUTHOR    + " text, "
+                                                    + TEXT      + " text);";
+
+        public static final String  TABLE_DROP   = "DROP TABLE IF EXISTS " + TABLE_NAME;
+            
+            
         /**
          * L'autorité identifiant de manière unique le content provider
          */        
@@ -101,41 +149,6 @@ public final class SJLB {
          * Le matcher d'URI pour un live folder de PM
          */
         public static final String  MATCHER_LIVE_FOLDER = "live_folders/pm";
-
-        /**
-         * The default sort order for this table
-         */
-        public static final String  DEFAULT_SORT_ORDER  = "_id ASC";
-
-        /**
-         * L'id du PM
-         * <P>Type: INTEGER</P>
-         */
-        public static final String  ID                  = "_id";
-        
-        /**
-         * Date en secondes depuis le 1er janvier 1970
-         * <P>Type: TEXT</P>
-         */
-        public static final String  DATE                = "date";
-
-        /**
-         * L'id de l'auteur/expéditeur du PM
-         * <P>Type: INTEGER</P>
-         */
-        public static final String  AUTHOR_ID           = "author_id";
-
-        /**
-         * L'auteur/expéditeur du PM
-         * <P>Type: TEXT</P>
-         */
-        public static final String  AUTHOR              = "author";
-
-        /**
-         * Le texte du PM
-         * <P>Type: INTEGER</P>
-         */
-        public static final String  TEXT                = "text";
     }
     
     /**
@@ -145,7 +158,48 @@ public final class SJLB {
         // Interdiction de l'instanciation
         private Subj() {}
 
+        /**
+         * L'id du PM
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  ID                  = "_id";
+        
+        /**
+         * L'id de la catégorie de ratachement du sujet
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  CAT_ID              = "category_id";
+        
+        /**
+         * L'id du groupe d'utilisateur ayant les droits sur ce sujet
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  GROUP_ID            = "group_id";
+        
+        /**
+         * La date de dernier message du sujet
+         * <P>Type: DATE</P>
+         */
+        public static final String  LAST_DATE           = "last_date";
+        
+        /**
+         * Le texte du PM
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  TEXT                = "text";
+
+
         public static final String  TABLE_NAME   = "forum_subjects";
+
+        public static final String TABLE_CREATE = "create table " + TABLE_NAME + " ("
+                                                    + ID       + " integer primary key, "
+                                                    + CAT_ID   + " integer, "
+                                                    + GROUP_ID + " integer, "
+                                                    + LAST_DATE+ " date, "
+                                                    + TEXT     + " text);";
+
+        public static final String TABLE_DROP   = "DROP TABLE IF EXISTS " + SJLB.Subj.TABLE_NAME;
+
 
         /**
          * L'autorité identifiant de manière unique le content provider
@@ -185,36 +239,6 @@ public final class SJLB {
          * The default sort order for this table
          */
         public static final String  DEFAULT_SORT_ORDER  = "last_date DESC";
-
-        /**
-         * L'id du PM
-         * <P>Type: INTEGER</P>
-         */
-        public static final String  ID                  = "_id";
-        
-        /**
-         * L'id de la catégorie de ratachement du sujet
-         * <P>Type: INTEGER</P>
-         */
-        public static final String  CAT_ID              = "category_id";
-        
-        /**
-         * L'id du groupe d'utilisateur ayant les droits sur ce sujet
-         * <P>Type: INTEGER</P>
-         */
-        public static final String  GROUP_ID            = "group_id";
-        
-        /**
-         * La date de dernier message du sujet
-         * <P>Type: DATE</P>
-         */
-        public static final String  LAST_DATE           = "last_date";
-        
-        /**
-         * Le texte du PM
-         * <P>Type: INTEGER</P>
-         */
-        public static final String  TEXT                = "text";
     }
 
 
@@ -225,7 +249,55 @@ public final class SJLB {
         // Interdiction de l'instanciation
         private Msg() {}
 
+        /**
+         * L'id du Msg
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  ID                  = "_id";
+        
+        /**
+         * Date en secondes depuis le 1er janvier 1970
+         * <P>Type: TEXT</P>
+         */
+        public static final String  DATE                = "date";
+
+        /**
+         * L'auteur/expéditeur du Msg
+         * <P>Type: TEXT</P>
+         */
+        public static final String  AUTHOR              = "author";
+
+        /**
+         * L'id de l'auteur/expéditeur du Msg
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  AUTHOR_ID           = "author_id";
+
+        /**
+         * L'id de le sujet auquel s'applique le Msg
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  SUBJECT_ID          = "subject_id";
+
+        /**
+         * Le texte du Msg
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  TEXT                = "text";
+
+
         public static final String  TABLE_NAME   = "forum_messages";
+
+        public static final String TABLE_CREATE = "create table " + SJLB.Msg.TABLE_NAME + " ("
+                                                    + SJLB.Msg.ID        + " integer primary key, "
+                                                    + SJLB.Msg.DATE      + " text, "
+                                                    + SJLB.Msg.AUTHOR_ID + " integer, "
+                                                    + SJLB.Msg.AUTHOR    + " text, "
+                                                    + SJLB.Msg.SUBJECT_ID+ " integer, "
+                                                    + SJLB.Msg.TEXT      + " text);";
+
+        public static final String TABLE_DROP   = "DROP TABLE IF EXISTS " + SJLB.Msg.TABLE_NAME;        
+
 
         /**
          * L'autorité identifiant de manière unique le content provider
@@ -264,43 +336,10 @@ public final class SJLB {
         /**
          * The default sort order for this table
          */
-        public static final String  DEFAULT_SORT_ORDER  = "date ASC";
+        // TODO SRO : il nous faut conserver un champ Date en plus de la "DateString"
+        //public static final String  DEFAULT_SORT_ORDER  = "date ASC";
+        public static final String  DEFAULT_SORT_ORDER  = "_id ASC";
 
-        /**
-         * L'id du Msg
-         * <P>Type: INTEGER</P>
-         */
-        public static final String  ID                  = "_id";
-        
-        /**
-         * Date en secondes depuis le 1er janvier 1970
-         * <P>Type: TEXT</P>
-         */
-        public static final String  DATE                = "date";
-
-        /**
-         * L'auteur/expéditeur du Msg
-         * <P>Type: TEXT</P>
-         */
-        public static final String  AUTHOR              = "author";
-
-        /**
-         * L'id de l'auteur/expéditeur du Msg
-         * <P>Type: INTEGER</P>
-         */
-        public static final String  AUTHOR_ID           = "author_id";
-
-        /**
-         * L'id de le sujet auquel s'applique le Msg
-         * <P>Type: INTEGER</P>
-         */
-        public static final String  SUBJECT_ID          = "subject_id";
-
-        /**
-         * Le texte du Msg
-         * <P>Type: INTEGER</P>
-         */
-        public static final String  TEXT                = "text";
     }
 
     /**
@@ -310,7 +349,32 @@ public final class SJLB {
         // Interdiction de l'instanciation
         private User() {}
 
+        /**
+         * L'id de l'utilisateur
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  ID                  = "_id";
+        
+        /**
+         * Le pseudonyme/login de l'utilisateur
+         * <P>Type: TEXT</P>
+         */
+        public static final String  PSEUDO              = "pseudo";
+        
+        /**
+         * The default sort order for this table
+         */
+        public static final String  DEFAULT_SORT_ORDER  = "_id ASC";
+
+
         public static final String  TABLE_NAME   = "users";
+
+        public static final String  TABLE_CREATE = "create table " + TABLE_NAME + " ("
+                                                    + ID      + " integer primary key, "
+                                                    + PSEUDO  + " text);";
+
+        public static final String  TABLE_DROP   = "DROP TABLE IF EXISTS " + TABLE_NAME;
+
 
         /**
          * L'autorité identifiant de manière unique le content provider
@@ -346,23 +410,6 @@ public final class SJLB {
          * Le matcher d'URI pour un live folder de User
          */
         public static final String  MATCHER_LIVE_FOLDER = "live_folders/user";
-        
-        /**
-         * The default sort order for this table
-         */
-        public static final String  DEFAULT_SORT_ORDER  = "_id ASC";
-
-        /**
-         * L'id de l'utilisateur
-         * <P>Type: INTEGER</P>
-         */
-        public static final String  ID                  = "_id";
-        
-        /**
-         * Le pseudonyme/login de l'utilisateur
-         * <P>Type: TEXT</P>
-         */
-        public static final String  PSEUDO              = "pseudo";
     }    
 }
 

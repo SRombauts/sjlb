@@ -39,15 +39,6 @@ public class ActivityNewPrivateMessage extends Activity {
         // Layout de l'activité
         setContentView(R.layout.pm_new);
 
-        // Récupère l'éventuel paramètre de lancement (id de l'auteur du message auquel on souhaite répondre)
-        Intent startIntent = getIntent();
-        if (null != startIntent.getExtras())
-        {
-            // Sélectionne le destinataire du PM pour répondre
-            int authorId = startIntent.getExtras().getInt(START_INTENT_EXTRA_AUTHOR_ID);
-            mUsersSpinner.setSelection(authorId-1);
-        }
-        
         // Récupére un curseur sur les données (les utilisateurs) 
         mCursor = managedQuery( SJLB.User.CONTENT_URI,
                                 null,
@@ -68,6 +59,15 @@ public class ActivityNewPrivateMessage extends Activity {
         
         mUsersSpinner = (Spinner)findViewById(R.id.destinataireListView);
         mUsersSpinner.setAdapter (mAdapter);
+        
+        // Récupère l'éventuel paramètre de lancement (id de l'auteur du message auquel on souhaite répondre)
+        Intent startIntent = getIntent();
+        if (null != startIntent.getExtras())
+        {
+            // Sélectionne le destinataire du PM pour répondre
+            int authorId = startIntent.getExtras().getInt(START_INTENT_EXTRA_AUTHOR_ID);
+            mUsersSpinner.setSelection(authorId-1);
+        }
         
         // Binding de la zone de saisie du message
         mText = (EditText)findViewById(R.id.textEditText);

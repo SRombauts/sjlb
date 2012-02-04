@@ -14,7 +14,6 @@
             android:id="@+id/msgAuthor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="4px"
             android:textSize="22px"
             android:textColor="#FFF"
             android:background="#000"
@@ -23,17 +22,17 @@
             android:id="@+id/msgDate"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:padding="4px"
             android:textSize="22px"
             android:textColor="#FFF"
             android:background="#000"
+            android:gravity="right"
             />
     </LinearLayout>
     <TextView
         android:id="@+id/msgText"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="8px"
+        android:paddingTop="8px"
         android:textSize="26px"
         android:textColor="#FFF"
         android:background="#000"

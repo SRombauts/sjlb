@@ -174,6 +174,7 @@ public class ActivityPrivateMessages extends Activity {
     /**
      * Création de la boîte de dialogue
      */
+    // TODO SRO : ne pas créer de lister directement dans le code comme ça !
     public Dialog onCreateDialog (int id) {
         switch(id) {
             case(DIALOG_ID_PM_DELETE_ONE): {
