@@ -19,10 +19,10 @@ import android.util.Log;
 public class ServiceRefresh extends Service {
     private static final String  LOG_TAG = "SJLBService";
 
-    private AsynchTaskRefresh     mRefreshTask    = null;
+    private AsynchTaskRefresh   mRefreshTask    = null;
 
-    private AlarmManager    mAlarmManager   = null;
-    private PendingIntent   mAlarmIntent    = null;    
+    private AlarmManager        mAlarmManager   = null;
+    private PendingIntent       mAlarmIntent    = null;    
 
     /**
      * Lancement de l'alarme périodique
@@ -62,7 +62,7 @@ public class ServiceRefresh extends Service {
         {
             // lance un rafraichissement de la liste des messages non lus
             mRefreshTask = new AsynchTaskRefresh(this);
-            mRefreshTask.execute((Void[]) null);
+            mRefreshTask.execute((Void) null);
         }
         
         // Le service peut être arrêter dès que le rafraichissement est terminé, l'alarme le réveillera régulièrement

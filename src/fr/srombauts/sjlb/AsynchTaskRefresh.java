@@ -44,27 +44,29 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     public static final  int     NOTIFICATION_NEW_MSG_ID    = 2;
     private static final String  LOG_TAG                    = "RefreshTask";
 
-    static final private String NODE_NAME_LOGIN_ID          = "id_login";
     static final private String NODE_NAME_PRIVATE_MSG       = "pm";
     static final private String NODE_NAME_PRIVATE_MSG_ID    = "id";
     static final private String NODE_NAME_FORUM_MSG         = "msg";
     static final private String NODE_NAME_FORUM_MSG_ID      = "id";
+    static final private String NODE_NAME_USER              = "user";
 
     static final private String ATTR_NAME_PRIVATE_MSG_ID        = "id";
     static final private String ATTR_NAME_PRIVATE_MSG_DATE      = "date";
     static final private String ATTR_NAME_PRIVATE_MSG_ID_AUTHOR = "id_auteur";
     static final private String ATTR_NAME_PRIVATE_MSG_PSEUDO    = "pseudo";
     
+    static final private String ATTR_NAME_USER_ID               = "id";
+    static final private String ATTR_NAME_USER_PSEUDO           = "pseudo";
 
     private ServiceRefresh  mContext        = null;
-    private int             mIdLogin        = 0;
     private int             mNbPM           = 0;
     private int             mNbNewPM        = 0;
     private int             mNbMsg          = 0;
     private int             mNbNewMsg       = 0;
-
-    private ContentProviderPM   mPMDBAdapter  = null;
-    private ContentProviderMsg  mMsgDBAdapter = null;
+    
+    private ContentProviderPM       mPMDBAdapter    = null;
+    private ContentProviderMsg      mMsgDBAdapter   = null;
+    private ContentProviderUser     mUserDBAdapter  = null;
       
     /**
      * Constructeur utilisé pour mémorisée la référence sur le service appelant
@@ -73,13 +75,14 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     public AsynchTaskRefresh(ServiceRefresh context) {
         mContext      = context;
                                 
-        mPMDBAdapter  = new ContentProviderPM(context);
-        mMsgDBAdapter = new ContentProviderMsg(context);
+        mPMDBAdapter    = new ContentProviderPM(context);
+        mMsgDBAdapter   = new ContentProviderMsg(context);
+        mUserDBAdapter  = new ContentProviderUser(context);
     }
 
     protected void onPreExecute() {
-        // SRO : comme on tourne dans un service en tache de fond, on ne veut pas gêner l'utilisateur avec une notification
-        // Toast notification de début de rafraichissement (pour le debug uniquement !)
+        // Toast notification de début de rafraichissement
+        // SRO : NON, comme on tourne dans un service en tache de fond, on ne veut pas gêner l'utilisateur avec une notification
         // Toast.makeText(mContext, mContext.getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
     }
     
@@ -89,15 +92,18 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
      * 
      * Ce travail s'exécute en tâche de fond, et n'a donc pas le droit d'effectuer d'actions sur la GUI
      */
-    protected Void doInBackground(Void... params) {
+    protected Void doInBackground(Void... args) {
         
         // Recherche d'éventuelles nouveautés
         refreshInfos ();
         
+        // Récupération (seulement si base vide)
+        refreshUsers ();
+        
         // Notifications des éventuelles nouveautés par appel à onProgressUpdate()
         publishProgress ();
         
-        // et récupération de ces éventuels nouveaux contenus
+        // et récupération de ces éventuels nouveaux contenus (seulement si nécessaire)
         fetchPM ();
         // TODO : fetchMsg ();
         
@@ -109,12 +115,12 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
      * Récupération des listes d'identifiants de messages non lus
      */
     void refreshInfos () {
-        Log.d(LOG_TAG, "refreshInfos...");
 
         mNbNewPM    = 0;
         mNbNewMsg   = 0;
         
         try {
+            Log.d(LOG_TAG, "refreshInfos...");
             
             // Utilise les préférences pour récupérer le login/mot de passe :
             LoginPassword loginPassword = new LoginPassword(mContext);
@@ -142,12 +148,6 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 Document                dom         = db.parse(in);
                 Element                 docElement  = dom.getDocumentElement();
                 
-                // Récupère l'id de l'utilsateur loggé
-                // TODO SRO : traiter ici les cas de noeuds "null" (cas du login/mdp erroné par exemple) ! 
-                Element eltIdLogin  = (Element)docElement.getElementsByTagName(NODE_NAME_LOGIN_ID).item(0);
-                String  strIdLogin  = eltIdLogin.getFirstChild().getNodeValue();
-                mIdLogin            = Integer.parseInt(strIdLogin);
-                
                 // Récupère la liste des PM
                 Element     eltPM  = (Element)docElement.getElementsByTagName(NODE_NAME_PRIVATE_MSG).item(0);
                 NodeList    listPM = eltPM.getElementsByTagName(NODE_NAME_PRIVATE_MSG_ID);
@@ -160,6 +160,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                         int     idPM    = Integer.parseInt(strIdPM);
                         
                         // Renseigne la bdd si PM inconnu
+                        // TODO SRO : un peu moche, provoque une exception SQL si le PM est déjà en base (pas propre en débug)
                         long nbInserted = mPMDBAdapter.insertPM(idPM);
                         if (-1 != nbInserted) {
                             mNbNewPM++;
@@ -189,6 +190,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                         int     idMsg    = Integer.parseInt(strIdMsg);
                         
                         // Renseigne la bdd si Message inconnu
+                        // TODO SRO : un peu moche, provoque une exception SQL si le PM est déjà en base (pas propre en débug)
                         long nbInserted = mMsgDBAdapter.insertMsg(idMsg);
                         if (-1 != nbInserted) {
                             mNbNewMsg++;
@@ -217,25 +219,103 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     
     
     /**
+     * Récupération des listes des utilisateurs du site
+     */
+    void refreshUsers () {
+
+        // TODO SRO : pour l'instant, fait une unique fois dans la vie de la BDD de l'application
+        if (0 == mUserDBAdapter.countUsers()) {
+            try {
+                Log.d(LOG_TAG, "refreshUsers...");
+                
+                // Utilise les préférences pour récupérer le login/mot de passe :
+                LoginPassword loginPassword = new LoginPassword(mContext);
+    
+                // Instancie un client http et un header de requète "POST"
+                HttpClient  httpClient  = new DefaultHttpClient();  
+                HttpPost    httpPost    = new HttpPost(mContext.getString(R.string.sjlb_users_uri));  
+                   
+                // Ajout des paramètres
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);  
+                nameValuePairs.add(new BasicNameValuePair("login",    loginPassword.mLogin));  
+                nameValuePairs.add(new BasicNameValuePair("password", loginPassword.mPasswordMD5));  
+                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
+                
+                // Execute HTTP Post Request  
+                HttpResponse response = httpClient.execute(httpPost);
+                if (HttpStatus.SC_OK == response.getStatusLine ().getStatusCode())
+                {
+                    // Récupère le contenu de la réponse
+                    InputStream             in          = response.getEntity().getContent();
+                    
+                    // Parse de la page XML
+                    DocumentBuilderFactory  dbf         = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder         db          = dbf.newDocumentBuilder();
+                    Document                dom         = db.parse(in);
+                    Element                 docElement  = dom.getDocumentElement();
+                    
+                    // Récupère la liste des utilisateurs
+                    NodeList    listPM = (NodeList)docElement.getElementsByTagName(NODE_NAME_USER);
+                    if (null != listPM)
+                    {
+                        int nbUsers = listPM.getLength();
+                        for (int i = 0; i < nbUsers; i++) {
+                            Element user        = (Element)listPM.item(i);
+    
+                            String  strIdUser   = user.getAttribute(ATTR_NAME_USER_ID);
+                            int     idUser      = Integer.parseInt(strIdUser);
+                            String  strPseudo   = user.getAttribute(ATTR_NAME_USER_PSEUDO);
+                            
+                            Log.d(LOG_TAG, "User " + idUser + " " + strPseudo);
+                            
+                            User newUser = new User(idUser, strPseudo);
+                            
+                            // Renseigne la bdd si User inconnu
+                            // TODO SRO : un peu moche, provoque une exception SQL si le PM est déjà en base (pas propre en débug)
+                            mUserDBAdapter.insertUser(newUser);
+                        }
+                    }
+    
+                    Log.d(LOG_TAG, "refreshUsers... ok");
+                }
+                   
+            } catch (LoginPasswordException e) {
+                e.printStackTrace();
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (SAXException e) {
+                e.printStackTrace();
+            } catch (ClassCastException e) {        
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    
+    /**
      * Publication en cours de travail
      *
      * Cette méthode est synchronisée donc une action sur la GUI est autorisée 
      */
     protected void onProgressUpdate(Void... values) {
-      super.onProgressUpdate(values);
+        super.onProgressUpdate(values);
       
-      // s'il y a de nouveaux PM :
-      if (0 < mNbNewPM)
-      {
-          // Notification dans la barre de status
-          notifyUserPM ();
-      }
-      // s'il y a de nouveaux messages non lus :
-      if (0 < mNbNewMsg)
-      {
-          // Notification dans la barre de status
-          notifyUserMsg ();
-      }
+        // s'il y a de nouveaux PM :
+        if (0 < mNbNewPM) {
+            // Notification dans la barre de status
+            notifyUserPM ();
+        }
+        // s'il y a de nouveaux messages non lus :
+        if (0 < mNbNewMsg) {
+            // Notification dans la barre de status
+            notifyUserMsg ();
+        }
     }
     
     
@@ -243,12 +323,11 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
      * Récupération du contenu des messages privés
      */
     void fetchPM () {
-        Log.d(LOG_TAG, "fetchPM...");
         
         // s'il y a de nouveaux PM (ou au contraire s'il y en a moins) :
-        if (0 != mNbNewPM)
-        {
+        if (0    != mNbNewPM) {
             try {
+                Log.d(LOG_TAG, "fetchPM...");
                 
                 // Utilise les préférences pour récupérer le login/mot de passe :
                 LoginPassword loginPassword = new LoginPassword(mContext);
@@ -260,7 +339,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 // Ajout des paramètres
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);  
                 nameValuePairs.add(new BasicNameValuePair("login",    loginPassword.mLogin));  
-                nameValuePairs.add(new BasicNameValuePair("password", loginPassword.mPasswordMD5));  
+                nameValuePairs.add(new BasicNameValuePair("password", loginPassword.mPasswordMD5));
+              //nameValuePairs.add(new BasicNameValuePair("id_message", aPmIdToDelete));
                 httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
                 
                 // Execute HTTP Post Request  
@@ -302,7 +382,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             
                             Log.d(LOG_TAG, "PM " + idPM + " " + strAuthor + " ("+ idAuthor +") " + date + " (" + strDate + ") : "  + strText);
                             
-                            PrivateMessage newPM = new PrivateMessage(idPM, date, strAuthor, strText);
+                            PrivateMessage newPM = new PrivateMessage(idPM, date, idAuthor, strAuthor, strText);
                             
                             // Renseigne la bdd
                             Boolean bInserted = mPMDBAdapter.insertPM(newPM);
@@ -351,6 +431,9 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     private void notifyUserPM () {
         Log.d(LOG_TAG, "notifyUserPM");
 
+        // Récupère les préférences de notification :
+        NotificationPrefs    notificationPrefs        = new NotificationPrefs(mContext);
+
         // Récupère une reference sur le NotificationManager :
         String              ns                      = Context.NOTIFICATION_SERVICE;
         NotificationManager notificationManager     = (NotificationManager) mContext.getSystemService(ns);
@@ -373,8 +456,20 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         Notification    notification    = new Notification(icon, tickerText, when);
 
         notification.number     = mNbPM;
-        notification.defaults   = Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND;
-        notification.vibrate    = new long[]{0, 200, 500, 200};
+        
+        notification.defaults   = 0;
+        if (notificationPrefs.mbSound)
+        {
+            notification.defaults   |= Notification.DEFAULT_SOUND;
+        }
+        if (notificationPrefs.mbLight)
+        {
+            notification.defaults   |= Notification.DEFAULT_LIGHTS;
+        }
+        if (notificationPrefs.mbVibrate)
+        {
+	        notification.vibrate    = new long[]{0, 200, 300, 200, 300, 200};
+        }
 
         // Assemblage final de la notification
         notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
@@ -389,6 +484,9 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     private void notifyUserMsg () {
         Log.d(LOG_TAG, "notifyUserMsg");
         
+        // Récupère les préférences de notification :
+        NotificationPrefs    notificationPrefs        = new NotificationPrefs(mContext);
+
         // Récupère une reference sur le NotificationManager :
         String              ns                      = Context.NOTIFICATION_SERVICE;
         NotificationManager notificationManager     = (NotificationManager) mContext.getSystemService(ns);
@@ -412,8 +510,20 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         Notification notification = new Notification(icon, tickerText, when);
 
         notification.number     = mNbMsg;
-        notification.defaults   = Notification.DEFAULT_LIGHTS + Notification.DEFAULT_SOUND;
-        notification.vibrate    = new long[]{0, 200, 300, 200, 300, 200};
+
+        notification.defaults   = 0;
+        if (notificationPrefs.mbSound)
+        {
+            notification.defaults   |= Notification.DEFAULT_SOUND;
+        }
+        if (notificationPrefs.mbLight)
+        {
+            notification.defaults   |= Notification.DEFAULT_LIGHTS;
+        }
+        if (notificationPrefs.mbVibrate)
+        {
+	        notification.vibrate    = new long[]{0, 200, 300, 200, 300, 200};
+        }
         
         // Assemblage final de la notification
         notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);

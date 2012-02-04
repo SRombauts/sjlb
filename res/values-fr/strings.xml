@@ -3,23 +3,54 @@
     <string name="pm_description">  Messages Privés </string>
 
     <string name="button_show_pm">  Messages Privés </string>
+    <string name="button_new_pm">   Nouveau message privé </string>
+    <string name="button_send_pm">  Envoyer le message privé </string>
 
-    <string name="prefs_authentication">    Authentification        </string>
+    <string name="prefs_authentication">    Authentification                </string>
+    <string name="prefs_login_title">       Login                           </string>
+    <string name="prefs_login_desc">        Pseudo de l\'utilisateur        </string>
+    <string name="prefs_password_title">    Mot de passe                    </string>
+    <string name="prefs_password_desc">     Mot de passe de l\'utilisateur  </string>
+
     <string name="prefs_auto_update">       Auto-Rafraîchissement   </string>
-    <string name="prefs_notification">      Notifications           </string>
+    <string name="prefs_auto_update_title"> Auto-Rafraîchissement   </string>
+    <string name="prefs_auto_update_desc">  Selectionner pour activer le rafraichissement automatique </string>
+    <string name="prefs_update_freq_title"> Frequence de rafraîchissement                             </string>
+    <string name="prefs_update_freq_desc">  Frequence de rafraichissement automatique des messages    </string>
 
-    <string name="menu_update">     Rafraîchir </string>
-    <string name="menu_show_pm">    Messages privés </string>
-    <string name="menu_show_msg">   Messages du forum </string>
-    <string name="menu_reset">      Supprimer tous msg </string>
-    <string name="menu_prefs">      Préférences </string>
-    <string name="menu_quit">       Quitter </string>
+    <string name="prefs_notification">      Notifications           </string>
+    <string name="prefs_sound_title">       Sonnerie    </string>
+    <string name="prefs_sound_desc">        Selectionner pour activer les notifications sonores       </string>
+    <string name="prefs_vibrate_title">     Vibreur     </string>
+    <string name="prefs_vibrate_desc">      Selectionner pour activer les notifications par vibreur   </string>
+    <string name="prefs_light_title">       Led         </string>
+    <string name="prefs_light_desc">        Selectionner pour activer les notifications par led       </string>
+
+    <string name="menu_show_pm">        Messages privés     </string>
+    <string name="menu_show_msg">       Messages du forum   </string>
+    <string name="menu_new_pm">         Nouveau message     </string>
+    <string name="menu_send_pm">        Envoyer le message  </string>
+    <string name="menu_update">         Rafraîchir          </string>
+    <string name="menu_reset">          Vider la base locale</string>
+    <string name="menu_delete_all_pm">  Supprimer tous les messages   </string>
+    <string name="menu_prefs">          Préférences         </string>
+    <string name="menu_quit">           Quitter             </string>
     
-    <string name="refreshing">         En cours de rafraichissement... </string>
-    <string name="refresh_impossible"> Impossible de rafraichir, nécessite login et mot de passe ! </string>
+    <string name="menu_pm_answer">      Répondre            </string>
+    <string name="menu_pm_delete">      Supprimer           </string>
+  
+    <string name="delete_one_pm_confirmation">  "Etes-vous sûr de vouloir supprimer ce message privé ?"           </string>
+    <string name="delete_all_pm_confirmation">  "Etes-vous sûr de vouloir supprimer TOUS LES messages privés ?!"  </string>
+    <string name="yes">                 Oui </string>
+    <string name="no">                  Non </string>
+
+    <string name="authentication_needed">   Action non disponible : nécessite login/mot de passe ! </string>
+    <string name="refreshing">              En cours de rafraichissement... </string>
+    <string name="deleting">                Effacement demandé...           </string>
+    <string name="sending">                 Envoi en cours...              </string>
 
     <string name="notification_title_pm">   Message(s) Privé(s) </string>
-    <string name="notification_title_msg">  Post(s) non lu(s) </string>
+    <string name="notification_title_msg">  Post(s) non lu(s)   </string>
     <string name="notification_text_pm">    message(s) privé(s) </string>
-    <string name="notification_text_msg">   post(s) non lu(s) </string>
+    <string name="notification_text_msg">   post(s) non lu(s)   </string>
 </resources>

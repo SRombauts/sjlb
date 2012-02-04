@@ -4,14 +4,13 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,13 +27,6 @@ import android.widget.AdapterView.OnItemClickListener;
  */
 public class ActivitySJLB extends Activity {
     private static final String LOG_TAG = "SJLBMain";
-
-    static final private int MENU_ID_SHOW_PM    = Menu.FIRST;
-    static final private int MENU_ID_SHOW_MSG   = Menu.FIRST + 1;
-    static final private int MENU_ID_UPDATE     = Menu.FIRST + 2;
-    static final private int MENU_ID_RESET      = Menu.FIRST + 3;
-    static final private int MENU_ID_PREFS      = Menu.FIRST + 4;
-    static final private int MENU_ID_QUIT       = Menu.FIRST + 5;
 
     // Liste des catégories du forum
     private ListView        mCategoriesListView = null;
@@ -77,15 +69,8 @@ public class ActivitySJLB extends Activity {
      * Création du menu
      */
     public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        
-        menu.add(0, MENU_ID_SHOW_PM,  Menu.NONE, R.string.menu_show_pm);
-        menu.add(0, MENU_ID_SHOW_MSG, Menu.NONE, R.string.menu_show_msg);
-        menu.add(0, MENU_ID_UPDATE,   Menu.NONE, R.string.menu_update);
-        menu.add(0, MENU_ID_RESET,    Menu.NONE, R.string.menu_reset);
-        menu.add(0, MENU_ID_PREFS,    Menu.NONE, R.string.menu_prefs);
-        menu.add(0, MENU_ID_QUIT,     Menu.NONE, R.string.menu_quit);
-        
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
         return true;
     }
     
@@ -95,55 +80,61 @@ public class ActivitySJLB extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         
+        // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
+        LoginPassword loginPassword = null;
+        try {
+            loginPassword = new LoginPassword(this);
+        } catch (LoginPasswordException e) {
+            e.printStackTrace();
+        }
+        
         switch (item.getItemId()) {
-            case (MENU_ID_SHOW_PM): {
-                Intent intent = new Intent(this, ActivityPrivateMessages.class);
-                startActivity(intent);
+            case (R.id.menu_show_pm): {
+                if (null != loginPassword) {
+                    Intent intent = new Intent(this, ActivityPrivateMessages.class);
+                    startActivity(intent);
+                } else {
+                    // Toast notification signalant l'absence de login/password
+                    Toast.makeText(this, getString(R.string.authentication_needed), Toast.LENGTH_SHORT).show();
+                }
                 break;
             }
-            case (MENU_ID_SHOW_MSG): {
-                // TODO lien temporaire : à implémenter correctement
-                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_uri)));
-                startActivity(intent);                
-                /*
-                Intent intent = new Intent(this, SJLBForumMessages.class);
-                */
+            case (R.id.menu_show_msg): {
+                if (null != loginPassword) {
+                    // TODO lien temporaire : à implémenter correctement
+                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_uri)));
+                    startActivity(intent);                
+                } else {
+                    // Toast notification signalant l'absence de login/password
+                    Toast.makeText(this, getString(R.string.authentication_needed), Toast.LENGTH_SHORT).show();
+                }
                 break;
             }
-            case (MENU_ID_UPDATE): {
-                // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
-                SharedPreferences   prefs       = PreferenceManager.getDefaultSharedPreferences(this);
-                String              login       = prefs.getString(SJLB.PREFS.LOGIN,    "");
-                String              password    = prefs.getString(SJLB.PREFS.PASSWORD, "");
-
-                if (   (false == login.contentEquals(""))
-                    && (false == password.contentEquals("")) )
-                {
+            case (R.id.menu_update): {
+                if (null != loginPassword) {
                     // Toast notification de début de rafraichissement
                     Toast.makeText(this, getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
                     // TODO voir si c'est la meilleurs manière de faire...
                     IntentReceiverStartService.startService (this, LOG_TAG);
-                }
-                else
-                {
+                } else {
                     // Toast notification signalant l'absence de login/password
-                    Toast.makeText(this, getString(R.string.refresh_impossible), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.authentication_needed), Toast.LENGTH_SHORT).show();
                 }
                 break;
             }
-            case (MENU_ID_RESET): {
+            case (R.id.menu_reset): {
                 ContentProviderPM   pms = new ContentProviderPM (this);
                 pms.clearPM();
                 ContentProviderMsg  msgs = new ContentProviderMsg (this);
                 msgs.clearMsg();
                 break;
             }
-            case (MENU_ID_PREFS): {
+            case (R.id.menu_prefs): {
                 Intent intent = new Intent(this, ActivityPreferences.class);
                 startActivity(intent);
                 break;
             }
-            case (MENU_ID_QUIT): {
+            case (R.id.menu_quit): {
                 finish ();
                 break;
             }
@@ -153,8 +144,20 @@ public class ActivitySJLB extends Activity {
         return true;
     }
 
+    /**
+     * Lance l'activité présentant la liste des PM, sur click du bouton correspondant 
+     */
     public void onShowPM (View v) {
-        Intent intent = new Intent(this, ActivityPrivateMessages.class);
-        startActivity(intent);        
+        // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
+        try {
+            new LoginPassword(this);
+            // Lance l'activité lisant les PM
+            Intent intent = new Intent(this, ActivityPrivateMessages.class);
+            startActivity(intent);
+        } catch (LoginPasswordException e) {
+            e.printStackTrace();
+            // Toast notification signalant l'absence de login/password
+            Toast.makeText(this, getString(R.string.authentication_needed), Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -27,14 +27,14 @@ public class ContentProviderPM extends ContentProvider {
     private static final UriMatcher sUriMatcher;
     static {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        sUriMatcher.addURI(SJLB.AUTHORITY, "pm",                PM_ALL);
-        sUriMatcher.addURI(SJLB.AUTHORITY, "pm/#",              PM_ID);
-        sUriMatcher.addURI(SJLB.AUTHORITY, "live_folders/pm",   PM_LIVE_FOLDER);
+        sUriMatcher.addURI(SJLB.PM.AUTHORITY, "pm",                PM_ALL);
+        sUriMatcher.addURI(SJLB.PM.AUTHORITY, "pm/#",              PM_ID);
+        sUriMatcher.addURI(SJLB.PM.AUTHORITY, "live_folders/pm",   PM_LIVE_FOLDER);
     }
     
     // TODO ce constructeur semble nécessaire : pour une instanciation de content provider  on dirait ?!
     public ContentProviderPM () {
-        
+        mDBHelper = null;
     }
     
     // TODO : ce constructeur est conservé tant qu'on conserve un accès directe à cette classe
@@ -55,15 +55,15 @@ public class ContentProviderPM extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri arg0, String arg1, String[] arg2) {
-        // TODO Auto-generated method stub
-        return 0;
+    public String getType(Uri arg0) {
+        // TODO SRO Auto-generated method stub
+        return null;
     }
 
     @Override
-    public String getType(Uri arg0) {
+    public int delete(Uri arg0, String arg1, String[] arg2) {
         // TODO Auto-generated method stub
-        return null;
+        return 0;
     }
 
     @Override
@@ -109,6 +109,7 @@ public class ContentProviderPM extends ContentProvider {
       ContentValues newPMValues = new ContentValues();
       newPMValues.put(SJLB.PM.ID,        aPM.getId());
       newPMValues.put(SJLB.PM.DATE,      aPM.getDate());
+      newPMValues.put(SJLB.PM.AUTHOR_ID, aPM.getAuthorId());
       newPMValues.put(SJLB.PM.AUTHOR,    aPM.getAuthor());
       newPMValues.put(SJLB.PM.TEXT,      aPM.getText());
       return mDBHelper.getWritableDatabase().insert(SJLB.PM.TABLE_NAME, null, newPMValues) > 0;
@@ -118,6 +119,7 @@ public class ContentProviderPM extends ContentProvider {
     public boolean updatePM(PrivateMessage aPM) {
       ContentValues newPMValues = new ContentValues();
       newPMValues.put(SJLB.PM.DATE,      aPM.getDate());
+      newPMValues.put(SJLB.PM.AUTHOR_ID, aPM.getAuthorId());
       newPMValues.put(SJLB.PM.AUTHOR,    aPM.getAuthor());
       newPMValues.put(SJLB.PM.TEXT,      aPM.getText());
       return mDBHelper.getWritableDatabase().update(SJLB.PM.TABLE_NAME, newPMValues, SJLB.PM.ID + "=" + aPM.getId(), null) > 0;
@@ -136,14 +138,14 @@ public class ContentProviderPM extends ContentProvider {
     // récupère un cursor avec la liste de tous les PM
     public Cursor getAllPM () {
         return mDBHelper.getReadableDatabase().query(   SJLB.PM.TABLE_NAME,
-                                                       new String[] { SJLB.PM.ID, SJLB.PM.DATE, SJLB.PM.AUTHOR, SJLB.PM.TEXT},
+                                                       new String[] { SJLB.PM.ID, SJLB.PM.DATE, SJLB.PM.AUTHOR_ID, SJLB.PM.AUTHOR, SJLB.PM.TEXT},
                                                        null, null, null, null, null);
     }
     
     // récupère un cursor sur un PM particulier
     public Cursor getPM (int aId) {
         Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.PM.TABLE_NAME,
-                                                                new String[]{SJLB.PM.DATE, SJLB.PM.AUTHOR, SJLB.PM.TEXT},
+                                                                new String[]{SJLB.PM.DATE, SJLB.PM.AUTHOR_ID, SJLB.PM.AUTHOR, SJLB.PM.TEXT},
                                                                 SJLB.PM.ID + "=" + aId,
                                                                 null, null, null, null, null);
         if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {

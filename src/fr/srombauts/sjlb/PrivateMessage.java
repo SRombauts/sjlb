@@ -10,17 +10,19 @@ import java.util.Date;
 public class PrivateMessage {
     private int     mId;
     private String  mDate;
+    private int     mAuthorId;
     private String  mAuthor;
     private String  mText;
 
-    public PrivateMessage(int aId, Date aDate, String aAuthor, String aText) {
+    public PrivateMessage(int aId, Date aDate, int aAuthorId, String aAuthor, String aText) {
         SimpleDateFormat    sdf         = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
         String              dateString  = sdf.format(aDate);
 
-        mId     = aId;
-        mDate   = dateString;
-        mAuthor = aAuthor;
-        mText   = aText;
+        mId         = aId;
+        mDate       = dateString;
+        mAuthorId   = aAuthorId;
+        mAuthor     = aAuthor;
+        mText       = aText;
     }
     
     public int getId () {
@@ -28,6 +30,9 @@ public class PrivateMessage {
     }
     public String getDate () {
         return mDate;
+    }
+    public int getAuthorId () {
+        return mAuthorId;
     }
     public String getAuthor () {
         return mAuthor;

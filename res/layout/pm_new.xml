@@ -2,25 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="fill_parent"
 >
-    <TextView  
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content" 
-        android:text="@string/pm_description"
-    />
-    <ListView
-        android:id="@+id/privateMessagesListView"
+    <Spinner
+        android:id="@+id/destinataireListView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
     />
-    <!-- TODO SRO : pb si trop de PM
+    <EditText
+        android:id="@+id/textEditText"
+        android:layout_width="fill_parent"
+        android:layout_height="200px"
+        android:gravity="top"
+    />
     <Button
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
-        android:text="@string/button_new_pm"
-        android:onClick="onNewPM"
+        android:text="@string/button_send_pm"
+        android:onClick="onSendPM"
     />
-    -->
-    
+
 </LinearLayout>

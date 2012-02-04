@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.net.Uri;
 
@@ -14,11 +15,11 @@ import android.net.Uri;
  * 
  * @author seb
  */
-public class ContentProviderMsg extends ContentProvider {
+public class ContentProviderUser extends ContentProvider {
 
-    private static final int MSG_ALL         = 1;
-    private static final int MSG_ID          = 2;
-    private static final int MSG_LIVE_FOLDER = 3;
+    private static final int USER_ALL         = 1;
+    private static final int USER_ID          = 2;
+    private static final int USER_LIVE_FOLDER = 3;
 
     private DBOpenHelper    mDBHelper   = null;
 
@@ -26,19 +27,19 @@ public class ContentProviderMsg extends ContentProvider {
     private static final UriMatcher sUriMatcher;
     static {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        sUriMatcher.addURI(SJLB.Msg.AUTHORITY, SJLB.Msg.MATCHER_ALL,            MSG_ALL);
-        sUriMatcher.addURI(SJLB.Msg.AUTHORITY, SJLB.Msg.MATCHER_ONE,            MSG_ID);
-        sUriMatcher.addURI(SJLB.Msg.AUTHORITY, SJLB.Msg.MATCHER_LIVE_FOLDER,    MSG_LIVE_FOLDER);
+        sUriMatcher.addURI(SJLB.User.AUTHORITY, SJLB.User.MATCHER_ALL,           USER_ALL);
+        sUriMatcher.addURI(SJLB.User.AUTHORITY, SJLB.User.MATCHER_ONE,           USER_ID);
+        sUriMatcher.addURI(SJLB.User.AUTHORITY, SJLB.User.MATCHER_LIVE_FOLDER,   USER_LIVE_FOLDER);
     }
     
     // TODO ce constructeur semble nécessaire : pour une instanciation de content provider  on dirait ?!
-    public ContentProviderMsg () {
+    public ContentProviderUser () {
         mDBHelper = null;
     }
     
     // TODO : ce constructeur est conservé tant qu'on conserve un accès directe à cette classe
     //           (au lieu d'utiliser uniquement comme content provider)
-    public ContentProviderMsg (Context aContext) {
+    public ContentProviderUser (Context aContext) {
         mDBHelper   = new DBOpenHelper(aContext, SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
     }
 
@@ -47,6 +48,7 @@ public class ContentProviderMsg extends ContentProvider {
         // TODO : Est ce que cette bidouille sert à qqch !?
         if (null == mDBHelper)
         {
+            // est ce que getContext fonctionne dans ce contexte là ?
             mDBHelper   = new DBOpenHelper(getContext(), SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
         }
         return true;
@@ -57,7 +59,7 @@ public class ContentProviderMsg extends ContentProvider {
         // TODO SRO Auto-generated method stub
         return null;
     }
-
+    
     @Override
     public int delete(Uri arg0, String arg1, String[] arg2) {
         // TODO Auto-generated method stub
@@ -74,7 +76,7 @@ public class ContentProviderMsg extends ContentProvider {
     public Cursor query(Uri arg0, String[] arg1, String arg2, String[] arg3,
             String arg4) {
         // TODO prendre en compte les paramètres pour faire la bonne requète !
-        return getAllMsg ();
+        return getAllUsers ();
     }
 
     @Override
@@ -87,40 +89,50 @@ public class ContentProviderMsg extends ContentProvider {
         mDBHelper.close();
     }
     
-
     /**
-     * Insert un nouveau message juste par son ID (ne fonctionne que si msg non déjà connu)
-     * @param aId
-     * @return l'identifiant de la ligne insérée en BDD si succès
+     * Insert un nouveau User complet (ne fonctionne que si User non déjà connu)
+     * @param aUser le User à insérer
+     * @return true si succès
      */
-    public long insertMsg(int aId) {
-      ContentValues newMsgValues = new ContentValues();
-      newMsgValues.put(SJLB.Msg.ID, aId);
-      return mDBHelper.getWritableDatabase().insert(SJLB.Msg.TABLE_NAME, null, newMsgValues);
+    public boolean insertUser(User aUser) {
+      ContentValues newUserValues = new ContentValues();
+      newUserValues.put(SJLB.User.ID,        aUser.getId());
+      newUserValues.put(SJLB.User.PSEUDO,    aUser.getPseudo());
+      return mDBHelper.getWritableDatabase().insert(SJLB.User.TABLE_NAME, null, newUserValues) > 0;
+    }
+
+    // retire un User juste par son ID
+    public boolean removeUser(long aId) {
+      return mDBHelper.getWritableDatabase().delete(SJLB.User.TABLE_NAME, SJLB.User.ID + "=" + aId, null) > 0;
+    }
+
+    // vide la table des User
+    public boolean clearUser() {
+      return mDBHelper.getWritableDatabase().delete(SJLB.User.TABLE_NAME, null, null) > 0;
     }
     
-    // récupère un cursor avec la liste de tous les Msg
-    public Cursor getAllMsg () {
-        return mDBHelper.getReadableDatabase().query(   SJLB.Msg.TABLE_NAME,
-                                                       new String[] { SJLB.Msg.ID, SJLB.Msg.DATE, SJLB.Msg.AUTHOR, SJLB.Msg.DATE},
+    // récupère un cursor avec la liste de tous les User
+    public Cursor getAllUsers () {
+        return mDBHelper.getReadableDatabase().query(   SJLB.User.TABLE_NAME,
+                                                       new String[] {SJLB.User.ID, SJLB.User.PSEUDO},
                                                        null, null, null, null, null);
     }
     
-    // récupère un cursor sur un Msg particulier
-    public Cursor getMsg (int aId) {
-        Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.Msg.TABLE_NAME,
-                                                                new String[]{SJLB.Msg.DATE, SJLB.Msg.AUTHOR, SJLB.Msg.TEXT},
-                                                                SJLB.Msg.ID + "=" + aId,
+    // récupère un cursor sur un User particulier
+    public Cursor getUser (int aId) {
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.User.TABLE_NAME,
+                                                                new String[]{SJLB.User.PSEUDO},
+                                                                SJLB.User.ID + "=" + aId,
                                                                 null, null, null, null, null);
         if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
-            throw new SQLException("Pas de Msg pour l'Id " + aId);
+            throw new SQLException("Pas de User pour l'Id " + aId);
         }
         return cursor;
     }
-   
-    // vide la table des PM
-    public boolean clearMsg() {
-      return mDBHelper.getWritableDatabase().delete(SJLB.Msg.TABLE_NAME, null, null) > 0;
+
+    // compte les utilisateurs
+    public long countUsers () {
+        return DatabaseUtils.queryNumEntries(mDBHelper.getReadableDatabase(), SJLB.User.TABLE_NAME);
     }
     
 }

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="@string/prefs_authentication">
+         android:title="@string/prefs_authentication">
         
         <EditTextPreference
             android:key="PREF_LOGIN"
-            android:title="Login"
-            android:summary="User name"
+            android:title="@string/prefs_login_title"
+            android:summary="@string/prefs_login_desc"
             android:defaultValue=""
             />
         <EditTextPreference
             android:key="PREF_PASSWORD"
-            android:title="Pasword"
-            android:summary="User password"
+            android:title="@string/prefs_password_title"
+            android:summary="@string/prefs_password_desc"
             android:password="true"
             android:defaultValue=""
             />
@@ -23,14 +23,14 @@
         
         <CheckBoxPreference
             android:key="PREF_AUTO_UPDATE"
-            android:title="Auto refresh"
-            android:summary="Select to turn on automatic updating"
+            android:title="@string/prefs_auto_update_title"
+            android:summary="@string/prefs_auto_update_desc"
             android:defaultValue="true"
             />
         <ListPreference
             android:key="PREF_UPDATE_FREQ"
-            android:title="Refresh frequency"
-            android:summary="Frequency at which to refresh messages"
+            android:title="@string/prefs_update_freq_title"
+            android:summary="@string/prefs_update_freq_desc"
             android:entries="@array/update_freq_options"
             android:entryValues="@array/update_freq_values"
             android:dialogTitle="Refresh frequency"
@@ -40,11 +40,23 @@
     
     <PreferenceCategory
          android:title="@string/prefs_notification">
-        
+
       <CheckBoxPreference
           android:key="PREF_NOTIFICATION_SOUND"
-          android:title="Sound Notification"
-          android:summary="Select to turn on sound notification"
+          android:title="@string/prefs_sound_title"
+          android:summary="@string/prefs_sound_desc"
+          android:defaultValue="true"
+            />
+      <CheckBoxPreference
+          android:key="PREF_NOTIFICATION_VIBRATE"
+          android:title="@string/prefs_vibrate_title"
+          android:summary="@string/prefs_vibrate_desc"
+          android:defaultValue="true"
+            />
+      <CheckBoxPreference
+          android:key="PREF_NOTIFICATION_LIGHT"
+          android:title="@string/prefs_light_title"
+          android:summary="@string/prefs_light_desc"
           android:defaultValue="true"
             />
     </PreferenceCategory>

@@ -3,5 +3,5 @@ package fr.srombauts.sjlb;
 
 
 @SuppressWarnings("serial")
-class LoginPasswordException extends Throwable {
+class LoginPasswordException extends Exception {
 }

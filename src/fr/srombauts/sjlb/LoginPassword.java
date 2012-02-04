@@ -48,7 +48,7 @@ class LoginPassword {
             }
             else
             {
-				// TODO SRO : lever une exception dédiée lorsque login/mdp ne sont pas renseignés !
+				// Lève une exception dédiée lorsque login/mdp ne sont pas renseignés !
 				throw new LoginPasswordException ();
             }
         } catch (NoSuchAlgorithmException e) {  
