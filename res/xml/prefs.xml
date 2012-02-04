@@ -1,31 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference
-        android:key="PREF_LOGIN"
-        android:title="Login"
-        android:summary="User name"
-        android:defaultValue=""
-        />
-    <EditTextPreference
-        android:key="PREF_PASSWORD"
-        android:title="Pasword"
-        android:summary="User password"
-        android:password="true"
-        android:defaultValue=""
-        />
-    <CheckBoxPreference
-        android:key="PREF_AUTO_UPDATE"
-        android:title="Auto refresh"
-        android:summary="Select to turn on automatic updating"
-        android:defaultValue="true"
-        />
-    <ListPreference
-        android:key="PREF_UPDATE_FREQ"
-        android:title="Refresh frequency"
-        android:summary="Frequency at which to refresh messages"
-        android:entries="@array/update_freq_options"
-        android:entryValues="@array/update_freq_values"
-        android:dialogTitle="Refresh frequency"
-        android:defaultValue="900"
-        />
+    <PreferenceCategory
+        android:title="@string/prefs_authentication">
+        
+        <EditTextPreference
+            android:key="PREF_LOGIN"
+            android:title="Login"
+            android:summary="User name"
+            android:defaultValue=""
+            />
+        <EditTextPreference
+            android:key="PREF_PASSWORD"
+            android:title="Pasword"
+            android:summary="User password"
+            android:password="true"
+            android:defaultValue=""
+            />
+    </PreferenceCategory>
+    
+    <PreferenceCategory
+         android:title="@string/prefs_auto_update">
+        
+        <CheckBoxPreference
+            android:key="PREF_AUTO_UPDATE"
+            android:title="Auto refresh"
+            android:summary="Select to turn on automatic updating"
+            android:defaultValue="true"
+            />
+        <ListPreference
+            android:key="PREF_UPDATE_FREQ"
+            android:title="Refresh frequency"
+            android:summary="Frequency at which to refresh messages"
+            android:entries="@array/update_freq_options"
+            android:entryValues="@array/update_freq_values"
+            android:dialogTitle="Refresh frequency"
+            android:defaultValue="900"
+            />
+    </PreferenceCategory>
+    
+    <PreferenceCategory
+         android:title="@string/prefs_notification">
+        
+      <CheckBoxPreference
+          android:key="PREF_NOTIFICATION_SOUND"
+          android:title="Sound Notification"
+          android:summary="Select to turn on sound notification"
+          android:defaultValue="true"
+            />
+    </PreferenceCategory>
+    
 </PreferenceScreen>

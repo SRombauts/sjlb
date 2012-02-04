@@ -6,6 +6,10 @@
 
     <string name="button_show_pm">  Private messages </string>
 
+    <string name="prefs_authentication">    Authentication  </string>
+    <string name="prefs_auto_update">       Auto-Update     </string>
+    <string name="prefs_notification">      Notifications   </string>
+
     <string name="menu_show_pm">    Private messages </string>
     <string name="menu_show_msg">   Forum messages </string>
     <string name="menu_update">     Refresh </string>
@@ -16,14 +20,15 @@
     <string name="refreshing">         Refreshing... </string>
     <string name="refresh_impossible"> Unable to refresh, need login/password ! </string>
 
-    <string name="notification_title_pm">   Unread Private Messages </string>
-    <string name="notification_title_msg">  Unread Post Messages </string>
-    <string name="notification_text_pm">    new pm </string>
-    <string name="notification_text_msg">   new unread message(s) </string>
+    <string name="notification_title_pm">   Private Message(s) </string>
+    <string name="notification_title_msg">  Unread Message(s) </string>
+    <string name="notification_text_pm">    private message(s) </string>
+    <string name="notification_text_msg">   unread message(s) </string>
     
     <string name="sjlb_forum_uri">      http://sjlb.dyndns.org/newsjlb/Site/Forum.php                       </string>
     <string name="sjlb_forum_cat_uri">  http://sjlb.dyndns.org/newsjlb/Site/ForumSujets.php?id_categorie=   </string>
     
     <string name="sjlb_polling_uri">    http://sjlb.dyndns.org/newsjlb/Android/Polling.php                  </string>
     <string name="sjlb_pm_uri">         http://sjlb.dyndns.org/newsjlb/Android/PrivateMessages.php          </string>
+
 </resources>

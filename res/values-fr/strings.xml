@@ -4,6 +4,10 @@
 
     <string name="button_show_pm">  Messages Privés </string>
 
+    <string name="prefs_authentication">    Authentification        </string>
+    <string name="prefs_auto_update">       Auto-Rafraîchissement   </string>
+    <string name="prefs_notification">      Notifications           </string>
+
     <string name="menu_update">     Rafraîchir </string>
     <string name="menu_show_pm">    Messages privés </string>
     <string name="menu_show_msg">   Messages du forum </string>
@@ -15,12 +19,7 @@
     <string name="refresh_impossible"> Impossible de rafraichir, nécessite login et mot de passe ! </string>
 
     <string name="notification_title_pm">   Message(s) Privé(s) </string>
-    <string name="notification_title_msg">  Post(s) du forum </string>
+    <string name="notification_title_msg">  Post(s) non lu(s) </string>
     <string name="notification_text_pm">    message(s) privé(s) </string>
-    <string name="notification_text_msg">   post(s) du forum </string>
-    
-    <string name="sjlb_forum_uri">      http://sjlb.dyndns.org/newsjlb/Site/Forum.php   </string>
-    
-    <string name="sjlb_polling_uri">    http://sjlb.dyndns.org/newsjlb/Android/Polling.php      </string>
-    <string name="sjlb_pm_uri">         http://sjlb.dyndns.org/newsjlb/Android/PrivateMessages.php      </string>
+    <string name="notification_text_msg">   post(s) non lu(s) </string>
 </resources>

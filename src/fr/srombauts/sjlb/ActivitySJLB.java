@@ -46,7 +46,7 @@ public class ActivitySJLB extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        // bind la liste des catégories
+        // binding de la liste des catégories et du champ de version
         mCategoriesListView     = (ListView)findViewById(R.id.categoriesListView);        
         TextView    VersionView = (TextView)findViewById(R.id.versionView);
         
@@ -61,6 +61,7 @@ public class ActivitySJLB extends Activity {
         }
         
         mCategoriesListView.setOnItemClickListener(new OnItemClickListener() {
+            @SuppressWarnings("unchecked")
             public void onItemClick(AdapterView adpter, View view, int index, long arg3) {
                 // Lance un intent correspondant à la catégorie du forum
                 Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_cat_uri)+(index+1)));
