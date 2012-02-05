@@ -61,6 +61,7 @@
     <string name="toast_deleting">          Deleting...         </string>
     <string name="toast_sending">           Sending...          </string>
     <string name="toast_sent">              Message sent !      </string>
+    <string name="toast_not_sent">          Message NOT sent !  </string>
     <string name="toast_deleted">           Message deleted !   </string>
 
     <!-- Notifications -->

@@ -1,5 +1,7 @@
 package fr.srombauts.sjlb;
 
+import java.util.Date;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
@@ -14,9 +16,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
+import android.widget.QuickContactBadge;
+import android.widget.ResourceCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
@@ -32,7 +37,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
     static final private int    DIALOG_ID_PM_DELETE_ALL     = 2;
     
     private Cursor              mCursor                     = null;
-    private SimpleCursorAdapter mAdapter                    = null;
+    private PmListItemAdapter   mAdapter                    = null;
     private ListView            mPrivateMessagesListView    = null;
     
     private long                mSelectedPmId               = 0;
@@ -46,22 +51,14 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
         setContentView(R.layout.pm_list);
         
         // Récupére un curseur sur les données (les messages Privés) 
-        mCursor = managedQuery( SJLB.PM.CONTENT_URI,
+        mCursor = managedQuery( SJLB.PM.CONTENT_URI, null,
                                 null,
-                                null, null, null);
-
-        // Les colonnes à mapper :
-        String[]    from = new String[] { SJLB.PM.AUTHOR, SJLB.PM.DATE, SJLB.PM.TEXT };
-        
-        // Les ID des views sur lesquels les mapper :
-        int[]       to   = new int[]    { R.id.pmAuthor, R.id.pmDate, R.id.pmText };
+                                null, null);
 
         // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
-        mAdapter = new SimpleCursorAdapter( this,
-                                            R.layout.pm,
-                                            mCursor,
-                                            from,
-                                            to);
+        mAdapter = new PmListItemAdapter( this,
+                                          R.layout.pm,
+                                          mCursor);
         
         mPrivateMessagesListView = (ListView)findViewById(R.id.pm_listview);
         mPrivateMessagesListView.setAdapter (mAdapter);
@@ -80,15 +77,6 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
         super.onResume();
         
         clearNotificationPM ();
-        
-        mCursor.requery();
-        mAdapter.notifyDataSetChanged();
-    }
-    
-    /// TODO SRO : trouver un moyen d'utiliser cette méthode depuis l'AsynchTaskRefresh (conserver une référence l'Activity ?)
-    public void notifyDataSetChanged () {
-        mCursor.requery();
-        mAdapter.notifyDataSetChanged();
     }
 
     private void clearNotificationPM () {
@@ -273,5 +261,65 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
     public void onNewPM (View v) {
         Intent intent = new Intent(this, ActivityNewPrivateMessage.class);
         startActivity(intent);
+    }
+    
+
+    // Adaptateur mappant les données du curseur dans des objets du cache du pool d'objets View utilisés par la ListView
+    private final class PmListItemAdapter extends ResourceCursorAdapter {
+        public PmListItemAdapter(Context context, int layout, Cursor cursor) {
+            super(context, layout, cursor);
+        }
+
+        // Met à jour avec un nouveau contenu un objet de cache du pool de view utilisées par la ListView 
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            final MessageListItemCache  cache = (MessageListItemCache) view.getTag();
+            
+            // Fixe la barre de titre du message 
+            String  title = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.PM.AUTHOR)); // on utilise le champ "PSEUDO" issu du croisement avec la table 
+            String  strDate = ForumMessage.getDateString (new Date(cursor.getLong(cursor.getColumnIndexOrThrow(SJLB.PM.DATE)))) ;
+            cache.titleView.setText(title + "\n" + strDate);
+            // Fixe le contenu du message 
+            String  text = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.PM.TEXT));
+            cache.textView.setText(text);
+
+            // Récupère le contact éventuellement associé à l'utilisateur (Uri et photo)
+            ApplicationSJLB appSJLB = (ApplicationSJLB)getApplication ();
+            int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.PM.AUTHOR_ID));
+            UserContactDescr user = appSJLB.mUserContactList.get(userId);
+            // Fixe la barre de QuickContact
+            cache.quickContactView.assignContactUri(user.lookupUri);
+            
+            // Affiche la photo du contact si elle existe (sinon petite icone de robot par défaut)
+            if (null != user.photo) {
+                cache.quickContactView.setImageBitmap(user.photo);
+            } else {
+                cache.quickContactView.setImageResource(R.drawable.ic_contact_picture);
+            }
+        }
+
+        // Création d'une nouvelle View et de son objet de cache (vide) pour le pool
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            View view = super.newView(context, cursor, parent);
+            
+            // Construction d'un nouvel objet de cache
+            MessageListItemCache cache = new MessageListItemCache();
+            // et binding sur les View décrites par le Layout
+            cache.quickContactView  = (QuickContactBadge)   view.findViewById(R.id.pmBadge);
+            cache.titleView         = (TextView)            view.findViewById(R.id.pmTitre);
+            cache.textView          = (TextView)            view.findViewById(R.id.pmText);
+            // enregistre cet objet de cache
+            view.setTag(cache);
+
+            return view;
+        }
+    }
+
+    // Objet utilisé comme cache des données d'une View, dans un pool d'objets utilisés par la ListView
+    final static class MessageListItemCache {
+        public QuickContactBadge    quickContactView;
+        public TextView             titleView;
+        public TextView             textView;
     }    
 }

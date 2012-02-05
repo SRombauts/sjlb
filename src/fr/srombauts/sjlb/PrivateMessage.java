@@ -9,17 +9,14 @@ import java.util.Date;
  */
 public class PrivateMessage {
     private int     mId;
-    private String  mDate;
+    private Date    mDate;
     private int     mAuthorId;
     private String  mAuthor;
     private String  mText;
 
     public PrivateMessage(int aId, Date aDate, int aAuthorId, String aAuthor, String aText) {
-        SimpleDateFormat    sdf         = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        String              dateString  = sdf.format(aDate);
-
         mId         = aId;
-        mDate       = dateString;
+        mDate       = aDate;
         mAuthorId   = aAuthorId;
         mAuthor     = aAuthor;
         mText       = aText;
@@ -28,7 +25,7 @@ public class PrivateMessage {
     public int getId () {
         return mId;
     }
-    public String getDate () {
+    public Date getDate () {
         return mDate;
     }
     public int getAuthorId () {
@@ -45,6 +42,15 @@ public class PrivateMessage {
      * Retourne une description résumée en une unique chaine
      */
     public String toString () {
-        return mAuthor + " (" + mDate + ") : " + mText;
+        return mAuthor + " (" + getDateString (mDate) + ") : " + mText;
     }
+
+    // Formatte une date en chaîne de caractère
+    static public String getDateString (Date aDate) {
+        SimpleDateFormat    sdf         = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String              dateString  = sdf.format(aDate);
+
+        return dateString;
+    }
+
 }

@@ -24,7 +24,7 @@ import android.widget.Toast;
 /**
  * Travail en tâche de fond, chargée d'envoyer un nouveau message du forum
  */
-class AsynchTaskNewMsg extends AsyncTask<String, Void, Void> {
+class AsynchTaskNewMsg extends AsyncTask<String, Void, Boolean> {
     private static final String  LOG_TAG        = "NewMsgTask";
 
     private Context             mContext        = null;
@@ -52,12 +52,13 @@ class AsynchTaskNewMsg extends AsyncTask<String, Void, Void> {
      * 
      * Ce travail s'exécute en tâche de fond, et n'a donc pas le droit d'effectuer d'actions sur la GUI
      */
-    protected Void doInBackground(String... args) {
+    protected Boolean doInBackground(String... args) {
+        Boolean bResult;
         
         // Envoi du pm, et récupération des éventuels nouveaux contenus
-        sendMsg (args[0], args[1], args[2], args[3]);
+        bResult = sendMsg (args[0], args[1], args[2], args[3]);
         
-        return null;
+        return bResult;
     }
     
     
@@ -74,7 +75,9 @@ class AsynchTaskNewMsg extends AsyncTask<String, Void, Void> {
     /**
      * Envoi du nouveau message, et récupération du contenu des messages privés
      */
-    void sendMsg (String aIdCategory, String aIdSubject, String aIdGroup, String aText) {
+    Boolean sendMsg (String aIdCategory, String aIdSubject, String aIdGroup, String aText) {
+        Boolean bResult = false;
+        
         Log.d(LOG_TAG, "sendMsg (" + aIdCategory + ", " + aIdSubject + ", " + aIdGroup + ") : " + aText + " ...");
         
         try {
@@ -108,10 +111,11 @@ class AsynchTaskNewMsg extends AsyncTask<String, Void, Void> {
             if (HttpStatus.SC_OK == response.getStatusLine ().getStatusCode())
             {
                 // Récupère le contenu de la réponse
-                // TODO SRO : parser la réponse comme dans RefreshTask
+                // TODO SRO : parser la réponse comme dans RefreshTask (ou au moins partiellement)
                 //InputStream             in          = response.getEntity().getContent();
-            
-                Log.d(LOG_TAG, "sendMsg ok ");                        
+                
+                Log.d(LOG_TAG, "sendMsg ok ");
+                bResult = true;
             }
             
         } catch (LoginPasswordException e) {
@@ -125,6 +129,8 @@ class AsynchTaskNewMsg extends AsyncTask<String, Void, Void> {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        
+        return bResult;
     }
     
     
@@ -133,11 +139,17 @@ class AsynchTaskNewMsg extends AsyncTask<String, Void, Void> {
      *
      * Cette méthode est synchronisée donc on peut y faire des notifications
      */
-    protected void onPostExecute(Void result) {
-        super.onPostExecute(result);
+    protected void onPostExecute(Boolean abResult) {
+        super.onPostExecute(abResult);
 
-	    // Toast notification de fin d'envoi
-	    Toast.makeText(mContext, mContext.getString(R.string.toast_sent), Toast.LENGTH_SHORT).show();                
+        if (abResult) {
+    	    // Toast notification de fin d'envoi
+    	    Toast.makeText(mContext, mContext.getString(R.string.toast_sent), Toast.LENGTH_SHORT).show();
+        }
+        else {
+            // Toast notification d'erreur d'envoi !
+            Toast.makeText(mContext, mContext.getString(R.string.toast_not_sent), Toast.LENGTH_SHORT).show();
+        }
     }
 }
 

@@ -226,6 +226,10 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             // TODO SRO : un peu moche, provoque une exception SQL si le PM est déjà en base (pas propre en débug)
                             mUserDBAdapter.insertUser(newUser);
                         }
+                        
+                        // Initialise la liste des utilisateurs
+                        ApplicationSJLB appSJLB = (ApplicationSJLB)mContext.getApplication();
+                        appSJLB.initUserContactList();
                     }
                     
                     Log.d(LOG_TAG, "refreshUsers... ok");

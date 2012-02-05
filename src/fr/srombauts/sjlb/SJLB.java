@@ -11,7 +11,7 @@ public final class SJLB {
     private SJLB() {}
 
     public static final String DATABASE_NAME        = "SJLB.db";
-    public static final int    DATABASE_VERSION     = 5;
+    public static final int    DATABASE_VERSION     = 6;
     
     
     /**
@@ -79,7 +79,7 @@ public final class SJLB {
 
         /**
          * Date en secondes depuis le 1er janvier 1970
-         * <P>Type: TEXT</P>
+         * <P>Type: INTEGER</P>
          */
         public static final String  DATE                = "date";
 
@@ -112,7 +112,7 @@ public final class SJLB {
 
         public static final String  TABLE_CREATE = "create table " + TABLE_NAME + " ("
                                                     + _ID       + " integer primary key, "
-                                                    + DATE      + " text, "
+                                                    + DATE      + " integer, "
                                                     + AUTHOR_ID + " integer, "
                                                     + AUTHOR    + " text, "
                                                     + TEXT      + " text);";
@@ -199,7 +199,7 @@ public final class SJLB {
                                                     + _ID      + " integer primary key, "
                                                     + CAT_ID   + " integer, "
                                                     + GROUP_ID + " integer, "
-                                                    + LAST_DATE+ " date, "
+                                                    + LAST_DATE+ " integer, "
                                                     + TEXT     + " text);";
 
         public static final String  TABLE_DROP   = "DROP TABLE IF EXISTS " + SJLB.Subj.TABLE_NAME;

@@ -96,8 +96,8 @@ public class ContentProviderPM extends ContentProvider {
      */
     public boolean insertPM(PrivateMessage aPM) {
       ContentValues newPMValues = new ContentValues();
-      newPMValues.put(SJLB.PM._ID,        aPM.getId());
-      newPMValues.put(SJLB.PM.DATE,      aPM.getDate());
+      newPMValues.put(SJLB.PM._ID,       aPM.getId());
+      newPMValues.put(SJLB.PM.DATE,      aPM.getDate().getTime());
       newPMValues.put(SJLB.PM.AUTHOR_ID, aPM.getAuthorId());
       newPMValues.put(SJLB.PM.AUTHOR,    aPM.getAuthor());
       newPMValues.put(SJLB.PM.TEXT,      aPM.getText());

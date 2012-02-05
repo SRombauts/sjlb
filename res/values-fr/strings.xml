@@ -59,6 +59,7 @@
     <string name="toast_deleting">          Effacement demandé...           </string>
     <string name="toast_sending">           Envoi en cours...               </string>
     <string name="toast_sent">              Message envoyé !                </string>
+    <string name="toast_not_sent">          Message NON envoyé !            </string>
     <string name="toast_deleted">           Message effacé !                </string>
 
     <!-- Notifications -->

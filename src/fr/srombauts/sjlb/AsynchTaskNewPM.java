@@ -34,7 +34,7 @@ import android.widget.Toast;
 /**
  * Travail en tâche de fond, chargée d'envoyer un nouveau message privé
  */
-class AsynchTaskNewPM extends AsyncTask<String, Void, Void> {
+class AsynchTaskNewPM extends AsyncTask<String, Void, Boolean> {
     private static final String  LOG_TAG                    = "NewPMTask";
 
     public static final  int     NOTIFICATION_NEW_PM_ID     = 1;
@@ -74,12 +74,13 @@ class AsynchTaskNewPM extends AsyncTask<String, Void, Void> {
      * 
      * Ce travail s'exécute en tâche de fond, et n'a donc pas le droit d'effectuer d'actions sur la GUI
      */
-    protected Void doInBackground(String... args) {
+    protected Boolean doInBackground(String... args) {
+        Boolean bResult;
         
         // Envoi du pm, et récupération des éventuels nouveaux contenus
-        sendPM (args[0], args[1]);
+        bResult = sendPM (args[0], args[1]);
         
-        return null;
+        return bResult;
     }
     
     
@@ -96,7 +97,9 @@ class AsynchTaskNewPM extends AsyncTask<String, Void, Void> {
     /**
      * Envoi du nouveau message, et récupération du contenu des messages privés
      */
-    void sendPM (String aIdDestinataire, String aText) {
+    Boolean sendPM (String aIdDestinataire, String aText) {
+        Boolean bResult = false;
+        
         Log.d(LOG_TAG, "sendPM (" + aIdDestinataire + ") : " + aText + " ...");
         
         try {
@@ -167,6 +170,7 @@ class AsynchTaskNewPM extends AsyncTask<String, Void, Void> {
                     }
                 }
                 Log.d(LOG_TAG, "sendPM... ok");
+                bResult = true;
             }
             
         } catch (LoginPasswordException e) {
@@ -184,6 +188,8 @@ class AsynchTaskNewPM extends AsyncTask<String, Void, Void> {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        
+        return bResult;
     }
     
     
@@ -192,11 +198,17 @@ class AsynchTaskNewPM extends AsyncTask<String, Void, Void> {
      *
      * Cette méthode est synchronisée donc on peut y faire des notifications
      */
-    protected void onPostExecute(Void result) {
-        super.onPostExecute(result);
+    protected void onPostExecute(Boolean abResult) {
+        super.onPostExecute(abResult);
 
-	    // Toast notification de fin d'envoi
-	    Toast.makeText(mContext, mContext.getString(R.string.toast_sent), Toast.LENGTH_SHORT).show();                
+        if (abResult) {
+    	    // Toast notification de fin d'envoi
+    	    Toast.makeText(mContext, mContext.getString(R.string.toast_sent), Toast.LENGTH_SHORT).show();
+        }
+        else {
+            // Toast notification d'erreur d'envoi !
+            Toast.makeText(mContext, mContext.getString(R.string.toast_not_sent), Toast.LENGTH_SHORT).show();
+        }
     }
 }
 

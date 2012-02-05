@@ -62,7 +62,7 @@ public class ApplicationSJLB extends Application {
 	
 	
 	// Renseigne la liste des contacts Google correspondant aux utilisateurs du site
-    private void initUserContactList () {
+    public void initUserContactList () {
 
         // Liste les utilisateurs du site
         Cursor cursor = getContentResolver().query (SJLB.User.CONTENT_URI, null, null, null, null);
