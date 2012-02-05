@@ -5,8 +5,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -38,10 +36,6 @@ public class LoginPasswordPopup {
                     .setPositiveButton(android.R.string.ok, new Dialog.OnClickListener() {
  
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            // TODO SRO : enregistrer les modifications dans les préférences 
-                            SharedPreferences.Editor editor = prefs.edit();
-                            //editor.putString(LAST_VERSION_CODE_KEY, packageInfo.versionCode);
-                            editor.commit();
                             dialogInterface.dismiss();
                         }
                     });
