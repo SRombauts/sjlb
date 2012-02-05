@@ -30,7 +30,7 @@ public class WhatsNewScreen {
             final long lastVersionCode = prefs.getLong(LAST_VERSION_CODE_KEY, 0);
             
             if (packageInfo.versionCode != lastVersionCode) {
-                Log.i(LOG_TAG, "versionCode " + packageInfo.versionCode + "is different from the last known version " + lastVersionCode);
+                Log.i(LOG_TAG, "versionCode " + packageInfo.versionCode + " is different from the last known version " + lastVersionCode);
 
                 final String title = mActivity.getString(R.string.app_name) + " v" + packageInfo.versionName;
      
@@ -52,7 +52,7 @@ public class WhatsNewScreen {
                         });
                 builder.create().show();
             } else {
-                Log.i(LOG_TAG, "versionCode " + packageInfo.versionCode + "is already known");
+                Log.i(LOG_TAG, "versionCode " + packageInfo.versionCode + " is already known");
             }
                 
         } catch (PackageManager.NameNotFoundException e) {

@@ -158,7 +158,7 @@ class AsynchTaskDeletePM extends AsyncTask<String, Void, Void> {
                 Log.d(LOG_TAG, "fetchPM... ok");                        
             }
             
-        } catch (LoginPasswordException e) {
+        } catch (LoginPasswordEmptyException e) {
             e.printStackTrace();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();

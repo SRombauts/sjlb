@@ -50,9 +50,13 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         
         // Layout de l'activité
         setContentView(R.layout.main);
-        
+
+        // Affiche si nécessaire les modifications de la nouvelle version
         new WhatsNewScreen(this).show();
 
+        // Demande si nécessaire les infos de login/mot de passe
+        new LoginPasswordPopup(this).show();
+        
         // binding de la liste des catégories
         mCategoriesListView     = (ListView)findViewById(R.id.categoriesListView);
         // Create the array adapter to bind the array to the listview
@@ -74,7 +78,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
             e.printStackTrace();
         }
         
-        // Enregister les listener d'IHM que la classe implémente
+        // Enregistre les listener d'IHM que la classe implémente
         mCategoriesListView.setOnItemClickListener(this);
         mCategoriesListView.setOnItemLongClickListener(this);
         mCategoriesListView.setOnTouchListener(this);
@@ -152,7 +156,6 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         IntentReceiverStartService.startService (this, LOG_TAG);
     }
 
-    @SuppressWarnings("unchecked")
     public void onItemClick(AdapterView adpter, View view, int index, long arg3) {
         // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
         if (PrefsLoginPassword.AreFilled (this)) {
@@ -174,7 +177,6 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
     /**
      *  Sur long clic sur un sujet, envoie sur le site Web sur la catégorie concernée
      */
-    @SuppressWarnings("unchecked")
     public boolean onItemLongClick(AdapterView adapter, View view, int index, long id) {
         // lien vers le Forum sur le Site Web, à la catégorie correspondant à l'index cliqué dans la liste des catégories :
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_cat_uri) + (index+1)));

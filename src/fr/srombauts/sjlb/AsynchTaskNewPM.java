@@ -173,7 +173,7 @@ class AsynchTaskNewPM extends AsyncTask<String, Void, Boolean> {
                 bResult = true;
             }
             
-        } catch (LoginPasswordException e) {
+        } catch (LoginPasswordEmptyException e) {
             e.printStackTrace();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();

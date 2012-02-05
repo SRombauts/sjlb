@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="pm_description">      Messages Privés </string>
-
+    <string name="app_name"> SJLB </string>
+    
+    <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Suppression de nombreuses stacks d\'exceptions SQLite\n
-        - Correction du problème d\'empilement des activités lors du clic sur une notification alors que l\'application est déjà lancée\n
-        - Ajout de cet écran Nouveautés\n
+        - Meilleurs gestion d\'un mauvais login ou mot de passe\n
     </string>
+    <string name="loginscreen_title">   Login et mot de passe                                                           </string>
+    <string name="loginscreen_message"> Veuillez saisir votre login et votre mot de passe dans le menu des préférences  </string>
+    
+    <string name="pm_description">  Messages Privés             </string>
 
     <string name="button_show_pm">  Messages Privés             </string>
     <string name="button_send_pm">  Envoyer le message privé    </string>

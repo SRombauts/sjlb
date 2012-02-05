@@ -182,7 +182,6 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     /**
      *  Sur sélection d'un sujet, lance l'activité "messages du forum" avec en paramètre l'id du sujet :
      */
-    @SuppressWarnings("unchecked")
     public void onItemClick(AdapterView adapter, View view, int index, long arg3) {
         mSavedIntent = new Intent(this, ActivityForumMessages.class);
         mCursor.moveToPosition(index);
@@ -201,7 +200,6 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     /**
      *  Sur long clic sur un sujet, envoie sur le site Web sur le sujet concerné
      */
-    @SuppressWarnings("unchecked")
     public boolean onItemLongClick(AdapterView adapter, View view, int index, long id) {
         // lien vers le Forum sur le Site Web :
         mCursor.moveToPosition(index);

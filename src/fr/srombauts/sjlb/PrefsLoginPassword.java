@@ -26,13 +26,13 @@ class PrefsLoginPassword {
      *
      * @param[in] aContext Contexte de l'activité/du servicé, nécessaire pour récupérer les préférences de l'application
      */
-    public PrefsLoginPassword (Context aContext) throws LoginPasswordException {
+    public PrefsLoginPassword (Context aContext) throws LoginPasswordEmptyException {
         try {
             
             // Récupère le login/mot de passe dans les préférences :
-            SharedPreferences   Prefs       = PreferenceManager.getDefaultSharedPreferences(aContext);
-                                mLogin      = Prefs.getString(SJLB.PREFS.LOGIN,    "");
-            String              password    = Prefs.getString(SJLB.PREFS.PASSWORD, "");
+            SharedPreferences   prefs       = PreferenceManager.getDefaultSharedPreferences(aContext);
+                                mLogin      = prefs.getString(SJLB.PREFS.LOGIN,    "");
+            String              password    = prefs.getString(SJLB.PREFS.PASSWORD, "");
         
             if (   (false == mLogin.contentEquals(""))
                 && (false == password.contentEquals("")) )
@@ -45,7 +45,7 @@ class PrefsLoginPassword {
                 BigInteger number = new BigInteger(1,messageDigest);
                 mPasswordMD5 = number.toString(16);
            
-                // Compléte au besoin par des 0
+                // Complète au besoin par des 0
                 while (mPasswordMD5.length() < 32) {
                     mPasswordMD5 = "0" + mPasswordMD5;
                 }
@@ -53,7 +53,7 @@ class PrefsLoginPassword {
             else
             {
 				// Lève une exception dédiée lorsque login/mdp ne sont pas renseignés !
-				throw new LoginPasswordException ();
+				throw new LoginPasswordEmptyException ();
             }
         } catch (NoSuchAlgorithmException e) {  
             e.printStackTrace();  
@@ -69,11 +69,23 @@ class PrefsLoginPassword {
      */
     static public boolean AreFilled (Context aContext) {
             // Récupère le login/mot de passe dans les préférences :
-            SharedPreferences   Prefs       = PreferenceManager.getDefaultSharedPreferences(aContext);
-            String              login       = Prefs.getString(SJLB.PREFS.LOGIN,    "");
-            String              password    = Prefs.getString(SJLB.PREFS.PASSWORD, "");
+            SharedPreferences   prefs       = PreferenceManager.getDefaultSharedPreferences(aContext);
+            String              login       = prefs.getString(SJLB.PREFS.LOGIN,    "");
+            String              password    = prefs.getString(SJLB.PREFS.PASSWORD, "");
             
             return (   (false == login.contentEquals(""))
                     && (false == password.contentEquals("")) );
+    }
+    
+    /**
+     * Supprime le mot de passe des préférences (sur erreur de login remonté par le serveur)
+     *
+     * @param[in] aContext Contexte de l'activité/du servicé, nécessaire pour récupérer les préférences de l'application
+     */
+    static public void InvalidatePassword (Context aContext) {
+        // Récupère l'interface d'édition des préférences
+        SharedPreferences.Editor PrefsEditor = PreferenceManager.getDefaultSharedPreferences(aContext).edit();
+        PrefsEditor.remove(SJLB.PREFS.PASSWORD);
+        PrefsEditor.commit();
     }
 }

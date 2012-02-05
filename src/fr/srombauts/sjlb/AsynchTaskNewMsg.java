@@ -120,7 +120,7 @@ class AsynchTaskNewMsg extends AsyncTask<String, Void, Boolean> {
                 bResult = true;
             }
             
-        } catch (LoginPasswordException e) {
+        } catch (LoginPasswordEmptyException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {
             e.printStackTrace();

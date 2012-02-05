@@ -2,13 +2,14 @@
 <resources>
     <string name="app_name"> SJLB </string>
     
+    <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Removed many SQLite exception stack\n
-        - Improved the way the application launch on notification (no more multi-activity stacking)\n
-        - Added this What\'s new screen\n
+        - Better handling of login/password error\n
     </string>
-
-    <string name="pm_description">      Private Messages    </string>
+    <string name="loginscreen_title">   Login/password                                          </string>
+    <string name="loginscreen_message"> Enter your login and password in the preferences menu   </string>
+    
+    <string name="pm_description">  Private Messages        </string>
 
     <string name="button_show_pm">  Private messages        </string>
     <string name="button_send_pm">  Send Private Message    </string>

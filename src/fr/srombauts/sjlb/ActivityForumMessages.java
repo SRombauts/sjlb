@@ -210,7 +210,6 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     /**
      *  Sur clic sur un message, fait apparaitre la boîte de réponse
      */
-    @SuppressWarnings("unchecked")
     public void onItemClick(AdapterView adapter, View view, int index, long arg3) {
         openEditText ();
     }
@@ -218,7 +217,6 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     /**
      *  Sur long clic sur un message, envoie sur le site Web à la page du sujet contenant ce message
      */
-    @SuppressWarnings("unchecked")
     public boolean onItemLongClick(AdapterView adapter, View view, int index, long id) {
         // lien vers le Forum sur le Site Web :
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + mSelectedSubjectId + getString(R.string.sjlb_forum_subj_dernier)));
@@ -406,7 +404,6 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         /**
          *  Sur clic sur un fichier, l'affiche ou le télécharge
          */
-        @SuppressWarnings("unchecked")
         public void onItemClick(AdapterView adapter, View view, int index, long arg3) {
             // lien vers le fichier sur le Site Web :
             final FileListItem  file = (FileListItem) view.getTag();
