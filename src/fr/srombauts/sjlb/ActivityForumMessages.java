@@ -26,13 +26,14 @@ import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 
 /**
  * Activité présentant la liste des sujets de la catégorie sélectionnée
  * @author 22/08/2010 srombauts
  */
-public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener {
+public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener {
     private static final String LOG_TAG = "ActivityMsg";
     
     public  static final String START_INTENT_EXTRA_CAT_ID       = "CategoryId";
@@ -96,16 +97,20 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                 + " AND " + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")",
                 null,
                 null);
-        int idxBeforeFirstUnreadMsg = Math.max(mMsgListView.getCount()-1 - subCursor.getCount(), 0);
-        Log.d(LOG_TAG, "idxBeforeFirstUnreadMsg = " + idxBeforeFirstUnreadMsg);
-        mMsgListView.setSelection(idxBeforeFirstUnreadMsg);    
+        // Calcul de l'offset d'affichage correspondant au nombre de messages non lus moins un, mais plafonné à zéro !
+        int offsetNewMessages = Math.max(subCursor.getCount() - 1, 0);
+        // Calcul de l'index du premier message à afficher dans la liste, qui doit être du coup le premier non lu le cas échéant, là aussi plaffoné par 0
+        int idxOfFirstUnreadMsg = Math.max(mMsgListView.getCount()-1 - offsetNewMessages, 0);
+        Log.d(LOG_TAG, "idxOfFirstUnreadMsg = " + idxOfFirstUnreadMsg);
+        mMsgListView.setSelection(idxOfFirstUnreadMsg);    
 
         // Binding de la zone de saisie du message (masquée par la liste tant qu'on ne clic pas)
         mEditText   = (EditText)findViewById(R.id.textEditText);
         mEditButton = (Button)  findViewById(R.id.textSendButton);
         
-        // Enregister les listener d'IHM que la classe implémente
+        // Enregistre les listener d'IHM que la classe implémente
         mMsgListView.setOnItemClickListener(this);
+        mMsgListView.setOnItemLongClickListener(this);
         mMsgListView.setOnTouchListener(this);
         mMsgListView.getRootView().setOnTouchListener(this);
     }
@@ -153,7 +158,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     }
 
     /**
-     * Sur sélection dans le menu
+     * Sur sélection dans le menu général
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -194,13 +199,25 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         }
         return true;
     }
-    
+       
     /**
-     *  Sur sélection clic sur un message, fait apparaitre la boîte de réponse
+     *  Sur clic sur un message, fait apparaitre la boîte de réponse
      */
     @SuppressWarnings("unchecked")
     public void onItemClick(AdapterView adapter, View view, int index, long arg3) {
         openEditText ();
+    }
+    
+    /**
+     *  Sur long clic sur un message, envoie sur le site Web à la page du sujet contenant ce message
+     */
+    @SuppressWarnings("unchecked")
+    public boolean onItemLongClick(AdapterView adapter, View view, int index, long id) {
+        // lien vers le Forum sur le Site Web :
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + mSelectedSubjectId));
+        Log.d (LOG_TAG, "onItemLongClick: show_online: " + getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + mSelectedSubjectId);                
+        startActivity(intent);
+        return true;
     }
     
     /**

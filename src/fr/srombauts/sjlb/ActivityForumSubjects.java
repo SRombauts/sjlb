@@ -18,13 +18,14 @@ import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 
 /**
  * Activité présentant la liste des sujets de la catégorie sélectionnée
  * @author 22/08/2010 srombauts
  */
-public class ActivityForumSubjects extends ActivityTouchListener implements OnItemClickListener {
+public class ActivityForumSubjects extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener {
     private static final String LOG_TAG         = "ActivitySubj";
     
     private static final String SAVE_FILENAME   = "SavedIntent";
@@ -82,6 +83,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
 
         // Enregister les listener d'IHM que la classe implémente        
         mSubjectsListView.setOnItemClickListener(this);
+        mSubjectsListView.setOnItemLongClickListener(this);
         mSubjectsListView.setOnTouchListener(this);
         mSubjectsListView.getRootView().setOnTouchListener(this);
 
@@ -198,6 +200,21 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         startActivity (mSavedIntent);
     }
 
+    
+    /**
+     *  Sur long clic sur un sujet, envoie sur le site Web sur le sujet concerné
+     */
+    @SuppressWarnings("unchecked")
+    public boolean onItemLongClick(AdapterView adapter, View view, int index, long id) {
+        // lien vers le Forum sur le Site Web :
+        mCursor.moveToPosition(index);
+        long selectedSubjectId = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj._ID));
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + selectedSubjectId));
+        Log.d (LOG_TAG, "onItemLongClick: show_online: " + getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + selectedSubjectId);                
+        startActivity(intent);
+        return true;
+    }
+    
     @Override
     protected boolean onLeftGesture () {
         Log.i (LOG_TAG, "onTouch: va a l'ecran de gauche... pour retour à l'ecran principal");

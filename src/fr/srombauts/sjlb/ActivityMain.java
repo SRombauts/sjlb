@@ -21,13 +21,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 
 /**
  * Activité du menu principal, qui lance le service si besoin et permet de naviguer entre PM et Msg
  * @author 27/06/2010 srombauts
  */
-public class ActivityMain extends ActivityTouchListener implements OnItemClickListener {
+public class ActivityMain extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener {
     private static final String LOG_TAG         = "ActivityMain";
 
     private static final String SAVE_FILENAME   = "SavedIntent";
@@ -100,6 +101,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         
         // Enregister les listener d'IHM que la classe implémente
         mCategoriesListView.setOnItemClickListener(this);
+        mCategoriesListView.setOnItemLongClickListener(this);
         mCategoriesListView.setOnTouchListener(this);
         mCategoriesListView.getRootView().setOnTouchListener(this);
 
@@ -153,6 +155,18 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
             // Toast notification signalant l'absence de login/password
             Toast.makeText(this, getString(R.string.toast_auth_needed), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     *  Sur long clic sur un sujet, envoie sur le site Web sur la catégorie concernée
+     */
+    @SuppressWarnings("unchecked")
+    public boolean onItemLongClick(AdapterView adapter, View view, int index, long id) {
+        // lien vers le Forum sur le Site Web, à la catégorie correspondant à l'index cliqué dans la liste des catégories :
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_cat_uri) + (index+1)));
+        Log.d (LOG_TAG, "onItemLongClick: show_online: " + getString(R.string.sjlb_forum_subj_uri) + (index+1));                
+        startActivity(intent);
+        return true;
     }
 
     /**

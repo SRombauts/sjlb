@@ -1,6 +1,5 @@
 package fr.srombauts.sjlb;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
@@ -14,10 +13,8 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.View.OnTouchListener;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
@@ -28,7 +25,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
  * Activité présentant la liste des messages privés
  * @author 14/06/2010 srombauts
  */
-public class ActivityPrivateMessages extends Activity implements OnTouchListener {
+public class ActivityPrivateMessages extends ActivityTouchListener {
     private static final String LOG_TAG = "ActivityPM";
     
     static final private int    DIALOG_ID_PM_DELETE_ONE     = 1;
@@ -39,9 +36,6 @@ public class ActivityPrivateMessages extends Activity implements OnTouchListener
     private ListView            mPrivateMessagesListView    = null;
     
     private long                mSelectedPmId               = 0;
-   
-    private float               mTouchStartPositionX    = 0;
-    private float               mTouchStartPositionY    = 0;
     
     /** Called when the activity is first created. */
     @Override
@@ -74,9 +68,10 @@ public class ActivityPrivateMessages extends Activity implements OnTouchListener
         // Scroll tout en bas de la liste des messages
         mPrivateMessagesListView.setSelection(mPrivateMessagesListView.getCount()-1);
         
+        // Enregistre le menu contextuel de la liste
         registerForContextMenu (mPrivateMessagesListView);        
         
-        // Enregister les listener d'IHM que la classe implémente        
+        // Enregistre les listener d'IHM que la classe implémente        
         mPrivateMessagesListView.setOnTouchListener(this);
         mPrivateMessagesListView.getRootView().setOnTouchListener(this);
     }
@@ -103,53 +98,10 @@ public class ActivityPrivateMessages extends Activity implements OnTouchListener
         notificationManager.cancel(AsynchTaskRefresh.NOTIFICATION_NEW_PM_ID);
     }
 
-    // TODO SRO : callback d'évènement tactiles, à mutualiser entre les activités
-    public boolean onTouch(View aView, MotionEvent aMotionEvent) {
-        boolean     bActionTraitee = false;
-        final int   touchAction = aMotionEvent.getAction();
-        final float touchX      = aMotionEvent.getX();
-        final float touchY      = aMotionEvent.getY();
-        
-        switch (touchAction)
-        {
-            case MotionEvent.ACTION_DOWN: {
-                //Log.d (LOG_TAG, "onTouch (ACTION_DOWN) : touch (" + touchX + ", " + touchY + ")");
-                mTouchStartPositionX = touchX;
-                mTouchStartPositionY = touchY;
-                break;
-            }
-            case MotionEvent.ACTION_UP: {
-                //Log.d (LOG_TAG, "onTouch (ACTION_UP) : touch (" + touchX + ", " + touchY + ")");
-                final float proportionalDeltaX = (touchX - mTouchStartPositionX) / (float)aView.getWidth();
-                final float proportionalDeltaY = (touchY - mTouchStartPositionY) / (float)aView.getHeight();
-                //Log.d (LOG_TAG, "onTouch: deltas proportionnels : (" + proportionalDeltaX + ", " + proportionalDeltaY + ")");
-                
-                // Teste si le mouvement correspond à un mouvement franc
-                if (   (Math.abs(proportionalDeltaX) > 0.2)                                 // mouvement d'ampleur importante
-                    && (Math.abs(proportionalDeltaX)/Math.abs(proportionalDeltaY) > 0.8) )  // mouvement plus latéral que vertical
-                {
-                    //Log.d (LOG_TAG, "onTouch: mouvement lateral franc");
-                    
-                    // Teste sa direction :
-                    if (proportionalDeltaX < 0) {
-                        Log.i (LOG_TAG, "onTouch: mouvement vers la gauche, on quitte l'activité");
-                        bActionTraitee = true;
-                        finish ();
-                    }
-                }
-                break;
-            }
-            default: {
-                //Log.d (LOG_TAG, "onTouch autre (" + touchAction  + ") : touch (" + touchX + ", " + touchY + ")");
-            }
-        }
-
-        // Si on n'a pas déjà traité l'action, on passe la main à la Vue sous-jacente
-        if (false == bActionTraitee) {
-            aView.onTouchEvent(aMotionEvent);
-        }
-        
-        // Si on retourne false, on n'est plus notifié des évènements suivants
+    @Override
+    protected boolean onLeftGesture () {
+        Log.i (LOG_TAG, "onTouch: va a l'ecran de gauche... quitte l'activite pour retour à la liste des sujets");
+        finish ();
         return true;
     }
     
@@ -161,18 +113,9 @@ public class ActivityPrivateMessages extends Activity implements OnTouchListener
         inflater.inflate(R.menu.pm, menu);
         return true;
     }
-
-    /**
-     * Création du menu contextuel
-     */
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.pm_context, menu);
-    }
     
     /**
-     * Sur sélection dans le menu
+     * Sur sélection dans le menu général
      */
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
@@ -212,6 +155,15 @@ public class ActivityPrivateMessages extends Activity implements OnTouchListener
     }
 
     /**
+     * Création du menu contextuel
+     */
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.pm_context, menu);
+    }
+
+    /**
      * Sur sélection d'un choix du menu contextuel
      */
     public boolean onContextItemSelected(MenuItem item) {
@@ -233,7 +185,7 @@ public class ActivityPrivateMessages extends Activity implements OnTouchListener
     /**
      * Création de la boîte de dialogue
      */
-    // TODO SRO : ne pas créer de lister directement dans le code comme ça !
+    // TODO SRO : ne pas créer de liste directement dans le code comme ça !
     public Dialog onCreateDialog (int id) {
         switch(id) {
             case(DIALOG_ID_PM_DELETE_ONE): {
