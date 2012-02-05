@@ -307,7 +307,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     
     
     // Adaptateur mappant les données du curseur dans des objets du cache du pool d'objets View utilisés par la ListView
-    private final class MessageListItemAdapter extends ResourceCursorAdapter {
+    private final class MessageListItemAdapter extends ResourceCursorAdapter implements OnItemClickListener {
         public MessageListItemAdapter(Context context, int layout, Cursor cursor) {
             super(context, layout, cursor);
         }
@@ -375,6 +375,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                                                                         arrayFileListItem);
 
             cache.fileListView.setAdapter (adapterFiles);
+            cache.fileListView.setOnItemClickListener (this);
         }
 
         // Création d'une nouvelle View et de son objet de cache (vide) pour le pool
@@ -395,8 +396,21 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
 
             return view;
         }
+        
+        /**
+         *  Sur clic sur un fichier, l'affiche ou le télécharge
+         */
+        @SuppressWarnings("unchecked")
+        public void onItemClick(AdapterView adapter, View view, int index, long arg3) {
+            // lien vers le fichier sur le Site Web :
+            final FileListItem  file = (FileListItem) view.getTag();
+            Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_fichiers_attaches) + file.filename));
+            Log.d (LOG_TAG, "onClick: " + getString(R.string.sjlb_fichiers_attaches) + file.filename );                
+            startActivity(intent);
+        }
     }
     
+
     // Objet utilisé comme cache des données d'une View, dans un pool d'objets utilisés par la ListView
     final static class MessageListItemCache {
         public QuickContactBadge    quickContactView;
@@ -414,34 +428,37 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         private FileListItem[] mListeItem;
 
         public FileListItemAdapter(Context context, int textViewResourceId, FileListItem[] items) {
-                super(context, textViewResourceId, items);
-                mListeItem = items;
+            super(context, textViewResourceId, items);
+            mListeItem = items;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-                View view = convertView;
-                if (view == null) {
-                    LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    view = vi.inflate(R.layout.file, null);
-                }
+            View view = convertView;
+            if (view == null) {
+                LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = vi.inflate(R.layout.file, null);
+            }
 
-                FileListItem it = mListeItem[position];
-                if (it != null) {
-                        it.imageViewFile = (ImageView) view.findViewById(R.id.fileImage);
-                        it.imageViewFile.setOnClickListener(this);
-                        it.imageViewFile.setTag(it.filename);
-                        if (   (it.imageViewFile != null)
-                            && (it.imageBitmap != null) ) {
-                            // TODO SRO : je pense qu'il faut faire un reset du champ imageBitmap à un moment donné
-                            it.imageViewFile.setImageBitmap(it.imageBitmap);
-                        } else {
-                            // TODO SRO : il faut lancer le téléchargement du fichier en tache de fond (SSI il s'agit bien d'une image !)
-                        }
+            FileListItem it = mListeItem[position];
+            if (it != null) {
+                it.imageViewFile = (ImageView) view.findViewById(R.id.fileImage);
+                //it.imageViewFile.setOnClickListener(this);
+                //it.imageViewFile.setTag(it.filename);
+                if (   (it.imageViewFile != null)
+                    && (it.imageBitmap != null) ) {
+                    // TODO SRO : je pense qu'il faut faire un reset du champ imageBitmap à un moment donné
+                    it.imageViewFile.setImageBitmap(it.imageBitmap);
+                } else {
+                    // TODO SRO : il faut lancer le téléchargement du fichier en tache de fond (SSI il s'agit bien d'une image !)
                 }
-                
+                it.textViewFile  = (TextView) view.findViewById(R.id.filename);
+                it.textViewFile.setText (it.filename);
+            }
+            // Mémorise dans la vue les infos sous-jacentes
+            view.setTag (it);
 
-                return view;
+            return view;
         }
 
         @Override
@@ -457,6 +474,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     // Objet représentant une image et le nom du fichier associé
     final static class FileListItem {
         public ImageView    imageViewFile;
+        public TextView     textViewFile;
         public Bitmap       imageBitmap;
         public String       filename;
     }

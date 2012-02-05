@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical"
+	android:orientation="horizontal"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
    	>
     <ImageView
         android:id="@+id/fileImage"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="4px"
         android:scaleType="centerInside"
         android:src="@drawable/file_icon"
-        android:clickable="true"
-        android:longClickable="true"
+        />
+    <TextView
+        android:id="@+id/filename"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16px"
+        android:textColor="#FFF"
+        android:background="#000"
+        android:gravity="bottom"
         />
 </LinearLayout>
