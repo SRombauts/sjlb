@@ -5,6 +5,7 @@
     <!-- Pop-up screens -->
     <string name="whatsnew">
         - Meilleurs gestion d\'un mauvais login ou mot de passe\n
+        - Chargement des vieux messages en tâche de fond\n
     </string>
     <string name="loginscreen_title">   Login et mot de passe                                                           </string>
     <string name="loginscreen_message"> Veuillez saisir votre login et votre mot de passe dans le menu des préférences  </string>

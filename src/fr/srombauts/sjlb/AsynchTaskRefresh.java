@@ -48,8 +48,10 @@ import android.util.Log;
 class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     private static final String  LOG_TAG                    = "RefreshTask";
 
-    public static final  int     NOTIFICATION_NEW_PM_ID     = 1;
-    public static final  int     NOTIFICATION_NEW_MSG_ID    = 2;
+    public static final int     DATE_PREMIER_MSG            = 1051690936;   //!< Date du premier message publié sur SJLB
+    
+    public static final int     NOTIFICATION_NEW_PM_ID      = 1;
+    public static final int     NOTIFICATION_NEW_MSG_ID     = 2;
 
     static final private String NODE_NAME_BAD_LOGIN         = "login_error";
     static final private String NODE_NAME_PRIVATE_MSG       = "pm";
@@ -394,8 +396,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             int     idMsg    = Integer.parseInt(strIdMsg);
                             
                             if (0 < idMsg) {
-                                // Renseigne la bdd si Message inconnu
-                                // TODO SRO : PEUT ÊTRE PAS, il faudrait peut être juste tester si le message est nouveau, et le mettre en base plus bas, dans "fetchMsg()"
+                                // Teste si le message est nouveau, et le met en base plus bas, dans "fetchMsg()"
                                 if (false == mMsgDBAdapter.isExist(idMsg)) {
                                     Log.d(LOG_TAG, "Msg " + idMsg + " nouveau");
                                     mNbNewMsg++;
@@ -561,8 +562,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
 
         // s'il y a de nouveaux Msg
 //      if (0 < mNbNewMsg) {
-        // TODO SRO : en fait même pas, il faudrait simplement toujours demander la liste des derniers messages, elle serait vide
-        // TODO SRO : ET EN PLUS il faut aussi redemander les messages marqués "non lus" qui ont en fait simplement été édités par un user, alors qu'on les avait déjà !  
+        // En fait même pas, il faut simplement toujours demander la liste des derniers messages, elle sera souvent vide
+        // ET EN PLUS il faut aussi redemander les messages marqués "non lus" qui ont en fait simplement été édités par un user, alors qu'on les avait déjà !  
         if (true) {
             // Le nombre de nouveau Msg va être recalculé par rapport à ce qui sera réellement mis en BDD (pour servir ensuite à la notification)
             // TODO SRO mNbNewMsg   = 0;
@@ -572,8 +573,9 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 // Utilise les préférences pour récupérer le login/mot de passe :
                 PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
 
-                // Récupère la date du message le plus récent déjà lu
-                long lastMsgDate = mMsgDBAdapter.getLastMsgDate();
+                // Récupère la date du message le plus vieux en base, et du plus récent
+                long firstMsgDate   = mMsgDBAdapter.getFirstMsgDate();
+                long lastMsgDate    = mMsgDBAdapter.getLastMsgDate();
                 
                 // Instancie un client http et un header de requète "POST"  
                 HttpClient  httpClient  = new DefaultHttpClient();  
@@ -583,9 +585,12 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);  
                 nameValuePairs.add(new BasicNameValuePair("login",    loginPassword.mLogin));  
                 nameValuePairs.add(new BasicNameValuePair("password", loginPassword.mPasswordMD5));
-                if (0 < lastMsgDate) {
+                if (   (0 < firstMsgDate)
+                    && (0 < lastMsgDate) )
+                {
+                    nameValuePairs.add(new BasicNameValuePair("date_premier", Long.toString(firstMsgDate)));
                     nameValuePairs.add(new BasicNameValuePair("date_dernier", Long.toString(lastMsgDate)));
-                    Log.d(LOG_TAG, "fetchMsg (" + lastMsgDate + ")");
+                    Log.d(LOG_TAG, "fetchMsg (" + firstMsgDate +"," + lastMsgDate + ")");
                 }
                 httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
                 
@@ -811,13 +816,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             CharSequence    contentText         = mNbUnreadMsg + " " + mContext.getString(R.string.notification_text_msg) + " (" + mNbNewMsg + mContext.getString(R.string.notification_new) + ")";
             
             // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
-            // => lien Site Web :
-        // TODO SRO : ancienne méthode
-        //        Intent          notificationIntent  = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(mContext.getString(R.string.sjlb_forum_uri)));
-        //        PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
-            // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
             // => lien activité principale :
-        // TODO SRO : pas encore au point
             Intent          notificationIntent  = new Intent(mContext, ActivityMain.class);
             PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
         

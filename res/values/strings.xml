@@ -5,6 +5,7 @@
     <!-- Pop-up screens -->
     <string name="whatsnew">
         - Better handling of login/password error\n
+        - Back loading of old messages\n
     </string>
     <string name="loginscreen_title">   Login/password                                          </string>
     <string name="loginscreen_message"> Enter your login and password in the preferences menu   </string>

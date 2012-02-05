@@ -68,12 +68,17 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         // binding du champ de version
         TextView    VersionView = (TextView)findViewById(R.id.versionView);
         
+        // Compte le nombre de messages récupérés en base locale
+        ContentProviderMsg  msgs    = new ContentProviderMsg (this);
+        final long NbMsg = msgs.getCount();
+        msgs.close();
+        
         // Lit les informations de version du package courant
         PackageManager  manager = getPackageManager();
         PackageInfo     info    = null;
         try {
             info = manager.getPackageInfo(getPackageName(), 0);
-            VersionView.setText("version " + info.versionName);
+            VersionView.setText("version " + info.versionName + "       " + NbMsg + " messages");
         } catch (NameNotFoundException e) {
             e.printStackTrace();
         }

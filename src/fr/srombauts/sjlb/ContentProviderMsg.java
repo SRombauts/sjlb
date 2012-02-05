@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 
 
@@ -126,9 +127,22 @@ public class ContentProviderMsg extends ContentProvider {
       return mDBHelper.getWritableDatabase().update(SJLB.Msg.TABLE_NAME, newMsgValues, SJLB.Msg._ID + "=" + aMsg.getId(), null) > 0;
     }
     
+    // Récupère la date du premier message
+    public long getFirstMsgDate () {
+        long nbSeconds = 0;
+        Cursor cursor = getAllMsg ();
+        if (0 < cursor.getCount())
+        {
+            cursor.moveToFirst();
+            nbSeconds = cursor.getLong(cursor.getColumnIndex(SJLB.Msg.DATE))/1000;
+        }
+        cursor.close();
+        return nbSeconds;
+    }
+    
     // Récupère la date du dernier message
     public long getLastMsgDate () {
-        long                nbSeconds = 0;
+        long nbSeconds = 0;
         Cursor cursor = getAllMsg ();
         if (0 < cursor.getCount())
         {
@@ -149,7 +163,7 @@ public class ContentProviderMsg extends ContentProvider {
                                                                         SJLB.Msg.UNREAD,
                                                                         SJLB.Msg.TEXT},
                                                        null,
-                                                       null, null, null, null);
+                                                       null, null, null, SJLB.Msg.DEFAULT_SORT_ORDER);
         // TODO SRO : mDBHelper.close(); ?
     }
 
@@ -202,5 +216,13 @@ public class ContentProviderMsg extends ContentProvider {
     public boolean clearMsg() {
       return mDBHelper.getWritableDatabase().delete(SJLB.Msg.TABLE_NAME, null, null) > 0;
     }
-    
+
+    // compte les messages
+    public long getCount () {
+        // TODO SRO : comment fermer le curseur !?
+        long nbMsgs = DatabaseUtils.queryNumEntries(mDBHelper.getReadableDatabase(), SJLB.Msg.TABLE_NAME);
+        mDBHelper.getReadableDatabase().close();
+        return nbMsgs;
+    }
+
 }
