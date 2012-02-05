@@ -239,7 +239,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
             Cursor subCursor = managedQuery(SJLB.Msg.CONTENT_URI,
                                             null,
                                             "(" +       SJLB.Msg.SUBJECT_ID + "=" + cursor.getString(cursor.getColumnIndexOrThrow(SJLB.Subj._ID))
-                                            + " AND " + SJLB.Msg.UNREAD + "=1" + ")",
+                                            + " AND " + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")",
                                             null,
                                             null);
             

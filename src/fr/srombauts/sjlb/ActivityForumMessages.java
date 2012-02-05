@@ -15,19 +15,24 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.QuickContactBadge;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
 
 /**
  * Activité présentant la liste des sujets de la catégorie sélectionnée
  * @author 22/08/2010 srombauts
  */
-public class ActivityForumMessages extends ActivityTouchListener {
+public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener {
     private static final String LOG_TAG = "ActivityMsg";
     
     public  static final String START_INTENT_EXTRA_CAT_ID       = "CategoryId";
@@ -38,6 +43,8 @@ public class ActivityForumMessages extends ActivityTouchListener {
     private Cursor                  mCursor         = null;
     private MessageListItemAdapter  mAdapter        = null;
     private ListView                mMsgListView    = null;
+    private EditText                mEditText       = null;
+    private Button                  mEditButton     = null;
     
     private long                    mSelectedCategoryId     = 0;
     private long                    mSelectedSubjectId      = 0;
@@ -80,10 +87,25 @@ public class ActivityForumMessages extends ActivityTouchListener {
         
         mMsgListView = (ListView)findViewById(R.id.msg_listview);
         mMsgListView.setAdapter (mAdapter);
-        // Scroll tout en bas de la liste des messages
-        mMsgListView.setSelection(mMsgListView.getCount()-1);    
+        
+        // Scroll en bas de la liste des messages, sur le message précédant le premier message non lu
+        Cursor subCursor = managedQuery(
+                SJLB.Msg.CONTENT_URI,
+                null,
+                "(" +       SJLB.Msg.SUBJECT_ID + "=" + mSelectedSubjectId
+                + " AND " + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")",
+                null,
+                null);
+        int idxBeforeFirstUnreadMsg = Math.max(mMsgListView.getCount()-1 - subCursor.getCount(), 0);
+        Log.d(LOG_TAG, "idxBeforeFirstUnreadMsg = " + idxBeforeFirstUnreadMsg);
+        mMsgListView.setSelection(idxBeforeFirstUnreadMsg);    
+
+        // Binding de la zone de saisie du message (masquée par la liste tant qu'on ne clic pas)
+        mEditText   = (EditText)findViewById(R.id.textEditText);
+        mEditButton = (Button)  findViewById(R.id.textSendButton);
         
         // Enregister les listener d'IHM que la classe implémente
+        mMsgListView.setOnItemClickListener(this);
         mMsgListView.setOnTouchListener(this);
         mMsgListView.getRootView().setOnTouchListener(this);
     }
@@ -146,13 +168,7 @@ public class ActivityForumMessages extends ActivityTouchListener {
                 break;
             }
             case (R.id.menu_new_msg): {
-                Intent intent = new Intent(this, ActivityNewForumMessage.class);
-                intent.putExtra(ActivityNewForumMessage.START_INTENT_EXTRA_CAT_ID,        mSelectedCategoryId);
-                intent.putExtra(ActivityNewForumMessage.START_INTENT_EXTRA_SUBJ_ID,       mSelectedSubjectId);
-                intent.putExtra(ActivityNewForumMessage.START_INTENT_EXTRA_SUBJ_LABEL,    mSelectedSubjectLabel);
-                intent.putExtra(ActivityNewForumMessage.START_INTENT_EXTRA_GROUP_ID,      mSelectedGroupId);
-                Log.d (LOG_TAG, "onItemClick: intent.putExtra(" + mSelectedSubjectId + ", " + mSelectedSubjectLabel + ")");                
-                startActivity(intent);
+                openEditText ();
                 break;
             }
             case (R.id.menu_update): {
@@ -178,6 +194,51 @@ public class ActivityForumMessages extends ActivityTouchListener {
         }
         return true;
     }
+    
+    /**
+     *  Sur sélection clic sur un message, fait apparaitre la boîte de réponse
+     */
+    @SuppressWarnings("unchecked")
+    public void onItemClick(AdapterView adapter, View view, int index, long arg3) {
+        openEditText ();
+    }
+    
+    /**
+     *  Fait apparaitre la boîte de réponse directement en bas de la liste de messages
+     */
+    public void openEditText () {
+        // Pour ça, on va réduire la taille occupé par la liste de message
+        ViewGroup.LayoutParams params = mMsgListView.getLayoutParams();
+        params.height = 420; // pixels
+        mMsgListView.requestLayout();
+        // On fait apparaître la zone d'édition
+        mMsgListView.setVisibility(View.VISIBLE);
+        mEditText.setVisibility(View.VISIBLE);
+        mEditButton.setVisibility(View.VISIBLE);
+
+        // donne le focus à la zone d'édition
+        mEditText.requestFocus();
+        // et lève le clavier virtuel
+        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        mgr.showSoftInput(mEditText, InputMethodManager.SHOW_IMPLICIT);
+
+        // TODO SRO : Scroll tout en bas de la liste des messages ne marche pas :(
+        mMsgListView.setSelection(0);         
+        mMsgListView.setSelection(mMsgListView.getCount()-1);        
+    }
+    
+    /**
+     * Envoie au server le nouveau Msg 
+     */
+    public void onSendMsg (View v) {
+        Log.d (LOG_TAG, "onSendMsg ("+ mSelectedCategoryId +", " + mSelectedSubjectId + ", [" + mSelectedGroupId + "]) : " + mEditText.getText().toString());
+        AsynchTaskNewMsg TaskSendMsg = new AsynchTaskNewMsg(this);
+        // Envoie le message en le passant en paramètres
+        TaskSendMsg.execute(Long.toString(mSelectedCategoryId),
+                            Long.toString(mSelectedSubjectId),
+                            Long.toString(mSelectedGroupId),
+                            mEditText.getText().toString());
+    }    
    
     @Override
     protected boolean onLeftGesture () {

@@ -44,7 +44,6 @@ public final class R {
         public static final int msgText=0x7f080005;
         public static final int msgTitre=0x7f080003;
         public static final int msg_listview=0x7f080007;
-        public static final int msg_new_label=0x7f080008;
         public static final int pmAuthor=0x7f08000a;
         public static final int pmDate=0x7f08000b;
         public static final int pmText=0x7f08000c;
@@ -52,19 +51,19 @@ public final class R {
         public static final int subjText=0x7f08000f;
         public static final int subj_listview=0x7f080011;
         public static final int subject_label=0x7f080006;
-        public static final int textEditText=0x7f080009;
+        public static final int textEditText=0x7f080008;
+        public static final int textSendButton=0x7f080009;
         public static final int versionView=0x7f080001;
     }
     public static final class layout {
         public static final int main=0x7f030000;
         public static final int msg=0x7f030001;
         public static final int msg_list=0x7f030002;
-        public static final int msg_new=0x7f030003;
-        public static final int pm=0x7f030004;
-        public static final int pm_list=0x7f030005;
-        public static final int pm_new=0x7f030006;
-        public static final int subj=0x7f030007;
-        public static final int subj_list=0x7f030008;
+        public static final int pm=0x7f030003;
+        public static final int pm_list=0x7f030004;
+        public static final int pm_new=0x7f030005;
+        public static final int subj=0x7f030006;
+        public static final int subj_list=0x7f030007;
     }
     public static final class menu {
         public static final int main=0x7f070000;

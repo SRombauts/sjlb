@@ -14,4 +14,20 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
     />    
+    <EditText
+        android:id="@+id/textEditText"
+        android:layout_width="fill_parent"
+        android:layout_height="200px"
+        android:gravity="top"
+        android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
+        android:visibility="invisible"
+    />
+    <Button
+        android:id="@+id/textSendButton"
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content" 
+        android:text="@string/button_send_msg"
+        android:onClick="onSendMsg"
+        android:visibility="invisible"
+    />
 </LinearLayout>
