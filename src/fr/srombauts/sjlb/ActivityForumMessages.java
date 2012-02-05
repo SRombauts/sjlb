@@ -37,7 +37,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
  * Activité présentant la liste des sujets de la catégorie sélectionnée
  * @author 22/08/2010 srombauts
  */
-public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener {
+public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, OnTransferDone {
     private static final String LOG_TAG = "ActivityMsg";
     
     public  static final String START_INTENT_EXTRA_CAT_ID       = "CategoryId";
@@ -55,6 +55,8 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     private long                    mSelectedSubjectId      = 0;
     private String                  mSelectedSubjectLabel   = "";
     private long                    mSelectedGroupId        = 0;
+    
+    private int                     mOriginalMsgListHeight  = -1; 
     
     
     /** Called when the activity is first created. */
@@ -230,10 +232,13 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     public void openEditText () {
         // Pour ça, on va réduire la taille occupé par la liste de message
         ViewGroup.LayoutParams params = mMsgListView.getLayoutParams();
+        if (-1 == mOriginalMsgListHeight) {
+            mOriginalMsgListHeight = params.height;
+        }
         params.height = 420; // pixels
         mMsgListView.requestLayout();
         // On fait apparaître la zone d'édition
-        mMsgListView.setVisibility(View.VISIBLE);
+        //mMsgListView.setVisibility(View.VISIBLE);
         mEditText.setVisibility(View.VISIBLE);
         mEditButton.setVisibility(View.VISIBLE);
 
@@ -249,6 +254,25 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     }
     
     /**
+     *  Fait disparaitre la boîte de réponse du bas de la liste de messages
+     */
+    public void closeEditText () {
+        // Pour ça, on va restaurer la taille occupé par la liste de message
+        ViewGroup.LayoutParams params = mMsgListView.getLayoutParams();
+        if (-1 != mOriginalMsgListHeight) {
+            params.height = mOriginalMsgListHeight;
+        }
+        mMsgListView.requestLayout();
+        // On fait disparaître la zone d'édition
+        mEditText.setVisibility(View.GONE);
+        mEditButton.setVisibility(View.GONE);
+
+        // et cache lève le clavier virtuel
+        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        mgr.showSoftInput(mEditText, InputMethodManager.HIDE_IMPLICIT_ONLY);   
+    }
+    
+    /**
      * Envoie au server le nouveau Msg 
      */
     public void onSendMsg (View v) {
@@ -260,7 +284,16 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                             Long.toString(mSelectedGroupId),
                             mEditText.getText().toString());
     }    
-   
+
+    // Appelée lorsqu'un transfert s'est terminé (post d'un nouveau messages, effacement d'un PM...)
+    public void onTransferDone (boolean abResult) {
+        // Si le message a été envoyé avec succès, on peur refermer la zone de saisie texte
+        if (abResult) {
+            closeEditText ();
+        }
+    }
+    
+    
     @Override
     protected boolean onLeftGesture () {
         Log.i (LOG_TAG, "onTouch: va a l'ecran de gauche... quitte l'activite pour retour à la liste des sujets");
@@ -269,6 +302,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     }
 
     // TODO SRO : onRightGesture
+    
     
     
     
@@ -363,8 +397,6 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         }
     }
     
-    // TODO SRO : http://stackoverflow.com/questions/459729/how-to-display-list-of-images-in-listview-in-android
-
     // Objet utilisé comme cache des données d'une View, dans un pool d'objets utilisés par la ListView
     final static class MessageListItemCache {
         public QuickContactBadge    quickContactView;
@@ -401,9 +433,13 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                         it.imageViewFile.setTag(it.filename);
                         if (   (it.imageViewFile != null)
                             && (it.imageBitmap != null) ) {
+                            // TODO SRO : je pense qu'il faut faire un reset du champ imageBitmap à un moment donné
                             it.imageViewFile.setImageBitmap(it.imageBitmap);
+                        } else {
+                            // TODO SRO : il faut lancer le téléchargement du fichier en tache de fond (SSI il s'agit bien d'une image !)
                         }
                 }
+                
 
                 return view;
         }

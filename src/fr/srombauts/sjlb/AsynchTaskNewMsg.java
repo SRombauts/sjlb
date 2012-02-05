@@ -28,6 +28,7 @@ class AsynchTaskNewMsg extends AsyncTask<String, Void, Boolean> {
     private static final String  LOG_TAG        = "NewMsgTask";
 
     private Context             mContext        = null;
+    private OnTransferDone      mOnTransferDone = null;
     
     private ContentProviderMsg  mMsgDBAdapter   = null;
       
@@ -35,10 +36,11 @@ class AsynchTaskNewMsg extends AsyncTask<String, Void, Boolean> {
      * Constructeur utilisé pour mémorisée la référence sur le service appelant
      * @param context
      */
-    public AsynchTaskNewMsg(Context context) {
-        mContext      = context;
+    public AsynchTaskNewMsg(Context context/*, OnTransferDone onTransferDone*/) {
+        mContext        = context;
+        mOnTransferDone = (OnTransferDone)context/*onTransferDone*/;
                                 
-        mMsgDBAdapter  = new ContentProviderMsg(context);
+        mMsgDBAdapter   = new ContentProviderMsg(context);
     }
 
     protected void onPreExecute() {
@@ -150,6 +152,9 @@ class AsynchTaskNewMsg extends AsyncTask<String, Void, Boolean> {
             // Toast notification d'erreur d'envoi !
             Toast.makeText(mContext, mContext.getString(R.string.toast_not_sent), Toast.LENGTH_SHORT).show();
         }
+        
+        // Notifie l'activité appelante à l'aide d'une callback
+        mOnTransferDone.onTransferDone(abResult);
     }
 }
 
