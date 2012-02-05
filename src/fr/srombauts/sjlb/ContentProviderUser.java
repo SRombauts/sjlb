@@ -136,7 +136,9 @@ public class ContentProviderUser extends ContentProvider {
 
     // compte les utilisateurs
     public long countUsers () {
-        return DatabaseUtils.queryNumEntries(mDBHelper.getReadableDatabase(), SJLB.User.TABLE_NAME);
+        // TODO SRO : comment fermer le curseur !?
+        long nbUsers = DatabaseUtils.queryNumEntries(mDBHelper.getReadableDatabase(), SJLB.User.TABLE_NAME);
+        return nbUsers;
     }
     
 }

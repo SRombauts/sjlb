@@ -5,9 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.net.Uri;
-import android.util.Log;
 
 
 /**
@@ -76,9 +74,10 @@ public class ContentProviderMsg extends ContentProvider {
 	 * @todo SRO : ajouter un filtrage sur un "id" donné lorsque l'utilisateur fourni une URI de type "content:path/id"
 	 */
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        // TODO SRO : virer cette complexité en ne croisant plus les deux tables ?
         if (null == selection) selection = ""; 
         String selectionCplx = "(" + selection + ") AND (" + SJLB.Msg.TABLE_NAME+"."+SJLB.Msg.AUTHOR_ID+"="+SJLB.User.TABLE_NAME+"."+SJLB.User._ID + ")"; 
-        Log.e ("ContentProvider", selectionCplx);
+        //Log.e ("ContentProvider", selectionCplx);
         return mDBHelper.getReadableDatabase().query(
                     SJLB.Msg.TABLE_NAME + ", " + SJLB.User.TABLE_NAME,
                     projection,
@@ -130,18 +129,18 @@ public class ContentProviderMsg extends ContentProvider {
     // Récupère la date du dernier message
     public long getLastMsgDate () {
         long                nbSeconds = 0;
-        Cursor cur = getAllMsg ();
-        if (0 < cur.getCount())
+        Cursor cursor = getAllMsg ();
+        if (0 < cursor.getCount())
         {
-            cur.moveToLast();
-            nbSeconds = cur.getLong(cur.getColumnIndex(SJLB.Msg.DATE))/1000;
+            cursor.moveToLast();
+            nbSeconds = cursor.getLong(cursor.getColumnIndex(SJLB.Msg.DATE))/1000;
         }
+        cursor.close();
         return nbSeconds;
     }
     
     // récupère un cursor avec la liste de tous les Msg
     public Cursor getAllMsg () {
-        // TODO SRO : croiser avec la table des sujets pour obtenir l'intitulé du sujet
         return mDBHelper.getReadableDatabase().query(   SJLB.Msg.TABLE_NAME,
                                                        new String[] {   SJLB.Msg._ID,
                                                                         SJLB.Msg.DATE,
@@ -149,33 +148,54 @@ public class ContentProviderMsg extends ContentProvider {
                                                                         SJLB.Msg.SUBJECT_ID,
                                                                         SJLB.Msg.UNREAD,
                                                                         SJLB.Msg.TEXT},
-                                                       null, null, null, null, null);
+                                                       null,
+                                                       null, null, null, null);
+        // TODO SRO : mDBHelper.close(); ?
+    }
+
+    // récupère un cursor avec la liste des Msg marqués UNREAD_LOCALY non lus mais localement lus 
+    public Cursor getMsgUnread () {
+        return mDBHelper.getReadableDatabase().query(   SJLB.Msg.TABLE_NAME,
+                                                       new String[] { SJLB.Msg._ID },
+                                                       SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_LOCALY,
+                                                       null, null, null, null);
     }
     
+    // Efface les flags UNREAD_LOCALY des messages lus localement
+    public int clearMsgUnread () {
+        ContentValues values = new ContentValues();
+        values.put(SJLB.Msg.UNREAD, SJLB.Msg.UNREAD_FALSE); // on les passe à UNREAD_LOCALY ce qui indique qu'il faut encore signaler le site Web SJLB du fait qu'on les a lu !
+        String where = SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_LOCALY;
+        return mDBHelper.getWritableDatabase ().update(SJLB.Msg.TABLE_NAME, values, where, null);
+    }
+
+/*    
     // récupère un cursor sur un Msg particulier
     public Cursor getMsg (int aId) {
-        // TODO SRO : croiser avec la table des sujets pour obtenir l'intitulé du sujet
-        Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.Msg.TABLE_NAME,
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Msg.TABLE_NAME,
                                                                 new String[]{   SJLB.Msg.DATE,
                                                                                 SJLB.Msg.AUTHOR_ID,
                                                                                 SJLB.Msg.SUBJECT_ID,
                                                                                 SJLB.Msg.UNREAD,
                                                                                 SJLB.Msg.TEXT},
                                                                 SJLB.Msg._ID + "=" + aId,
-                                                                null, null, null, null, null);
+                                                                null, null, null, null);
         if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
             throw new SQLException("Pas de Msg pour l'Id " + aId);
         }
         return cursor;
     }
+*/
 
     // teste l'existence d'un Msg particulier
     public Boolean isExist (int aId) {
-        Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.Msg.TABLE_NAME,
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Msg.TABLE_NAME,
                                                                 new String[]{SJLB.Msg._ID},
                                                                 SJLB.Msg._ID + "=" + aId,
                                                                 null, null, null, null, null);
-        return (0 < cursor.getCount());
+        boolean bIsExist = (0 < cursor.getCount());
+        cursor.close ();
+        return bIsExist;
     }
        
     // vide la table des Msg

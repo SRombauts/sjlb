@@ -74,6 +74,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
             if (0 < cursor.getCount()) {
                 titre += " (" + cursor.getCount() + ")"; 
             }
+            cursor.close();
             mCategories.add(titre);            
         }
         // binding de la liste des catégories

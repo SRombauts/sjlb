@@ -162,7 +162,9 @@ public class ContentProviderSubj extends ContentProvider {
                                                                 new String[]{SJLB.Subj._ID},
                                                                 SJLB.Subj._ID + "=" + aId,
                                                                 null, null, null, null, null);
-        return (0 < cursor.getCount());
+        boolean bIsExist = (0 < cursor.getCount());
+        cursor.close ();
+        return bIsExist;
     }
 
     // compte les Subj

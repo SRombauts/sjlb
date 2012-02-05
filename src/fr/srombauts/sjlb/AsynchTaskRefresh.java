@@ -29,6 +29,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.ParseException;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -181,16 +182,16 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 
                 // Utilise les préférences pour récupérer le login/mot de passe :
                 PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
-    
+                
                 // Instancie un client http et un header de requète "POST"
-                HttpClient  httpClient  = new DefaultHttpClient();  
-                HttpPost    httpPost    = new HttpPost(mContext.getString(R.string.sjlb_users_uri));  
+                HttpClient  httpClient  = new DefaultHttpClient();
+                HttpPost    httpPost    = new HttpPost(mContext.getString(R.string.sjlb_users_uri));
                    
                 // Ajout des paramètres
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);  
-                nameValuePairs.add(new BasicNameValuePair("login",    loginPassword.mLogin));  
-                nameValuePairs.add(new BasicNameValuePair("password", loginPassword.mPasswordMD5));  
-                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+                nameValuePairs.add(new BasicNameValuePair("login",    loginPassword.mLogin));
+                nameValuePairs.add(new BasicNameValuePair("password", loginPassword.mPasswordMD5));
+                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
                 
                 // Execute HTTP Post Request  
                 HttpResponse response = httpClient.execute(httpPost);
@@ -226,7 +227,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             mUserDBAdapter.insertUser(newUser);
                         }
                     }
-    
+                    
                     Log.d(LOG_TAG, "refreshUsers... ok");
                 }
                    
@@ -263,6 +264,22 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             // Utilise les préférences pour récupérer le login/mot de passe :
             PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
 
+            // TODO SRO : déplacer ce qui suit dans une méthode dédiée
+            Cursor cursor = mMsgDBAdapter.getMsgUnread ();
+            String strMsgLus = "";
+            int    nbMsgLus = cursor.getCount ();
+            if (0 < nbMsgLus) {
+                if (cursor.moveToFirst ()) {
+                    do {
+                        //Log.d(LOG_TAG, "refreshUsers id_msg_non_lu=" + cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg._ID)));
+                        if (strMsgLus != "") {
+                            strMsgLus += ",";
+                        }
+                        strMsgLus += cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg._ID));
+                    } while (cursor.moveToNext ());
+                }
+            }
+
             // Instancie un client http et un header de requète "POST"
             HttpClient  httpClient  = new DefaultHttpClient();  
             HttpPost    httpPost    = new HttpPost(mContext.getString(R.string.sjlb_polling_uri));  
@@ -271,6 +288,10 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);  
             nameValuePairs.add(new BasicNameValuePair("login",    loginPassword.mLogin));  
             nameValuePairs.add(new BasicNameValuePair("password", loginPassword.mPasswordMD5));  
+            if (0 < nbMsgLus) {
+                Log.d(LOG_TAG, "strMsgLus=" + strMsgLus);
+                nameValuePairs.add(new BasicNameValuePair("msg_lus", strMsgLus));
+            }
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
             
             // Execute HTTP Post Request  
@@ -321,17 +342,29 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                         String  strIdMsg = msg.getFirstChild().getNodeValue();
                         int     idMsg    = Integer.parseInt(strIdMsg);
                         
-                        // Renseigne la bdd si Message inconnu
-                        // TODO SRO : PEUT ÊTRE PAS, il faudrait peut être juste tester si le message est nouveau, et le mettre en base plus bas, dans "fetchMsg()"
-                        if (false == mMsgDBAdapter.isExist(idMsg)) {
-                            Log.d(LOG_TAG, "Msg " + idMsg + " nouveau");
-                            mNbNewMsg++;
-                        }
-                        else {
-                            Log.d(LOG_TAG, "Msg " + idMsg + " recuperes precedemment");
+                        if (0 < idMsg) {
+                            // Renseigne la bdd si Message inconnu
+                            // TODO SRO : PEUT ÊTRE PAS, il faudrait peut être juste tester si le message est nouveau, et le mettre en base plus bas, dans "fetchMsg()"
+                            if (false == mMsgDBAdapter.isExist(idMsg)) {
+                                Log.d(LOG_TAG, "Msg " + idMsg + " nouveau");
+                                mNbNewMsg++;
+                            }
+                            else {
+                                Log.d(LOG_TAG, "Msg " + idMsg + " recuperes precedemment");
+                            }
+                        } else {
+                            Log.e(LOG_TAG, "Msg d'ID " + idMsg + " interdit");
                         }
                     }
                 }
+                
+                // TODO SRO : démarquer UNREAD les messages lus localement
+                if (0 < nbMsgLus) {
+                    int nbCleared = mMsgDBAdapter.clearMsgUnread ();
+                    Log.d(LOG_TAG, "clearMsgUnread = " + nbCleared);
+                }
+                cursor.close ();
+                
                 Log.d(LOG_TAG, "refreshInfos... ok : mNbNewPM="+mNbNewPM+" ("+mNbPM+"), mNbNewMsg="+mNbNewMsg+" ("+mNbMsg+")");
             }
                

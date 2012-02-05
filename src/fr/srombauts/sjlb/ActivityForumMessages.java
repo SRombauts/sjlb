@@ -94,8 +94,9 @@ public class ActivityForumMessages extends ActivityTouchListener {
         
         clearNotificationMsg ();
         
-        mCursor.requery();
-        mAdapter.notifyDataSetChanged();
+        // TODO SRO : tentative de refresh des données affichées (nb de new msg)
+        //mCursor.requery();    // => inutile car on utilise managedQuery !
+        //mAdapter.notifyDataSetChanged();
     }
 
     @Override

@@ -104,9 +104,9 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     protected void onResume () {
         super.onResume();
 
-        // tentative de refresh des données affichées (nb de new msg)
-        mCursor.requery();
-        mAdapter.notifyDataSetChanged();
+        // TODO SRO : tentative de refresh des données affichées (nb de new msg)
+        //mCursor.requery();    // => inutile car on utilise managedQuery !
+        //mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -121,9 +121,9 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         editor.putLong  ("mSelectedGroupId",    mSelectedGroupId);
         editor.commit();
 
-        // tentative de refresh des données affichées (nb de new msg)
-        mCursor.requery();
-        mAdapter.notifyDataSetChanged();
+        // TODO SRO : tentative de refresh des données affichées (nb de new msg)
+        //mCursor.requery();    // => inutile car on utilise managedQuery !
+        //mAdapter.notifyDataSetChanged();
     }
 
     /**

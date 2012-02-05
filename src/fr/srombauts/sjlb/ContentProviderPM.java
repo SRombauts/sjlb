@@ -146,7 +146,9 @@ public class ContentProviderPM extends ContentProvider {
                                                                 new String[]{SJLB.PM._ID},
                                                                 SJLB.PM._ID + "=" + aId,
                                                                 null, null, null, null, null);
-        return (0 < cursor.getCount());
+        boolean bIsExist = (0 < cursor.getCount());
+        cursor.close ();
+        return bIsExist;
     }
     
     // compte les PM
