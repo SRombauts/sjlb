@@ -12,6 +12,10 @@
     <string name="prefs_password_title">    Mot de passe                    </string>
     <string name="prefs_password_desc">     Mot de passe de l\'utilisateur  </string>
 
+    <string name="prefs_interface">             Interface                   </string>
+    <string name="prefs_switch_screen_title">   Sens pour changer d\'écrans  </string>
+    <string name="prefs_switch_screen_desc">    Sens du mouvement de doigt pour changer d\'écran </string>
+
     <string name="prefs_auto_update">       Auto-Rafraîchissement   </string>
     <string name="prefs_auto_update_title"> Auto-Rafraîchissement   </string>
     <string name="prefs_auto_update_desc">  Selectionner pour activer le rafraichissement automatique </string>

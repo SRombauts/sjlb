@@ -6,20 +6,21 @@ import android.preference.PreferenceManager;
 
 
 /**
- * Récupération et encapsulation du couple login/password renseigné dans les préférences
+ * Récupération et encapsulation des préférences de notification
+ * @author srombauts
 */
-class NotificationPrefs {
-    public Boolean	mbSound;
-    public Boolean mbVibrate;
-    public Boolean mbLight;
+class PrefsNotification {
+    public Boolean  mbSound;
+    public Boolean  mbVibrate;
+    public Boolean  mbLight;
 
     // Interdiction du constructeur par défaut
     @SuppressWarnings("unused")
-    private NotificationPrefs () {
+    private PrefsNotification () {
     }
 
     // Constructeur utilisant les préférences
-    public NotificationPrefs (Context aContext) {
+    public PrefsNotification (Context aContext) {
         // Récupère les options de notification dans les préférences :
         SharedPreferences   Prefs       = PreferenceManager.getDefaultSharedPreferences(aContext);
                             mbSound		= Prefs.getBoolean(SJLB.PREFS.NOTIFICATION_SOUND,   true);

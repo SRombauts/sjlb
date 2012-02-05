@@ -1,13 +1,11 @@
 package fr.srombauts.sjlb;
 
-import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -19,8 +17,10 @@ import android.widget.AdapterView.OnItemClickListener;
  * Activité présentant la liste des sujets de la catégorie sélectionnée
  * @author 22/08/2010 srombauts
  */
-public class ActivityForumSubjects extends Activity implements OnItemClickListener, OnTouchListener {
-    private static final String LOG_TAG = "ActivitySubj";
+public class ActivityForumSubjects extends ActivityTouchListener implements OnItemClickListener {
+    private static final String LOG_TAG         = "ActivitySubj";
+    
+    private static final String SAVE_FILENAME   = "SavedIntent";
     
     public  static final String START_INTENT_EXTRA_CAT_ID       = "CategoryId";
     public  static final String START_INTENT_EXTRA_CAT_LABEL    = "CategoryLabel";
@@ -31,12 +31,11 @@ public class ActivityForumSubjects extends Activity implements OnItemClickListen
     
     private long                mSelectedCategoryId     = 0;
     private String              mSelectedCategoryLabel  = "";
-    
-    private float               mTouchStartPositionX    = 0;
-    private float               mTouchStartPositionY    = 0;
+    private long                mSelectedSubjId         = 0;
+    private long                mSelectedGroupId        = 0;
+    private String              mSelectedSubjLabel      = "";
     
     private Intent              mSavedIntent            = null;
-    
     
     /** Called when the activity is first created. */
     @Override
@@ -84,95 +83,83 @@ public class ActivityForumSubjects extends Activity implements OnItemClickListen
         mSubjectsListView.setOnItemClickListener(this);
         mSubjectsListView.setOnTouchListener(this);
         mSubjectsListView.getRootView().setOnTouchListener(this);
+
+        // Restaure les valeurs du dernier intent seulement si elles correspondent à la même catégorie que celle sélectionnée
+        SharedPreferences settings = getSharedPreferences(SAVE_FILENAME, 0);
+        if (settings.getLong ("mSelectedCategoryId", 0) == mSelectedCategoryId) {
+            mSavedIntent = new Intent(this, ActivityForumMessages.class);
+            mSelectedSubjId     = settings.getLong   ("mSelectedSubjId",    0);
+            mSelectedSubjLabel  = settings.getString ("mSelectedSubjLabel", "");
+            mSelectedGroupId    = settings.getLong   ("mSelectedGroupId",   0);
+            mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_CAT_ID,        mSelectedCategoryId);
+            mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_SUBJ_ID,       mSelectedSubjId);
+            mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_SUBJ_LABEL,    mSelectedSubjLabel);
+            mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_GROUP_ID,      mSelectedGroupId);
+            Log.d (LOG_TAG, "onCreate: restaure l'intent sauvegarde (" + mSelectedCategoryId + ", " + settings.getLong   ("mSelectedSubjId",    0) + ", " + settings.getString ("mSelectedSubjLabel", "") + ", " + settings.getLong   ("mSelectedGroupId",   0) + ")");
+        }
     }
     
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        Log.w (LOG_TAG, "onSaveInstanceState");       
-    }
-    
+    @Override
     protected void onResume () {
         super.onResume();
-        
+
         mCursor.requery();
         mAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onStop () {
+        super.onStop();
+        Log.d (LOG_TAG, "onStop: Sauvegarde les valeurs du dernier intent (" + mSelectedCategoryId + ", " + mSelectedSubjId + ", " + mSelectedGroupId + ", " + mSelectedSubjLabel + ")");
+        SharedPreferences           settings    = getSharedPreferences(SAVE_FILENAME, 0);
+        SharedPreferences.Editor    editor      = settings.edit();
+        editor.putLong  ("mSelectedCategoryId", mSelectedCategoryId);
+        editor.putLong  ("mSelectedSubjId",     mSelectedSubjId);
+        editor.putString("mSelectedSubjLabel",  mSelectedSubjLabel);
+        editor.putLong  ("mSelectedGroupId",    mSelectedGroupId);
+        editor.commit();
+    }
+    
     /**
      *  Lance l'activité correspondante avec en paramètre l'id du sujet :
      */
     @SuppressWarnings("unchecked")
+    @Override
     public void onItemClick(AdapterView adapter, View view, int index, long arg3) {
         mSavedIntent = new Intent(this, ActivityForumMessages.class);
         mCursor.moveToPosition(index);
-        long    selectedCategoryId  = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.CAT_ID));
-        long    selectedSubjId      = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.ID));
-        long    selectedGroupId     = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.GROUP_ID));
-        String  selectedSubjLabel   = mCursor.getString(mCursor.getColumnIndexOrThrow(SJLB.Subj.TEXT));
-        mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_CAT_ID,        selectedCategoryId);
-        mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_SUBJ_ID,       selectedSubjId);
-        mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_SUBJ_LABEL,    selectedSubjLabel);
-        mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_GROUP_ID,      selectedGroupId);
-        Log.d (LOG_TAG, "onItemClick: mSavedIntent.putExtra(" + selectedSubjId + ", " + selectedSubjLabel + ")");
+        mSelectedSubjId      = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.ID));
+        mSelectedSubjLabel   = mCursor.getString(mCursor.getColumnIndexOrThrow(SJLB.Subj.TEXT));
+        mSelectedGroupId     = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.GROUP_ID));
+        mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_CAT_ID,        mSelectedCategoryId);
+        mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_SUBJ_ID,       mSelectedSubjId);
+        mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_SUBJ_LABEL,    mSelectedSubjLabel);
+        mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_GROUP_ID,      mSelectedGroupId);
+        Log.d (LOG_TAG, "onItemClick: mSavedIntent.putExtra(" + mSelectedSubjId + ", " + mSelectedSubjLabel + ")");
         startActivity (mSavedIntent);
     }
 
-    // TODO SRO : callback d'évènement tactiles, à mutualiser entre les activités
-    public boolean onTouch(View aView, MotionEvent aMotionEvent) {
-        boolean     bActionTraitee = false;
-        final int   touchAction = aMotionEvent.getAction();
-        final float touchX      = aMotionEvent.getX();
-        final float touchY      = aMotionEvent.getY();
-        
-        switch (touchAction)
-        {
-            case MotionEvent.ACTION_DOWN: {
-                //Log.d (LOG_TAG, "onTouch (ACTION_DOWN) : touch (" + touchX + ", " + touchY + ")");
-                mTouchStartPositionX = touchX;
-                mTouchStartPositionY = touchY;
-                break;
-            }
-            case MotionEvent.ACTION_UP: {
-                //Log.d (LOG_TAG, "onTouch (ACTION_UP) : touch (" + touchX + ", " + touchY + ")");
-                final float proportionalDeltaX = (touchX - mTouchStartPositionX) / (float)aView.getWidth();
-                final float proportionalDeltaY = (touchY - mTouchStartPositionY) / (float)aView.getHeight();
-                //Log.d (LOG_TAG, "onTouch: deltas proportionnels : (" + proportionalDeltaX + ", " + proportionalDeltaY + ")");
-                
-                // Teste si le mouvement correspond à un mouvement franc
-                if (   (Math.abs(proportionalDeltaX) > 0.2)                                 // mouvement d'ampleur importante
-                    && (Math.abs(proportionalDeltaX)/Math.abs(proportionalDeltaY) > 0.8) )  // mouvement plus latéral que vertical
-                {
-                    //Log.d (LOG_TAG, "onTouch: mouvement lateral franc");
-                    
-                    // Teste sa direction :
-                    if (proportionalDeltaX > 0) {
-                        if (null != mSavedIntent) {
-                            Log.i (LOG_TAG, "onTouch: mouvement vers la droite, on relance le dernier intent sauvegardé");
-                            startActivity (mSavedIntent);
-                            bActionTraitee = true;
-                        } else {
-                           Log.w (LOG_TAG, "onTouch: mouvement vers la droite mais pas d'intent sauvegardé");
-                        }
-                    }
-                    else {
-                        Log.i (LOG_TAG, "onTouch: mouvement vers la gauche, on quitte l'activité");
-                        bActionTraitee = true;
-                        finish ();
-                    }
-                }
-                break;
-            }
-            default: {
-                //Log.d (LOG_TAG, "onTouch autre (" + touchAction  + ") : touch (" + touchX + ", " + touchY + ")");
-            }
-        }
-
-        // Si on n'a pas déjà traité l'action, on passe la main à la Vue sous-jacente
-        if (false == bActionTraitee) {
-            aView.onTouchEvent(aMotionEvent);
-        }
-        
-        // Si on retourne false, on n'est plus notifié des évènements suivants
+    @Override
+    protected boolean onLeftGesture () {
+        Log.i (LOG_TAG, "onTouch: va a l'ecran de gauche... pour retour à l'ecran principal");
+        // Quitte l'activité
+        finish ();
         return true;
     }
+    
+    @Override
+    protected boolean onRightGesture () {
+        boolean bActionTraitee = false;
         
+        if (null != mSavedIntent) {
+            Log.d (LOG_TAG, "onTouch: va a l'ecran de droite... relance le dernier intent sauvegarde");
+            startActivity (mSavedIntent);
+            bActionTraitee = true;
+        } else {
+           Log.w (LOG_TAG, "onTouch: pas d'intent sauvegardé");
+        }
+        
+        return bActionTraitee;
+    }
+    
 }

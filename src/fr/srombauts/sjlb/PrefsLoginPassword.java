@@ -12,13 +12,13 @@ import android.preference.PreferenceManager;
 /**
  * Récupération et encapsulation du couple login/password renseigné dans les préférences
 */
-class LoginPassword {
+class PrefsLoginPassword {
     public String mLogin;
     public String mPasswordMD5;
 
     // Interdiction du constructeur par défaut
     @SuppressWarnings("unused")
-    private LoginPassword () {
+    private PrefsLoginPassword () {
     }
 
     /**
@@ -26,7 +26,7 @@ class LoginPassword {
      *
      * @param[in] aContext Contexte de l'activité/du servicé, nécessaire pour récupérer les préférences de l'application
      */
-    public LoginPassword (Context aContext) throws LoginPasswordException {
+    public PrefsLoginPassword (Context aContext) throws LoginPasswordException {
         try {
             
             // Récupère le login/mot de passe dans les préférences :

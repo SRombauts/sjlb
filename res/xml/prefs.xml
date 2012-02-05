@@ -19,6 +19,17 @@
     </PreferenceCategory>
     
     <PreferenceCategory
+         android:title="@string/prefs_interface">
+        
+        <CheckBoxPreference
+            android:key="PREF_SWITCH_SCREEN_DIRECTION"
+            android:title="@string/prefs_switch_screen_title"
+            android:summary="@string/prefs_switch_screen_desc"
+            android:defaultValue="true"
+            />
+    </PreferenceCategory>
+    
+    <PreferenceCategory
          android:title="@string/prefs_auto_update">
         
         <CheckBoxPreference

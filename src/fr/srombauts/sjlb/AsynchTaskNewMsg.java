@@ -80,7 +80,7 @@ class AsynchTaskNewMsg extends AsyncTask<String, Void, Void> {
         try {
             
             // Utilise les préférences pour récupérer le login/mot de passe :
-            LoginPassword loginPassword = new LoginPassword(mContext);
+            PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
             
             // Récupère la date du message le plus récent déjà lu
             long lastMsgDate = mMsgDBAdapter.getLastMsgDate();

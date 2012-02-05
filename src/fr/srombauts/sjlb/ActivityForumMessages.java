@@ -23,7 +23,7 @@ import android.widget.Toast;
  * Activité présentant la liste des sujets de la catégorie sélectionnée
  * @author 22/08/2010 srombauts
  */
-public class ActivityForumMessages extends Activity implements OnTouchListener {
+public class ActivityForumMessages extends ActivityTouchListener {
     private static final String LOG_TAG = "ActivityMsg";
     
     public  static final String START_INTENT_EXTRA_CAT_ID       = "CategoryId";
@@ -39,10 +39,6 @@ public class ActivityForumMessages extends Activity implements OnTouchListener {
     private long                mSelectedSubjectId      = 0;
     private String              mSelectedSubjectLabel   = "";
     private long                mSelectedGroupId        = 0;
-   
-    private float               mTouchStartPositionX    = 0;
-    private float               mTouchStartPositionY    = 0;
-    
     
     /** Called when the activity is first created. */
     @Override
@@ -95,6 +91,7 @@ public class ActivityForumMessages extends Activity implements OnTouchListener {
         mMsgListView.getRootView().setOnTouchListener(this);
     }
     
+    @Override
     protected void onResume () {
         super.onResume();
         
@@ -112,67 +109,11 @@ public class ActivityForumMessages extends Activity implements OnTouchListener {
         NotificationManager notificationManager     = (NotificationManager) getSystemService(ns);
         notificationManager.cancel(AsynchTaskRefresh.NOTIFICATION_NEW_MSG_ID);
     }
-
-    // TODO SRO : callback d'évènement tactiles, à mutualiser entre les activités
-    public boolean onTouch(View aView, MotionEvent aMotionEvent) {
-        boolean     bActionTraitee = false;
-        final int   touchAction = aMotionEvent.getAction();
-        final float touchX      = aMotionEvent.getX();
-        final float touchY      = aMotionEvent.getY();
-        
-        switch (touchAction)
-        {
-            case MotionEvent.ACTION_DOWN: {
-                //Log.d (LOG_TAG, "onTouch (ACTION_DOWN) : touch (" + touchX + ", " + touchY + ")");
-                mTouchStartPositionX = touchX;
-                mTouchStartPositionY = touchY;
-                break;
-            }
-            case MotionEvent.ACTION_UP: {
-                //Log.d (LOG_TAG, "onTouch (ACTION_UP) : touch (" + touchX + ", " + touchY + ")");
-                final float proportionalDeltaX = (touchX - mTouchStartPositionX) / (float)aView.getWidth();
-                final float proportionalDeltaY = (touchY - mTouchStartPositionY) / (float)aView.getHeight();
-                //Log.d (LOG_TAG, "onTouch: deltas proportionnels : (" + proportionalDeltaX + ", " + proportionalDeltaY + ")");
-                
-                // Teste si le mouvement correspond à un mouvement franc
-                if (   (Math.abs(proportionalDeltaX) > 0.2)                                 // mouvement d'ampleur importante
-                    && (Math.abs(proportionalDeltaX)/Math.abs(proportionalDeltaY) > 0.8) )  // mouvement plus latéral que vertical
-                {
-                    //Log.d (LOG_TAG, "onTouch: mouvement lateral franc");
-                    
-                    // Teste sa direction :
-                    if (proportionalDeltaX > 0) {
-                        Log.d (LOG_TAG, "onTouch: mouvement vers la droite");
-                        
-                        // TODO SRO : action intelligente : passer au prochain sujet contenant des messages non lus ? 
-                        //bActionTraitee = true;
-                        
-                    }
-                    else {
-                        Log.i (LOG_TAG, "onTouch: mouvement vers la gauche, on quitte l'activité");
-                        bActionTraitee = true;
-                        finish ();
-                    }
-                }
-                break;
-            }
-            default: {
-                //Log.d (LOG_TAG, "onTouch autre (" + touchAction  + ") : touch (" + touchX + ", " + touchY + ")");
-            }
-        }
-
-        // Si on n'a pas déjà traité l'action, on passe la main à la Vue sous-jacente
-        if (false == bActionTraitee) {
-            aView.onTouchEvent(aMotionEvent);
-        }
-        
-        // Si on retourne false, on n'est plus notifié des évènements suivants
-        return true;
-    }
     
     /**
      * Création du menu général
      */
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.msg, menu);
@@ -182,6 +123,7 @@ public class ActivityForumMessages extends Activity implements OnTouchListener {
     /**
      * Sur sélection dans le menu
      */
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         
@@ -221,4 +163,12 @@ public class ActivityForumMessages extends Activity implements OnTouchListener {
         return true;
     }
    
+    @Override
+    protected boolean onLeftGesture () {
+        Log.i (LOG_TAG, "onTouch: va a l'ecran de gauche... quitte l'activite pour retour à la liste des sujets");
+        finish ();
+        return true;
+    }
+
+    // TODO SRO : onRightGesture
 }

@@ -31,6 +31,17 @@ public final class SJLB {
          */
         public static final String PASSWORD     = "PREF_PASSWORD";
         
+        
+        /**
+         * La clef stockant le sens du mouvement nécessaire pour changer d'écran
+         * 
+         *  true : mouvements à la mode iPhone, qui semble "tirer" les écrans dans un sens ou dans l'autre  
+         *  false : 1) mouvement de gauche à droite pour remonter des messages vers l'écran d'accueil, puis quitter,
+         *          2) mouvement de droite à gauche pour redescendre vers le sujet qui a été vu en dernier 
+         */
+        public static final String SWITCH_SCREEN_DIRECTION  = "PREF_SWITCH_SCREEN_DIRECTION";
+        
+        
         /**
          * La clef activant le rafraichissement automatique cyclique en tache de fond (si non, rafraichissement uniquement au lancement de l'appli)
          */

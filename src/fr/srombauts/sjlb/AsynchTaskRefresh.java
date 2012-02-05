@@ -179,7 +179,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 Log.d(LOG_TAG, "refreshUsers...");
                 
                 // Utilise les préférences pour récupérer le login/mot de passe :
-                LoginPassword loginPassword = new LoginPassword(mContext);
+                PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
     
                 // Instancie un client http et un header de requète "POST"
                 HttpClient  httpClient  = new DefaultHttpClient();  
@@ -259,7 +259,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             Log.d(LOG_TAG, "refreshInfos...");
             
             // Utilise les préférences pour récupérer le login/mot de passe :
-            LoginPassword loginPassword = new LoginPassword(mContext);
+            PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
 
             // Instancie un client http et un header de requète "POST"
             HttpClient  httpClient  = new DefaultHttpClient();  
@@ -366,7 +366,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 Log.d(LOG_TAG, "fetchPM...");
                 
                 // Utilise les préférences pour récupérer le login/mot de passe :
-                LoginPassword loginPassword = new LoginPassword(mContext);
+                PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
                 
                 // Instancie un client http et un header de requète "POST"  
                 HttpClient  httpClient  = new DefaultHttpClient();  
@@ -466,7 +466,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 Log.d(LOG_TAG, "fetchMsg...");
                 
                 // Utilise les préférences pour récupérer le login/mot de passe :
-                LoginPassword loginPassword = new LoginPassword(mContext);
+                PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
 
                 // Récupère la date du message le plus récent déjà lu
                 long lastMsgDate = mMsgDBAdapter.getLastMsgDate();
@@ -611,7 +611,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         Log.d(LOG_TAG, "notifyUserPM");
 
         // Récupère les préférences de notification :
-        NotificationPrefs    notificationPrefs        = new NotificationPrefs(mContext);
+        PrefsNotification    notificationPrefs        = new PrefsNotification(mContext);
 
         // Récupère une reference sur le NotificationManager :
         String              ns                      = Context.NOTIFICATION_SERVICE;
@@ -661,7 +661,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         Log.d(LOG_TAG, "notifyUserMsg");
         
         // Récupère les préférences de notification :
-        NotificationPrefs    notificationPrefs        = new NotificationPrefs(mContext);
+        PrefsNotification    notificationPrefs        = new PrefsNotification(mContext);
 
         // Récupère une reference sur le NotificationManager :
         String              ns                      = Context.NOTIFICATION_SERVICE;

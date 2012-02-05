@@ -14,6 +14,10 @@
     <string name="prefs_password_title">    Password        </string>
     <string name="prefs_password_desc">     User Password   </string>
 
+    <string name="prefs_interface">             Interface               </string>
+    <string name="prefs_switch_screen_title">   Switch Screen Direction </string>
+    <string name="prefs_switch_screen_desc">    Direction of Horizontal Touch movement to switch screens </string>
+
     <string name="prefs_auto_update">       Auto-Update         </string>
     <string name="prefs_auto_update_title"> Auto-Update         </string>
     <string name="prefs_auto_update_desc">  Select to turn on automatic updating        </string>
