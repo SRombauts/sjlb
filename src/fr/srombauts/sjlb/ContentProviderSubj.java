@@ -73,27 +73,19 @@ public class ContentProviderSubj extends ContentProvider {
     }
 
 	/**
-	 * Requète générique sur les messages
+	 * Requète générique sur les sujets
 	 *
 	 * @todo SRO : ajouter un filtrage sur un "id" donné lorsque l'utilisateur fourni une URI de type "content:path/id"
 	 */
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        // TODO SRO : c'est nul, et finalement ce "nb_msg" n'est pas utilisé
-        if (null == selection) selection = ""; 
-        String selectionCplx = "(" + selection + ") AND (" + SJLB.Subj.TABLE_NAME+"."+SJLB.Subj._ID+"="+SJLB.Msg.TABLE_NAME+"."+SJLB.Msg.SUBJECT_ID + ")"; 
         return mDBHelper.getReadableDatabase().query(
-                    SJLB.Subj.TABLE_NAME + ", " + SJLB.Msg.TABLE_NAME,
-                    new String [] {	SJLB.Subj.TABLE_NAME+"."+SJLB.Subj._ID,
-                    				SJLB.Subj.TABLE_NAME+"."+SJLB.Subj.CAT_ID,
-                    				SJLB.Subj.TABLE_NAME+"."+SJLB.Subj.GROUP_ID,
-                    				SJLB.Subj.TABLE_NAME+"."+SJLB.Subj.LAST_DATE,
-                    				SJLB.Subj.TABLE_NAME+"."+SJLB.Subj.TEXT,
-                    				"COUNT(*) AS nb_msg"},
-                    selectionCplx,
+                    SJLB.Subj.TABLE_NAME,
+                    projection,
+                    selection,
                     selectionArgs,
-                    SJLB.Subj.TABLE_NAME+"."+SJLB.Subj._ID, // group by
+                    null, // groupBy
                     null, // having
-                    (null!=sortOrder)?(sortOrder):(SJLB.Subj.DEFAULT_SORT_ORDER)
+                    (null!=sortOrder)?sortOrder:SJLB.Subj.DEFAULT_SORT_ORDER
                     );
     }
 

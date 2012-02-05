@@ -33,7 +33,8 @@
             android:id="@+id/msgNew"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/level_list_new"
+            android:src="@drawable/msg_new"
+            android:visibility="invisible"
             android:gravity="right"
             />
     </LinearLayout>

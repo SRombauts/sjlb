@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,6 +41,8 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
     private String          mSelectedCategoryLabel  = "";
 
     private Intent          mSavedIntent            = null;
+
+    private DBOpenHelper    mDBHelper               = null;
     
     /** Called when the activity is first created. */
     @Override
@@ -48,9 +51,40 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         
         // Layout de l'activité
         setContentView(R.layout.main);
+
+        mDBHelper = new DBOpenHelper(this, SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
         
-        // binding de la liste des catégories et du champ de version
+        // Récupération de la liste des catégories :
+        // TODO SRO : ajout des nb de msg non lus !
+        String [] categories = getResources().getStringArray(R.array.category_labels);
+        for (int catIdx = 0; catIdx < categories.length; catIdx++) {
+            Cursor cursor = mDBHelper.getReadableDatabase().query(
+                    SJLB.Subj.TABLE_NAME + ", " + SJLB.Msg.TABLE_NAME,
+                    null,
+                      "(" + SJLB.Subj.TABLE_NAME + "." + SJLB.Subj._ID + "=" + SJLB.Msg.SUBJECT_ID + ")"
+                    + " AND "
+                    + "(" + SJLB.Subj.CAT_ID + "=" + (catIdx+1) + ")"
+                    + " AND "
+                    + "(" + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")",
+                    null,
+                    null,
+                    null,
+                    null);
+            String titre = categories[catIdx];
+            if (0 < cursor.getCount()) {
+                titre += " (" + cursor.getCount() + ")"; 
+            }
+            mCategories.add(titre);            
+        }
+        // binding de la liste des catégories
         mCategoriesListView     = (ListView)findViewById(R.id.categoriesListView);
+        // Create the array adapter to bind the array to the listview
+        mAA = new ArrayAdapter<String>( this,
+                                        android.R.layout.simple_list_item_1,
+                                        mCategories);
+        mCategoriesListView.setAdapter(mAA);
+        
+        // binding du champ de version
         TextView    VersionView = (TextView)findViewById(R.id.versionView);
         
         // Lit les informations de version du package courant

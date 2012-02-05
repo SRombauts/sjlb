@@ -11,7 +11,7 @@ public final class SJLB {
     private SJLB() {}
 
     public static final String DATABASE_NAME        = "SJLB.db";
-    public static final int    DATABASE_VERSION     = 6;
+    public static final int    DATABASE_VERSION     = 5;
     
     
     /**
@@ -270,7 +270,10 @@ public final class SJLB {
          * Flag (transitoire) indiquant que le message n'a pas encore été lu
          * <P>Type: INTEGER</P>
          */
-        public static final String  UNREAD          	= "unread";
+        public static final String  UNREAD              = "unread";
+        public static final int     UNREAD_FALSE        = 0;
+        public static final int     UNREAD_TRUE         = 1;
+        public static final int     UNREAD_LOCALY       = 2;
 
         /**
          * Le texte du Msg

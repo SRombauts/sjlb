@@ -245,11 +245,11 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
             
             // Fixe le nom
             // TODO SRO : à optimiser à l'aide d'un #define sur l'ID de la colonne ! 
-            String  text = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.Subj.TEXT));
+            String  title = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.Subj.TEXT));
             if (0 < subCursor.getCount()) {
-                text += " (" + subCursor.getCount() + ")";
+                title += " (" + subCursor.getCount() + ")";
             }
-            cache.nameView.setText(text);
+            cache.nameView.setText(title);
         }
 
         // Création d'une nouvelle View et de son objet de cache (vide) pour le pool

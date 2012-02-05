@@ -565,7 +565,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             boolean bUnread     = (0 != Integer.parseInt(strUnread));
                             
                             ForumMessage newMsg = new ForumMessage(idMsg, date, idAuthor, strAuthor, idSubject, bUnread, strText);
-                            Log.d(LOG_TAG, "Msg " + newMsg);
+                            //Log.d(LOG_TAG, "Msg " + newMsg);
                             
                             // Renseigne la bdd SSI le message n'est pas déjà inséré, sinon fait un update
                             if (mMsgDBAdapter.isExist(idMsg)) {

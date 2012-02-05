@@ -102,10 +102,10 @@ public class ActivityForumMessages extends ActivityTouchListener {
     protected void onDestroy () {
         super.onDestroy ();
         
-        // Efface les flags "unread" des messages lus lorsqu'on quitte !
+        // Efface les flags "UNREAD_TRUE" des messages lus lorsqu'on quitte !
         ContentValues values = new ContentValues();
-        values.put(SJLB.Msg.UNREAD, -1); // on les passe à "-1" ce qui indique qu'il faut encore signaler le site Web SJLB du fait qu'on les a lu !
-        String where = "(" + SJLB.Msg.SUBJECT_ID + "=" + mSelectedSubjectId + " AND " + SJLB.Msg.UNREAD + "=1)";
+        values.put(SJLB.Msg.UNREAD, SJLB.Msg.UNREAD_LOCALY); // on les passe à UNREAD_LOCALY ce qui indique qu'il faut encore signaler le site Web SJLB du fait qu'on les a lu !
+        String where = "(" + SJLB.Msg.SUBJECT_ID + "=" + mSelectedSubjectId + " AND " + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")";
         getContentResolver ().update(SJLB.Msg.CONTENT_URI, values, where, null);        
     }
     
@@ -206,13 +206,14 @@ public class ActivityForumMessages extends ActivityTouchListener {
             // Fixe le contenu du message 
             String  text = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.Msg.TEXT));
             cache.textView.setText(text);
-            // Fixe l'icone de 
-            // TODO SRO : positionner le niveau de l'image "unread" !
-            cache.imageView.setImageLevel(cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.UNREAD))); 
+            // Fixe l'icone de nouveau message uniquement si le message est nouveau 
+            boolean bIsNew = (SJLB.Msg.UNREAD_TRUE == cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.UNREAD)));
+            cache.imageView.setVisibility(bIsNew?ImageView.VISIBLE:ImageView.INVISIBLE); 
 
             // Récupère le contact éventuellement associé à l'utilisateur (Uri et photo)
             ApplicationSJLB appSJLB = (ApplicationSJLB)getApplication ();
-            UserContactDescr user = appSJLB.mUserContactList.get(cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.User._ID)));
+            int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.AUTHOR_ID));
+            UserContactDescr user = appSJLB.mUserContactList.get(userId);
             // Fixe la barre de QuickContact
             cache.quickContactView.assignContactUri(user.lookupUri);
             

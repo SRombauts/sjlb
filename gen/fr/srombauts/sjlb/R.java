@@ -18,11 +18,9 @@ public final class R {
     public static final class drawable {
         public static final int ic_contact_picture=0x7f020000;
         public static final int launcher_icon=0x7f020001;
-        public static final int level_list_new=0x7f020002;
-        public static final int msg_new=0x7f020003;
-        public static final int msg_new_ful=0x7f020004;
-        public static final int msg_ras=0x7f020005;
-        public static final int status_icon=0x7f020006;
+        public static final int msg_new=0x7f020002;
+        public static final int msg_new_ful=0x7f020003;
+        public static final int status_icon=0x7f020004;
     }
     public static final class id {
         public static final int categoriesListView=0x7f080000;
