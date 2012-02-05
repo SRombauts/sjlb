@@ -3,13 +3,18 @@ package fr.srombauts.sjlb;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 
@@ -119,9 +124,66 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         editor.putLong  ("mSelectedGroupId",    mSelectedGroupId);
         editor.commit();
     }
+
+    /**
+     * Création du menu général
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.subj, menu);
+        return true;
+    }
+
+    /**
+     * Sur sélection dans le menu
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        
+        switch (item.getItemId()) {
+            case (R.id.menu_show_online): {
+				// lien vers le Forum sur le Site Web :
+				Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_cat_uri) + mSelectedCategoryId));
+                Log.d (LOG_TAG, "onOptionsItemSelected: menu_show_online: " + getString(R.string.sjlb_forum_cat_uri) + mSelectedCategoryId);                
+				startActivity(intent);
+                break;
+            }
+            case (R.id.menu_new_subj): {
+                // TODO SRO : lancer l'activité chargée de créer un nouveau sujet dans la catégorie
+                break;
+            }
+            case (R.id.menu_update): {
+                // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
+                if (PrefsLoginPassword.AreFilled (this)) {
+                    // Toast notification de début de rafraichissement
+                    Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
+                    // TODO voir si c'est la meilleurs manière de faire...
+                    IntentReceiverStartService.startService (this, LOG_TAG);
+                } else {
+                    // Toast notification signalant l'absence de login/password
+                    Toast.makeText(this, getString(R.string.toast_auth_needed), Toast.LENGTH_SHORT).show();
+                }
+                break;
+            }
+            case (R.id.menu_prefs): {
+                Intent intent = new Intent(this, ActivityPreferences.class);
+                startActivity(intent);
+                break;
+            }
+            case (R.id.menu_quit): {
+                finish ();
+                break;
+            }
+            default:
+                return false;
+        }
+        return true;
+    }
     
     /**
-     *  Lance l'activité correspondante avec en paramètre l'id du sujet :
+     *  Sur sélection d'un sujet, lance l'activité "messages du forum" avec en paramètre l'id du sujet :
      */
     @SuppressWarnings("unchecked")
     @Override

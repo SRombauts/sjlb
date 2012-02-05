@@ -1,18 +1,15 @@
 package fr.srombauts.sjlb;
 
-import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.View.OnTouchListener;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -128,9 +125,15 @@ public class ActivityForumMessages extends ActivityTouchListener {
         super.onOptionsItemSelected(item);
         
         switch (item.getItemId()) {
+            case (R.id.menu_show_online): {
+				// lien vers le Forum sur le Site Web :
+				Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + mSelectedSubjectId));
+                Log.d (LOG_TAG, "onOptionsItemSelected: menu_show_online: " + getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + mSelectedSubjectId);                
+				startActivity(intent);
+                break;
+            }
             case (R.id.menu_new_msg): {
                 Intent intent = new Intent(this, ActivityNewForumMessage.class);
-                // TODO SRO : passer les paramètre requis !
                 intent.putExtra(ActivityNewForumMessage.START_INTENT_EXTRA_CAT_ID,        mSelectedCategoryId);
                 intent.putExtra(ActivityNewForumMessage.START_INTENT_EXTRA_SUBJ_ID,       mSelectedSubjectId);
                 intent.putExtra(ActivityNewForumMessage.START_INTENT_EXTRA_SUBJ_LABEL,    mSelectedSubjectLabel);
@@ -141,7 +144,7 @@ public class ActivityForumMessages extends ActivityTouchListener {
             }
             case (R.id.menu_update): {
                 // Toast notification de début de rafraichissement
-                Toast.makeText(this, getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
                 // TODO voir si c'est la meilleurs manière de faire : donnerait plus de contrôle si l'on pouvait faire un accès direct à la AsynchTask...
                 IntentReceiverStartService.startService (this, LOG_TAG);
                 // TODO SRO : trouver un moyen de rafraichir la liste à l'échéance de la tache de rafraichissement

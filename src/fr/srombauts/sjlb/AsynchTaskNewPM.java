@@ -65,7 +65,7 @@ class AsynchTaskNewPM extends AsyncTask<String, Void, Void> {
 
     protected void onPreExecute() {
         // Toast notification de début de rafraichissement
-        Toast.makeText(mContext, mContext.getString(R.string.sending), Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, mContext.getString(R.string.toast_sending), Toast.LENGTH_SHORT).show();
     }
     
     
@@ -162,11 +162,11 @@ class AsynchTaskNewPM extends AsyncTask<String, Void, Void> {
                         // Renseigne la bdd
                         Boolean bInserted = mPMDBAdapter.insertPM(newPM);
                         if (bInserted) {
-                            Log.d(LOG_TAG, "PM " + idPM + " inserted");                                
+                            Log.d(LOG_TAG, "PM " + idPM + " inserted");
                         }
                     }
                 }
-                Log.d(LOG_TAG, "sendPM... ok");                        
+                Log.d(LOG_TAG, "sendPM... ok");
             }
             
         } catch (LoginPasswordException e) {
@@ -188,12 +188,15 @@ class AsynchTaskNewPM extends AsyncTask<String, Void, Void> {
     
     
     /**
-     * Fin de refresh
+     * Fin d'envoi
      *
-     * Cette méthode est synchronisée donc on met à jour l'affichage de la liste 
+     * Cette méthode est synchronisée donc on peut y faire des notifications
      */
     protected void onPostExecute(Void result) {
-      super.onPostExecute(result);
+        super.onPostExecute(result);
+
+	    // Toast notification de fin d'envoi
+	    Toast.makeText(mContext, mContext.getString(R.string.toast_sent), Toast.LENGTH_SHORT).show();                
     }
 }
 

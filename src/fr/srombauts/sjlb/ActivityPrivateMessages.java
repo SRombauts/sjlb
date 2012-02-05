@@ -185,7 +185,7 @@ public class ActivityPrivateMessages extends Activity implements OnTouchListener
             }
             case (R.id.menu_update): {
                 // Toast notification de début de rafraichissement
-                Toast.makeText(this, getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
                 // TODO voir si c'est la meilleurs manière de faire : donnerait plus de contrôle si l'on pouvait faire un accès direct à la AsynchTask...
                 IntentReceiverStartService.startService (this, LOG_TAG);
                 // TODO SRO : trouver un moyen de rafraichir la liste à l'échéance de la tache de rafraichissement

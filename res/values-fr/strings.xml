@@ -6,6 +6,7 @@
     <string name="button_send_pm">  Envoyer le message privé    </string>
     <string name="button_send_msg"> Envoyer le message          </string>
 
+    <!-- Preferences -->
     <string name="prefs_authentication">    Authentification                </string>
     <string name="prefs_login_title">       Login                           </string>
     <string name="prefs_login_desc">        Pseudo de l\'utilisateur        </string>
@@ -30,10 +31,13 @@
     <string name="prefs_light_title">       Led         </string>
     <string name="prefs_light_desc">        Selectionner pour activer les notifications par led       </string>
 
+    <!-- Menus -->
+    <string name="menu_show_online">    Voir en ligne       </string>
     <string name="menu_show_pm">        Messages privés     </string>
     <string name="menu_new_pm">         Nouveau message     </string>
     <string name="menu_send_pm">        Envoyer le message  </string>
-    <string name="menu_new_msg">        Nouveau message     </string>
+    <string name="menu_new_subj">       Nouveau topic       </string>
+    <string name="menu_new_msg">        Répondre            </string>
     <string name="menu_send_msg">       Envoyer le message  </string>
     <string name="menu_update">         Rafraîchir          </string>
     <string name="menu_reset">          Vider la base locale</string>
@@ -49,14 +53,19 @@
     <string name="yes">                 Oui </string>
     <string name="no">                  Non </string>
 
-    <string name="authentication_needed">   Action non disponible : nécessite login/mot de passe ! </string>
-    <string name="refreshing">              En cours de rafraichissement... </string>
-    <string name="deleting">                Effacement demandé...           </string>
-    <string name="sending">                 Envoi en cours...              </string>
+    <!-- Toast notifications -->
+    <string name="toast_auth_needed">       Action non disponible : nécessite login/mot de passe ! </string>
+    <string name="toast_refreshing">        En cours de rafraichissement... </string>
+    <string name="toast_deleting">          Effacement demandé...           </string>
+    <string name="toast_sending">           Envoi en cours...               </string>
+    <string name="toast_sent">              Message envoyé !                </string>
+    <string name="toast_deleted">           Message effacé !                </string>
 
+    <!-- Notifications -->
     <string name="notification_title_pm">   Message(s) Privé(s) </string>
     <string name="notification_title_msg">  Post(s) non lu(s)   </string>
     <string name="notification_text_pm">    message(s) privé(s) </string>
     <string name="notification_text_msg">   post(s) non lu(s)   </string>
     <string name="notification_new">        nouveau(x)          </string>
+    <!-- URI -->
 </resources>

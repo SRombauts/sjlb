@@ -5,6 +5,8 @@
           android:icon="@drawable/ic_new_game"
           android:title="@string/new_game" />
 -->
+    <item android:id="@+id/menu_show_online"
+          android:title="@string/menu_show_online" />
     <item android:id="@+id/menu_show_pm"
           android:title="@string/menu_show_pm" />
     <item android:id="@+id/menu_update"

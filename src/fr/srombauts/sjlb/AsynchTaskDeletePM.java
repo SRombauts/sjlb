@@ -65,7 +65,7 @@ class AsynchTaskDeletePM extends AsyncTask<String, Void, Void> {
 
     protected void onPreExecute() {
         // Toast notification de début de rafraichissement
-        Toast.makeText(mContext, mContext.getString(R.string.deleting), Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, mContext.getString(R.string.toast_deleting), Toast.LENGTH_SHORT).show();
     }
     
     
@@ -175,14 +175,17 @@ class AsynchTaskDeletePM extends AsyncTask<String, Void, Void> {
         }
     }
     
-    
+        
     /**
-     * Fin de refresh
+     * Fin d'effacement
      *
-     * Cette méthode est synchronisée donc on met à jour l'affichage de la liste 
+     * Cette méthode est synchronisée donc on peut y faire des notifications
      */
     protected void onPostExecute(Void result) {
-      super.onPostExecute(result);
+        super.onPostExecute(result);
+
+	    // Toast notification de fin d'envoi
+	    Toast.makeText(mContext, mContext.getString(R.string.toast_deleted), Toast.LENGTH_SHORT).show();                
     }
 }
 

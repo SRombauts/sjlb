@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -41,6 +42,7 @@ public class ActivitySJLB extends ActivityTouchListener implements OnItemClickLi
     private Intent          mSavedIntent            = null;
     
     /** Called when the activity is first created. */
+    @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
@@ -108,6 +110,7 @@ public class ActivitySJLB extends ActivityTouchListener implements OnItemClickLi
     /**
      * Création du menu général
      */
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
@@ -117,11 +120,17 @@ public class ActivitySJLB extends ActivityTouchListener implements OnItemClickLi
     /**
      * Sur sélection dans le menu
      */
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         
-        
         switch (item.getItemId()) {
+            case (R.id.menu_show_online): {
+				// lien vers le Forum sur le Site Web :
+				Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_uri)));
+				startActivity(intent);
+                break;
+            }
             case (R.id.menu_show_pm): {
                 startActivityPM ();
                 break;
@@ -130,12 +139,12 @@ public class ActivitySJLB extends ActivityTouchListener implements OnItemClickLi
                 // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
                 if (PrefsLoginPassword.AreFilled (this)) {
                     // Toast notification de début de rafraichissement
-                    Toast.makeText(this, getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
                     // TODO voir si c'est la meilleurs manière de faire...
                     IntentReceiverStartService.startService (this, LOG_TAG);
                 } else {
                     // Toast notification signalant l'absence de login/password
-                    Toast.makeText(this, getString(R.string.authentication_needed), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.toast_auth_needed), Toast.LENGTH_SHORT).show();
                 }
                 break;
             }
@@ -183,7 +192,7 @@ public class ActivitySJLB extends ActivityTouchListener implements OnItemClickLi
             startActivity(intent);
         } else {
             // Toast notification signalant l'absence de login/password
-            Toast.makeText(this, getString(R.string.authentication_needed), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toast_auth_needed), Toast.LENGTH_SHORT).show();
         }
     }
     

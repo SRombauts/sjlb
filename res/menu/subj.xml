@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/menu_show_online"
           android:title="@string/menu_show_online" />
-    <item android:id="@+id/menu_new_msg"
-          android:title="@string/menu_new_msg" />
+    <item android:id="@+id/menu_new_subj"
+          android:title="@string/menu_new_subj" />
     <item android:id="@+id/menu_update"
           android:title="@string/menu_update" />
     <item android:id="@+id/menu_prefs"
