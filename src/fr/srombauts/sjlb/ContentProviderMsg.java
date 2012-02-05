@@ -76,7 +76,7 @@ public class ContentProviderMsg extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         // TODO SRO : virer cette complexité en ne croisant plus les deux tables ?
         if (null == selection) selection = ""; 
-        String selectionCplx = "(" + selection + ") AND (" + SJLB.Msg.TABLE_NAME+"."+SJLB.Msg.AUTHOR_ID+"="+SJLB.User.TABLE_NAME+"."+SJLB.User._ID + ")"; 
+        String selectionCplx = "(" + selection + ") AND (" + SJLB.Msg.TABLE_NAME+"."+SJLB.Msg.AUTHOR_ID+"=" + SJLB.User.TABLE_NAME+"."+SJLB.User._ID + ")"; 
         //Log.e ("ContentProvider", selectionCplx);
         return mDBHelper.getReadableDatabase().query(
                     SJLB.Msg.TABLE_NAME + ", " + SJLB.User.TABLE_NAME,

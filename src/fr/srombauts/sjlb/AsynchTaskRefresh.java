@@ -54,6 +54,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     static final private String NODE_NAME_PRIVATE_MSG       = "pm";
     static final private String NODE_NAME_PRIVATE_MSG_ID    = "id";
     static final private String NODE_NAME_FORUM_MSG         = "msg";
+    static final private String NODE_NAME_FORUM_FILE        = "fichier";
     static final private String NODE_NAME_FORUM_MSG_ID      = "id";
     static final private String NODE_NAME_FORUM_SUBJ        = "sujet";
     static final private String NODE_NAME_USER              = "user";
@@ -88,6 +89,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     private ContentProviderPM       mPMDBAdapter    = null;
     private ContentProviderSubj     mSubjDBAdapter  = null;
     private ContentProviderMsg      mMsgDBAdapter   = null;
+    private ContentProviderFile     mFileDBAdapter  = null;
     private ContentProviderUser     mUserDBAdapter  = null;
       
     /**
@@ -100,6 +102,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         mPMDBAdapter    = new ContentProviderPM(context);
         mSubjDBAdapter  = new ContentProviderSubj(context);
         mMsgDBAdapter   = new ContentProviderMsg(context);
+        mFileDBAdapter  = new ContentProviderFile(context);
         mUserDBAdapter  = new ContentProviderUser(context);
     }
 
@@ -132,6 +135,14 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         // et récupération de ces éventuels nouveaux contenus (seulement si nécessaire)
         fetchPM ();
         fetchMsg ();
+        
+        // TODO SRO : tests en cours
+        Cursor cursorFiles = mFileDBAdapter.getAllFiles();
+        Log.d(LOG_TAG, "countFiles = " + cursorFiles.getCount());
+        for (int i=0; i<cursorFiles.getCount(); i++) {
+            cursorFiles.moveToPosition(i);
+            Log.d(LOG_TAG, "Fichier " + cursorFiles.getInt(cursorFiles.getColumnIndexOrThrow(SJLB.File.MSG_ID)) + ": "  + cursorFiles.getString(cursorFiles.getColumnIndexOrThrow(SJLB.File.FILENAME)));
+        }
         
         return null;
     }
@@ -283,7 +294,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                     } while (cursor.moveToNext ());
                 }
             }
-
+            cursor.close ();
+            
             // Instancie un client http et un header de requète "POST"
             HttpClient  httpClient  = new DefaultHttpClient();  
             HttpPost    httpPost    = new HttpPost(mContext.getString(R.string.sjlb_polling_uri));  
@@ -367,7 +379,6 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                     int nbCleared = mMsgDBAdapter.clearMsgUnread ();
                     Log.d(LOG_TAG, "clearMsgUnread = " + nbCleared);
                 }
-                cursor.close ();
                 
                 Log.d(LOG_TAG, "refreshInfos... ok : mNbNewPM="+mNbNewPM+" ("+mNbPM+"), mNbNewMsg="+mNbNewMsg+" ("+mNbMsg+")");
             }
@@ -588,8 +599,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             
                             String  strText     = Msg.getFirstChild().getNodeValue();
 
-                            String  strIdMsg     = Msg.getAttribute(ATTR_NAME_FORUM_MSG_ID);
-                            int     idMsg        = Integer.parseInt(strIdMsg);
+                            String  strIdMsg    = Msg.getAttribute(ATTR_NAME_FORUM_MSG_ID);
+                            int     idMsg       = Integer.parseInt(strIdMsg);
                             String  strDate     = Msg.getAttribute(ATTR_NAME_FORUM_MSG_DATE);
                             long    longDate    = (long)Integer.parseInt(strDate);
                             Date    date        = new Date(longDate*1000);
@@ -602,7 +613,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             boolean bUnread     = (0 != Integer.parseInt(strUnread));
                             
                             ForumMessage newMsg = new ForumMessage(idMsg, date, idAuthor, strAuthor, idSubject, bUnread, strText);
-                            //Log.d(LOG_TAG, "Msg " + newMsg);
+                            Log.d(LOG_TAG, "Msg " + newMsg);
                             
                             // Renseigne la bdd SSI le message n'est pas déjà inséré, sinon fait un update
                             if (mMsgDBAdapter.isExist(idMsg)) {
@@ -617,6 +628,28 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                                 } else {
                                     Log.e(LOG_TAG, "Msg " + idMsg + " NOT inserted !");
                                 }                                
+                            }
+
+                            // Récupère la liste des fichiers attachés au Msg
+                            NodeList    listFile = Msg.getElementsByTagName(NODE_NAME_FORUM_FILE);
+                            if (null != listFile) {
+                                int nbFile = listFile.getLength();
+                                //Log.d(LOG_TAG, "listFile.getLength() = " + nbFile);
+                                for (int j = 0; j < nbFile; j++) {
+                                    Element FileElement = (Element)listFile.item(j);
+//                                    String  FileNameX   = FileElement.getNodeValue();
+//                                    Node    NodeFile    = FileElement.getFirstChild();
+                                    String  FileName    = FileElement.getFirstChild().getNodeValue();
+
+                                    AttachedFile newAttachedFile = new AttachedFile(idMsg, FileName);
+                                    Log.d(LOG_TAG, "Fichier " + newAttachedFile);
+                                    
+                                    if (mFileDBAdapter.insertFile(newAttachedFile)) {
+                                        Log.d(LOG_TAG, "AttachedFile " + FileName + " inserted");                                
+                                    } else {
+                                        Log.e(LOG_TAG, "AttachedFile " + FileName + " NOT inserted !");
+                                    }
+                                }
                             }
                         }
                     }

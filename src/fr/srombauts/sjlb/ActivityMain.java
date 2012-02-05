@@ -226,6 +226,8 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
                 subjs.clearSubj();
                 ContentProviderMsg  msgs    = new ContentProviderMsg (this);
                 msgs.clearMsg();
+                ContentProviderFile files   = new ContentProviderFile (this);
+                files.clearFiles();
                 break;
             }
             case (R.id.menu_prefs): {

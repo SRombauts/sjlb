@@ -48,4 +48,9 @@
         android:background="#000"
         android:autoLink="all"
         />
+    <ListView
+        android:id="@+id/msgFileListview"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+    />    
 </LinearLayout>

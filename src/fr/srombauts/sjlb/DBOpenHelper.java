@@ -28,16 +28,25 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         aDatabase.execSQL(SJLB.PM.TABLE_CREATE);
         aDatabase.execSQL(SJLB.Subj.TABLE_CREATE);
         aDatabase.execSQL(SJLB.Msg.TABLE_CREATE);
+        aDatabase.execSQL(SJLB.File.TABLE_CREATE);
         aDatabase.execSQL(SJLB.User.TABLE_CREATE);
     }
 
-    // Upgrade de la version du schéma de base : détruit et recréé !
+    /**
+     * Upgrade de la version du schéma de base : détruit et recréé !
+     *
+     * La version de la BDD est définie dans SJLB.DATABASE_VERSION
+    */     
     public void onUpgrade(SQLiteDatabase aDatabase, int aOldVersion, int aNewVersion) {
-        if (   (2 == aOldVersion)
-            && (3 == aNewVersion) )
+        if (   (6 == aOldVersion)
+            && (7 == aNewVersion) )
+        {
+            Log.i(LOG_TAG, "Upgrading from version 6 to 7, wich will preserve data");
+            aDatabase.execSQL(SJLB.File.TABLE_CREATE);
+        } else if (   (2 == aOldVersion)
+                   && (3 == aNewVersion) )
         {
             Log.i(LOG_TAG, "Upgrading from version 2 to 3, wich will preserve data");
-            aDatabase.execSQL(SJLB.Msg.TABLE_DROP);
             aDatabase.execSQL(SJLB.Subj.TABLE_CREATE);
             aDatabase.execSQL(SJLB.Msg.TABLE_CREATE);
         } else {
@@ -45,6 +54,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
             aDatabase.execSQL(SJLB.PM.TABLE_DROP);
             aDatabase.execSQL(SJLB.Subj.TABLE_DROP);
             aDatabase.execSQL(SJLB.Msg.TABLE_DROP);
+            aDatabase.execSQL(SJLB.File.TABLE_CREATE);
             aDatabase.execSQL(SJLB.User.TABLE_DROP);
             onCreate(aDatabase);
         }

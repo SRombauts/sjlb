@@ -7,16 +7,20 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -267,6 +271,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     // TODO SRO : onRightGesture
     
     
+    
     // Adaptateur mappant les données du curseur dans des objets du cache du pool d'objets View utilisés par la ListView
     private final class MessageListItemAdapter extends ResourceCursorAdapter {
         public MessageListItemAdapter(Context context, int layout, Cursor cursor) {
@@ -274,6 +279,8 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         }
 
         // Met à jour avec un nouveau contenu un objet de cache du pool de view utilisées par la ListView 
+        // TODO SRO : tenter d'optimiser à mort cette méthode qui consomme beaucoup,
+        //            par exemple en remplaçant les getColumnIndexOrThrow par des constantes
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
             final MessageListItemCache  cache = (MessageListItemCache) view.getTag();
@@ -287,7 +294,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             cache.textView.setText(text);
             // Fixe l'icone de nouveau message uniquement si le message est nouveau 
             boolean bIsNew = (SJLB.Msg.UNREAD_TRUE == cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.UNREAD)));
-            cache.imageView.setVisibility(bIsNew?ImageView.VISIBLE:ImageView.INVISIBLE); 
+            cache.imageViewNew.setVisibility(bIsNew?ImageView.VISIBLE:ImageView.INVISIBLE); 
 
             // Récupère le contact éventuellement associé à l'utilisateur (Uri et photo)
             ApplicationSJLB appSJLB = (ApplicationSJLB)getApplication ();
@@ -302,6 +309,38 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             } else {
                 cache.quickContactView.setImageResource(R.drawable.ic_contact_picture);
             }
+
+            
+            // Affiche la liste les éventuels fichiers attachés, pour l'ID du message concerné
+            // cursor.getColumnIndexOrThrow(SJLB.Msg._ID) retourne 6 !
+            int msgId = cursor.getInt(0); // SJLB.Msg._ID, à ne pas confondre avec SJLB.Msg
+            
+            // Récupére un curseur sur les données (les fichiers) en filtrant sur l'id du sujet sélectionné
+            Cursor cursorFiles = managedQuery(  SJLB.File.CONTENT_URI, null,
+                                                SJLB.File.MSG_ID + "=" + msgId,
+                                                null, null);
+
+            // Constitue le tableau de fichiers
+            FileListItem [] arrayFileListItem = new FileListItem [cursorFiles.getCount()];
+            int count = cursorFiles.getCount();
+            //Log.d(LOG_TAG, "msgId " + msgId + " cursorFiles.getCount()=" + cursorFiles.getCount());
+            for (int i=0; i<count ;i++)
+            {
+                // Récupère le nom du fichier
+                boolean bMoved = cursorFiles.moveToPosition(i);
+                if (bMoved) {
+                    FileListItem file = new FileListItem();
+                    file.filename = cursorFiles.getString(cursorFiles.getColumnIndexOrThrow(SJLB.File.FILENAME));
+                    arrayFileListItem[i] = file;
+                }
+            }
+
+            // Créer l'adapteur entre la liste de fichiers et le layout et les informations sur le mapping des colonnes
+            FileListItemAdapter adapterFiles = new FileListItemAdapter( context,
+                                                                        R.layout.file,
+                                                                        arrayFileListItem);
+
+            cache.fileListView.setAdapter (adapterFiles);
         }
 
         // Création d'une nouvelle View et de son objet de cache (vide) pour le pool
@@ -315,19 +354,74 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             cache.quickContactView  = (QuickContactBadge)   view.findViewById(R.id.msgBadge);
             cache.titleView         = (TextView)            view.findViewById(R.id.msgTitre);
             cache.textView          = (TextView)            view.findViewById(R.id.msgText);
-            cache.imageView         = (ImageView)           view.findViewById(R.id.msgNew);
+            cache.imageViewNew      = (ImageView)           view.findViewById(R.id.msgNew);
+            cache.fileListView      = (ListView)            view.findViewById(R.id.msgFileListview);
             // enregistre cet objet de cache
             view.setTag(cache);
 
             return view;
         }
     }
+    
+    // TODO SRO : http://stackoverflow.com/questions/459729/how-to-display-list-of-images-in-listview-in-android
 
     // Objet utilisé comme cache des données d'une View, dans un pool d'objets utilisés par la ListView
     final static class MessageListItemCache {
         public QuickContactBadge    quickContactView;
         public TextView             titleView;
         public TextView             textView;
-        public ImageView            imageView;
+        public ImageView            imageViewNew;
+        public ListView             fileListView;
+    }
+
+    
+    
+    // TODO SRO : documentation !
+    private class FileListItemAdapter extends ArrayAdapter<FileListItem> implements OnClickListener {
+
+        private FileListItem[] mListeItem;
+
+        public FileListItemAdapter(Context context, int textViewResourceId, FileListItem[] items) {
+                super(context, textViewResourceId, items);
+                mListeItem = items;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+                View view = convertView;
+                if (view == null) {
+                    LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    view = vi.inflate(R.layout.file, null);
+                }
+
+                FileListItem it = mListeItem[position];
+                if (it != null) {
+                        it.imageViewFile = (ImageView) view.findViewById(R.id.fileImage);
+                        it.imageViewFile.setOnClickListener(this);
+                        it.imageViewFile.setTag(it.filename);
+                        if (   (it.imageViewFile != null)
+                            && (it.imageBitmap != null) ) {
+                            it.imageViewFile.setImageBitmap(it.imageBitmap);
+                        }
+                }
+
+                return view;
+        }
+
+        @Override
+        public void onClick(View view) {
+            // lien vers le fichier sur le Site Web :
+            final String  filename = (String) view.getTag();
+            Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_fichiers_attaches) + filename));
+            Log.d (LOG_TAG, "onClick: " + getString(R.string.sjlb_fichiers_attaches) + filename );                
+            startActivity(intent);
+        }
+    }    
+        
+    // Objet représentant une image et le nom du fichier associé
+    final static class FileListItem {
+        public ImageView    imageViewFile;
+        public Bitmap       imageBitmap;
+        public String       filename;
     }
 }

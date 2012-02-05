@@ -70,8 +70,8 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         // Récupére un curseur sur les données (les sujets) en filtrant sur l'id de la catégorie sélectionnée
         mCursor = managedQuery( SJLB.Subj.CONTENT_URI,
         						null,
-                                SJLB.Subj.CAT_ID + "=" + mSelectedCategoryId, null,
-                                null);
+                                SJLB.Subj.CAT_ID + "=" + mSelectedCategoryId,
+                                null, null);
 
         // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
         mAdapter = new SubjectListItemAdapter(  this,

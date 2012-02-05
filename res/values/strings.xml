@@ -77,6 +77,7 @@
     <string name="sjlb_forum_subj_uri"> http://www.sjlb.fr/Site/ForumReponses.php?id_categorie= </string>
     <string name="sjlb_forum_subj_param">   &amp;id_sujet=                                                  </string>
     <string name="sjlb_forum_subj_dernier"> #dernier_message                                                </string>
+    <string name="sjlb_fichiers_attaches">  http://www.sjlb.fr/FichiersAttaches/                            </string>
 
     <string name="sjlb_polling_uri">    http://www.sjlb.fr/Android/Polling.php                  </string>
     <string name="sjlb_users_uri">      http://www.sjlb.fr/Android/Users.php                    </string>

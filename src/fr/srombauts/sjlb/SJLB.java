@@ -11,7 +11,7 @@ public final class SJLB {
     private SJLB() {}
 
     public static final String DATABASE_NAME        = "SJLB.db";
-    public static final int    DATABASE_VERSION     = 6;
+    public static final int    DATABASE_VERSION     = 7;
     
     
     /**
@@ -335,6 +335,78 @@ public final class SJLB {
         public static final String  MATCHER_LIVE_FOLDER = "live_folders/msg";
     }
 
+    
+    /**
+     * Table des fichiers attachés
+     */
+    public static final class File implements BaseColumns {
+        // Interdiction de l'instanciation
+        private File() {}
+
+        /**
+         * L'id du message auquel est rattaché le fichier attaché
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  MSG_ID              = "message_id";
+
+        /**
+         * Le nom du fichier attaché
+         * <P>Type: TEXT</P>
+         */
+        public static final String  FILENAME            = "filename";
+
+        /**
+         * The default sort order for this table
+         */
+        public static final String  DEFAULT_SORT_ORDER  = FILENAME + " ASC";
+
+
+
+        public static final String  TABLE_NAME   = "fichiers_attaches";
+
+        public static final String  TABLE_CREATE = "create table " + TABLE_NAME + " ("
+                                                    + MSG_ID    + " integer, "
+                                                    + FILENAME  + " text);";
+
+        public static final String  TABLE_DROP   = "DROP TABLE IF EXISTS " + TABLE_NAME;
+            
+            
+        /**
+         * L'autorité identifiant de manière unique le content provider
+         */        
+        public static final String  AUTHORITY            = "fr.srombauts.sjlb.file";
+
+        /**
+         * The content:// style URL for this table
+         */
+        public static final Uri     CONTENT_URI         = Uri.parse("content://" + AUTHORITY + "/file");
+
+        /**
+         * The MIME type of {@link #CONTENT_URI} providing a directory of notes.
+         */
+        public static final String  CONTENT_TYPE        = "vnd.android.cursor.dir/sjlb.file";
+
+        /**
+         * The MIME type of a {@link #CONTENT_URI} sub-directory of a single note.
+         */
+        public static final String  CONTENT_ITEM_TYPE   = "vnd.android.cursor.item/sjlb.file";
+
+        /**
+         * Le matcher d'URI pour tous les fichiers attachés
+         */
+        public static final String  MATCHER_ALL         = "file";
+
+        /**
+         * Le matcher d'URI pour un fichier attaché
+         */
+        public static final String  MATCHER_ONE         = "file/#";
+
+        /**
+         * Le matcher d'URI pour un live folder de fichier attaché
+         */
+        public static final String  MATCHER_LIVE_FOLDER = "live_folders/file";
+    }
+    
     /**
      * Table des utilisateurs du site
      */

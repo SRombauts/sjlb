@@ -16,54 +16,59 @@ public final class R {
     public static final class attr {
     }
     public static final class drawable {
-        public static final int ic_contact_picture=0x7f020000;
-        public static final int launcher_icon=0x7f020001;
-        public static final int msg_new=0x7f020002;
-        public static final int msg_new_ful=0x7f020003;
-        public static final int status_icon=0x7f020004;
+        public static final int file_icon=0x7f020000;
+        public static final int file_icon_full=0x7f020001;
+        public static final int ic_contact_picture=0x7f020002;
+        public static final int launcher_icon=0x7f020003;
+        public static final int msg_new=0x7f020004;
+        public static final int msg_new_ful=0x7f020005;
+        public static final int status_icon=0x7f020006;
     }
     public static final class id {
-        public static final int categoriesListView=0x7f080000;
-        public static final int category_label=0x7f080010;
-        public static final int destinataireListView=0x7f08000e;
-        public static final int menu_delete_all_pm=0x7f08001a;
-        public static final int menu_new_msg=0x7f080018;
-        public static final int menu_new_pm=0x7f080019;
-        public static final int menu_new_subj=0x7f08001e;
-        public static final int menu_pm_answer=0x7f08001b;
-        public static final int menu_pm_delete=0x7f08001c;
-        public static final int menu_prefs=0x7f080016;
-        public static final int menu_quit=0x7f080017;
-        public static final int menu_reset=0x7f080015;
-        public static final int menu_send_pm=0x7f08001d;
-        public static final int menu_show_online=0x7f080012;
-        public static final int menu_show_pm=0x7f080013;
-        public static final int menu_update=0x7f080014;
-        public static final int msgBadge=0x7f080002;
-        public static final int msgNew=0x7f080004;
-        public static final int msgText=0x7f080005;
-        public static final int msgTitre=0x7f080003;
-        public static final int msg_listview=0x7f080007;
-        public static final int pmBadge=0x7f08000a;
-        public static final int pmText=0x7f08000c;
-        public static final int pmTitre=0x7f08000b;
-        public static final int pm_listview=0x7f08000d;
-        public static final int subjText=0x7f08000f;
-        public static final int subj_listview=0x7f080011;
-        public static final int subject_label=0x7f080006;
-        public static final int textEditText=0x7f080008;
-        public static final int textSendButton=0x7f080009;
-        public static final int versionView=0x7f080001;
+        public static final int categoriesListView=0x7f080001;
+        public static final int category_label=0x7f080012;
+        public static final int destinataireListView=0x7f080010;
+        public static final int fileImage=0x7f080000;
+        public static final int menu_delete_all_pm=0x7f08001c;
+        public static final int menu_new_msg=0x7f08001a;
+        public static final int menu_new_pm=0x7f08001b;
+        public static final int menu_new_subj=0x7f080020;
+        public static final int menu_pm_answer=0x7f08001d;
+        public static final int menu_pm_delete=0x7f08001e;
+        public static final int menu_prefs=0x7f080018;
+        public static final int menu_quit=0x7f080019;
+        public static final int menu_reset=0x7f080017;
+        public static final int menu_send_pm=0x7f08001f;
+        public static final int menu_show_online=0x7f080014;
+        public static final int menu_show_pm=0x7f080015;
+        public static final int menu_update=0x7f080016;
+        public static final int msgBadge=0x7f080003;
+        public static final int msgFileListview=0x7f080007;
+        public static final int msgNew=0x7f080005;
+        public static final int msgText=0x7f080006;
+        public static final int msgTitre=0x7f080004;
+        public static final int msg_listview=0x7f080009;
+        public static final int pmBadge=0x7f08000c;
+        public static final int pmText=0x7f08000e;
+        public static final int pmTitre=0x7f08000d;
+        public static final int pm_listview=0x7f08000f;
+        public static final int subjText=0x7f080011;
+        public static final int subj_listview=0x7f080013;
+        public static final int subject_label=0x7f080008;
+        public static final int textEditText=0x7f08000a;
+        public static final int textSendButton=0x7f08000b;
+        public static final int versionView=0x7f080002;
     }
     public static final class layout {
-        public static final int main=0x7f030000;
-        public static final int msg=0x7f030001;
-        public static final int msg_list=0x7f030002;
-        public static final int pm=0x7f030003;
-        public static final int pm_list=0x7f030004;
-        public static final int pm_new=0x7f030005;
-        public static final int subj=0x7f030006;
-        public static final int subj_list=0x7f030007;
+        public static final int file=0x7f030000;
+        public static final int main=0x7f030001;
+        public static final int msg=0x7f030002;
+        public static final int msg_list=0x7f030003;
+        public static final int pm=0x7f030004;
+        public static final int pm_list=0x7f030005;
+        public static final int pm_new=0x7f030006;
+        public static final int subj=0x7f030007;
+        public static final int subj_list=0x7f030008;
     }
     public static final class menu {
         public static final int main=0x7f070000;
@@ -130,6 +135,7 @@ public final class R {
         public static final int prefs_update_freq_title=0x7f060010;
         public static final int prefs_vibrate_desc=0x7f060016;
         public static final int prefs_vibrate_title=0x7f060015;
+        public static final int sjlb_fichiers_attaches=0x7f06003c;
         public static final int sjlb_forum_cat_uri=0x7f060038;
         public static final int sjlb_forum_subj_dernier=0x7f06003b;
         public static final int sjlb_forum_subj_param=0x7f06003a;
@@ -137,10 +143,10 @@ public final class R {
         /**  URI 
          */
         public static final int sjlb_forum_uri=0x7f060037;
-        public static final int sjlb_msg_uri=0x7f06003f;
-        public static final int sjlb_pm_uri=0x7f06003e;
-        public static final int sjlb_polling_uri=0x7f06003c;
-        public static final int sjlb_users_uri=0x7f06003d;
+        public static final int sjlb_msg_uri=0x7f060040;
+        public static final int sjlb_pm_uri=0x7f06003f;
+        public static final int sjlb_polling_uri=0x7f06003d;
+        public static final int sjlb_users_uri=0x7f06003e;
         /**  Toast notifications 
  Toast notifications 
          */

@@ -40,9 +40,9 @@ public class ActivityNewPrivateMessage extends Activity {
         setContentView(R.layout.pm_new);
 
         // Récupére un curseur sur les données (les utilisateurs) 
-        mCursor = managedQuery( SJLB.User.CONTENT_URI,
+        mCursor = managedQuery( SJLB.User.CONTENT_URI, null,
                                 null,
-                                null, null, null);
+                                null, null);
 
         // Les colonnes à mapper :
         String[]    from = new String[] { SJLB.User.PSEUDO };
