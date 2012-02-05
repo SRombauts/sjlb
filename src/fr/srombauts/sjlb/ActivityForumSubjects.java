@@ -209,8 +209,8 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         // lien vers le Forum sur le Site Web :
         mCursor.moveToPosition(index);
         long selectedSubjectId = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj._ID));
-        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + selectedSubjectId));
-        Log.d (LOG_TAG, "onItemLongClick: show_online: " + getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + selectedSubjectId);                
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + selectedSubjectId + getString(R.string.sjlb_forum_subj_dernier)));
+        Log.d (LOG_TAG, "onItemLongClick: show_online: " + getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + selectedSubjectId + getString(R.string.sjlb_forum_subj_dernier));                
         startActivity(intent);
         return true;
     }

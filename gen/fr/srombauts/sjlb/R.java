@@ -131,15 +131,16 @@ public final class R {
         public static final int prefs_vibrate_desc=0x7f060016;
         public static final int prefs_vibrate_title=0x7f060015;
         public static final int sjlb_forum_cat_uri=0x7f060037;
+        public static final int sjlb_forum_subj_dernier=0x7f06003a;
         public static final int sjlb_forum_subj_param=0x7f060039;
         public static final int sjlb_forum_subj_uri=0x7f060038;
         /**  URI 
          */
         public static final int sjlb_forum_uri=0x7f060036;
-        public static final int sjlb_msg_uri=0x7f06003d;
-        public static final int sjlb_pm_uri=0x7f06003c;
-        public static final int sjlb_polling_uri=0x7f06003a;
-        public static final int sjlb_users_uri=0x7f06003b;
+        public static final int sjlb_msg_uri=0x7f06003e;
+        public static final int sjlb_pm_uri=0x7f06003d;
+        public static final int sjlb_polling_uri=0x7f06003b;
+        public static final int sjlb_users_uri=0x7f06003c;
         /**  Toast notifications 
  Toast notifications 
          */

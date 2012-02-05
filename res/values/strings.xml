@@ -74,7 +74,8 @@
     <string name="sjlb_forum_uri">      http://sjlb.dyndns.org/newsjlb/Site/Forum.php                       </string>
     <string name="sjlb_forum_cat_uri">  http://sjlb.dyndns.org/newsjlb/Site/ForumSujets.php?id_categorie=   </string>
     <string name="sjlb_forum_subj_uri"> http://sjlb.dyndns.org/newsjlb/Site/ForumReponses.php?id_categorie= </string>
-    <string name="sjlb_forum_subj_param"> &amp;id_sujet=                                                    </string>
+    <string name="sjlb_forum_subj_param">   &amp;id_sujet=                                                  </string>
+    <string name="sjlb_forum_subj_dernier"> #dernier_message                                                </string>
 
     <string name="sjlb_polling_uri">    http://sjlb.dyndns.org/newsjlb/Android/Polling.php                  </string>
     <string name="sjlb_users_uri">      http://sjlb.dyndns.org/newsjlb/Android/Users.php                    </string>
