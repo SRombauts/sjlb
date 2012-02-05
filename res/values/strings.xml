@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name"> SJLB </string>
+    
+    <string name="whatsnew">
+        - Removed many SQLite exception stack\n
+        - Improved the way the application launch on notification (no more multi-activity stacking)\n
+        - Added this What\'s new screen\n
+    </string>
 
     <string name="pm_description">      Private Messages    </string>
 

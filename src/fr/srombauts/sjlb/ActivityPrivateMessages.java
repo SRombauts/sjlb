@@ -73,6 +73,12 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
         mPrivateMessagesListView.getRootView().setOnTouchListener(this);
     }
     
+    // Appelée lorsque l'activité était déjà lancée (par exemple clic sur une notification de nouveau PM)
+    protected void onNewIntent (Intent intent) {
+        // rafraichi la liste des messages privés 
+        mCursor.requery();
+    }
+    
     protected void onResume () {
         super.onResume();
         
@@ -118,10 +124,10 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
                 // Toast notification de début de rafraichissement
                 Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
                 // TODO voir si c'est la meilleurs manière de faire : donnerait plus de contrôle si l'on pouvait faire un accès direct à la AsynchTask...
+                // TODO SRO : rafraichir la liste à l'échéance de la tache de rafraichissement
+                //            => "suffirait" que le service lance un Intent sur cette Activity, comme lorsqu'on clique sur une notification 
                 IntentReceiverStartService.startService (this, LOG_TAG);
-                // TODO SRO : trouver un moyen de rafraichir la liste à l'échéance de la tache de rafraichissement
                 mCursor.requery();
-                mAdapter.notifyDataSetChanged();
                 break;            }
             case (R.id.menu_delete_all_pm): {
                 showDialog(DIALOG_ID_PM_DELETE_ALL);

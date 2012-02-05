@@ -107,10 +107,11 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         super.onResume();
 
         // TODO SRO : tentative de refresh des données affichées (nb de new msg)
-        //mCursor.requery();    // => inutile car on utilise managedQuery !
-        //mAdapter.notifyDataSetChanged();
+        mCursor.requery();              // => inutile car on utilise managedQuery !
+        mAdapter.notifyDataSetChanged();// ne marche pas !
     }
 
+    
     @Override
     public void onStop () {
         super.onStop();
@@ -122,10 +123,6 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         editor.putString("mSelectedSubjLabel",  mSelectedSubjLabel);
         editor.putLong  ("mSelectedGroupId",    mSelectedGroupId);
         editor.commit();
-
-        // TODO SRO : tentative de refresh des données affichées (nb de new msg)
-        //mCursor.requery();    // => inutile car on utilise managedQuery !
-        //mAdapter.notifyDataSetChanged();
     }
 
     /**

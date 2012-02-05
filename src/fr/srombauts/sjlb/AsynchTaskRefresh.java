@@ -240,7 +240,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 }
                    
             } catch (LoginPasswordException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
+                Log.w(LOG_TAG, "refreshUsers: No Login/Password set in preferences");                
             } catch (ParserConfigurationException e) {
                 e.printStackTrace();
             } catch (MalformedURLException e) {
@@ -254,6 +255,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+            mUserDBAdapter.close();
         }
     }
         
@@ -377,7 +379,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             }
                
         } catch (LoginPasswordException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            Log.w(LOG_TAG, "refreshInfos: No Login/Password set in preferences");                
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {
@@ -391,6 +394,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        mMsgDBAdapter.close();
+        mPMDBAdapter.close();
     }
     
         
@@ -475,7 +480,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 }
                 
             } catch (LoginPasswordException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
+                Log.w(LOG_TAG, "fetchPM: No Login/Password set in preferences");                
             } catch (ParserConfigurationException e) {
                 e.printStackTrace();
             } catch (MalformedURLException e) {
@@ -490,6 +496,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 e.printStackTrace();
             }
         }
+        mPMDBAdapter.close();
     }
     
     
@@ -650,7 +657,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 }
                 
             } catch (LoginPasswordException e) {
-                e.printStackTrace();
+                // e.printStackTrace();
+                Log.w(LOG_TAG, "fetchMsg: No Login/Password set in Preferences");                                        
             } catch (ParserConfigurationException e) {
                 e.printStackTrace();
             } catch (MalformedURLException e) {
@@ -664,8 +672,10 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+            mMsgDBAdapter.close();
+            mSubjDBAdapter.close();
+            mFileDBAdapter.close();
         }
-
     }
     
     

@@ -2,6 +2,12 @@
 <resources>
     <string name="pm_description">      Messages Privés </string>
 
+    <string name="whatsnew">
+        - Suppression de nombreuses stacks d\'exceptions SQLite\n
+        - Correction du problème d\'empilement des activités lors du clic sur une notification alors que l\'application est déjà lancée\n
+        - Ajout de cet écran Nouveautés\n
+    </string>
+
     <string name="button_show_pm">  Messages Privés             </string>
     <string name="button_send_pm">  Envoyer le message privé    </string>
     <string name="button_send_msg"> Envoyer le message          </string>

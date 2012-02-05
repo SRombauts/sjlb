@@ -95,21 +95,21 @@ public class ContentProviderUser extends ContentProvider {
      * @return true si succès
      */
     public boolean insertUser(User aUser) {
-      ContentValues newUserValues = new ContentValues();
-      newUserValues.put(SJLB.User._ID,       aUser.getId());
-      newUserValues.put(SJLB.User.PSEUDO,    aUser.getPseudo());
-      newUserValues.put(SJLB.User.NAME,      aUser.getNom());
-      return mDBHelper.getWritableDatabase().insert(SJLB.User.TABLE_NAME, null, newUserValues) > 0;
+        ContentValues newUserValues = new ContentValues();
+        newUserValues.put(SJLB.User._ID,       aUser.getId());
+        newUserValues.put(SJLB.User.PSEUDO,    aUser.getPseudo());
+        newUserValues.put(SJLB.User.NAME,      aUser.getNom());
+        return mDBHelper.getWritableDatabase().insert(SJLB.User.TABLE_NAME, null, newUserValues) > 0;
     }
 
     // retire un User juste par son ID
     public boolean removeUser(long aId) {
-      return mDBHelper.getWritableDatabase().delete(SJLB.User.TABLE_NAME, SJLB.User._ID + "=" + aId, null) > 0;
+        return mDBHelper.getWritableDatabase().delete(SJLB.User.TABLE_NAME, SJLB.User._ID + "=" + aId, null) > 0;
     }
 
     // vide la table des User
     public boolean clearUser() {
-      return mDBHelper.getWritableDatabase().delete(SJLB.User.TABLE_NAME, null, null) > 0;
+        return mDBHelper.getWritableDatabase().delete(SJLB.User.TABLE_NAME, null, null) > 0;
     }
     
     // récupère un cursor avec la liste de tous les User

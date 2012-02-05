@@ -43,8 +43,6 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
 
     private Intent          mSavedIntent            = null;
 
-    private DBOpenHelper    mDBHelper               = null;
-    
     /** Called when the activity is first created. */
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -52,32 +50,9 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         
         // Layout de l'activité
         setContentView(R.layout.main);
-
-        mDBHelper = new DBOpenHelper(this, SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
         
-        // Récupération de la liste des catégories :
-        // TODO SRO : ajout des nb de msg non lus !
-        String [] categories = getResources().getStringArray(R.array.category_labels);
-        for (int catIdx = 0; catIdx < categories.length; catIdx++) {
-            Cursor cursor = mDBHelper.getReadableDatabase().query(
-                    SJLB.Subj.TABLE_NAME + ", " + SJLB.Msg.TABLE_NAME,
-                    null,
-                      "(" + SJLB.Subj.TABLE_NAME + "." + SJLB.Subj._ID + "=" + SJLB.Msg.SUBJECT_ID + ")"
-                    + " AND "
-                    + "(" + SJLB.Subj.CAT_ID + "=" + (catIdx+1) + ")"
-                    + " AND "
-                    + "(" + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")",
-                    null,
-                    null,
-                    null,
-                    null);
-            String titre = categories[catIdx];
-            if (0 < cursor.getCount()) {
-                titre += " (" + cursor.getCount() + ")"; 
-            }
-            cursor.close();
-            mCategories.add(titre);            
-        }
+        new WhatsNewScreen(this).show();
+
         // binding de la liste des catégories
         mCategoriesListView     = (ListView)findViewById(R.id.categoriesListView);
         // Create the array adapter to bind the array to the listview
@@ -118,6 +93,45 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         
         // Lance le service, si pas déjà lancé, et provoque un rafraichissement
         IntentReceiverStartService.startService (this, LOG_TAG);
+    }
+
+    // Appelée lorsque l'activité était déjà lancée (par exemple clic sur une notification de nouveau Msg)
+    protected void onNewIntent (Intent intent) {
+    }
+    
+    // Appelée lorsque l'activité passe de "en pause/cachée" à "au premier plan"
+    protected void onResume () {
+        super.onResume();
+
+        DBOpenHelper DBHelper = new DBOpenHelper(this, SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
+        
+        // rafraichi la liste des category 
+        // Récupération de la liste des catégories, avec le nombre de msg non lus :
+        mCategories.clear();
+        String [] categories = getResources().getStringArray(R.array.category_labels);
+        for (int catIdx = 0; catIdx < categories.length; catIdx++) {
+            Cursor cursor = DBHelper.getReadableDatabase().query(
+                    SJLB.Subj.TABLE_NAME + ", " + SJLB.Msg.TABLE_NAME,
+                    null,
+                      "(" + SJLB.Subj.TABLE_NAME + "." + SJLB.Subj._ID + "=" + SJLB.Msg.SUBJECT_ID + ")"
+                    + " AND "
+                    + "(" + SJLB.Subj.CAT_ID + "=" + (catIdx+1) + ")"
+                    + " AND "
+                    + "(" + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")",
+                    null,
+                    null,
+                    null,
+                    null);
+            String titre = categories[catIdx];
+            if (0 < cursor.getCount()) {
+                titre += " (" + cursor.getCount() + ")"; 
+            }
+            cursor.close();
+            mCategories.add(titre);            
+        }
+        DBHelper.close();
+        
+        mAA.notifyDataSetChanged();
     }
     
     @Override
@@ -211,6 +225,8 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
                     IntentReceiverStartService.startService (this, LOG_TAG);
                     // Toast notification de début de rafraichissement
                     Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
+                    // rafraichi la liste des categories 
+                    mAA.notifyDataSetChanged();
                 } else {
                     // Toast notification signalant l'absence de login/password
                     Toast.makeText(this, getString(R.string.toast_auth_needed), Toast.LENGTH_SHORT).show();
@@ -220,14 +236,19 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
             case (R.id.menu_reset): {
                 ContentProviderUser users   = new ContentProviderUser (this);
                 users.clearUser();
+                users.close();
                 ContentProviderPM   pms     = new ContentProviderPM (this);
                 pms.clearPM();
+                pms.close();
                 ContentProviderSubj subjs   = new ContentProviderSubj (this);
                 subjs.clearSubj();
+                subjs.close();
                 ContentProviderMsg  msgs    = new ContentProviderMsg (this);
                 msgs.clearMsg();
+                msgs.close();
                 ContentProviderFile files   = new ContentProviderFile (this);
                 files.clearFiles();
+                files.close();
                 break;
             }
             case (R.id.menu_prefs): {

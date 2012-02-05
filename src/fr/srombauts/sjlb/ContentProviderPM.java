@@ -95,23 +95,23 @@ public class ContentProviderPM extends ContentProvider {
      * @return true si succès
      */
     public boolean insertPM(PrivateMessage aPM) {
-      ContentValues newPMValues = new ContentValues();
-      newPMValues.put(SJLB.PM._ID,       aPM.getId());
-      newPMValues.put(SJLB.PM.DATE,      aPM.getDate().getTime());
-      newPMValues.put(SJLB.PM.AUTHOR_ID, aPM.getAuthorId());
-      newPMValues.put(SJLB.PM.AUTHOR,    aPM.getAuthor());
-      newPMValues.put(SJLB.PM.TEXT,      aPM.getText());
-      return mDBHelper.getWritableDatabase().insert(SJLB.PM.TABLE_NAME, null, newPMValues) > 0;
+        ContentValues newPMValues = new ContentValues();
+        newPMValues.put(SJLB.PM._ID,       aPM.getId());
+        newPMValues.put(SJLB.PM.DATE,      aPM.getDate().getTime());
+        newPMValues.put(SJLB.PM.AUTHOR_ID, aPM.getAuthorId());
+        newPMValues.put(SJLB.PM.AUTHOR,    aPM.getAuthor());
+        newPMValues.put(SJLB.PM.TEXT,      aPM.getText());
+        return mDBHelper.getWritableDatabase().insert(SJLB.PM.TABLE_NAME, null, newPMValues) > 0;
     }
 
     // retire un PM juste par son ID
     public boolean removePM(long aId) {
-      return mDBHelper.getWritableDatabase().delete(SJLB.PM.TABLE_NAME, SJLB.PM._ID + "=" + aId, null) > 0;
+        return mDBHelper.getWritableDatabase().delete(SJLB.PM.TABLE_NAME, SJLB.PM._ID + "=" + aId, null) > 0;
     }
 
     // vide la table des PM
     public boolean clearPM() {
-      return mDBHelper.getWritableDatabase().delete(SJLB.PM.TABLE_NAME, null, null) > 0;
+        return mDBHelper.getWritableDatabase().delete(SJLB.PM.TABLE_NAME, null, null) > 0;
     }
     
     // récupère un cursor avec la liste de tous les PM
