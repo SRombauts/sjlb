@@ -1,6 +1,9 @@
 package fr.srombauts.sjlb;
 
+import java.util.Date;
+
 import android.app.NotificationManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -10,8 +13,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
+import android.widget.QuickContactBadge;
+import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,14 +35,15 @@ public class ActivityForumMessages extends ActivityTouchListener {
     public  static final String START_INTENT_EXTRA_SUBJ_LABEL   = "SubjectLabel";
     public  static final String START_INTENT_EXTRA_GROUP_ID     = "GroupId";
     
-    private Cursor              mCursor         = null;
-    private SimpleCursorAdapter mAdapter        = null;
-    private ListView            mMsgListView    = null;
+    private Cursor                  mCursor         = null;
+    private MessageListItemAdapter  mAdapter        = null;
+    private ListView                mMsgListView    = null;
     
-    private long                mSelectedCategoryId     = 0;
-    private long                mSelectedSubjectId      = 0;
-    private String              mSelectedSubjectLabel   = "";
-    private long                mSelectedGroupId        = 0;
+    private long                    mSelectedCategoryId     = 0;
+    private long                    mSelectedSubjectId      = 0;
+    private String                  mSelectedSubjectLabel   = "";
+    private long                    mSelectedGroupId        = 0;
+    
     
     /** Called when the activity is first created. */
     @Override
@@ -54,36 +62,28 @@ public class ActivityForumMessages extends ActivityTouchListener {
             mSelectedSubjectLabel   = startIntent.getExtras().getString(START_INTENT_EXTRA_SUBJ_LABEL);
             mSelectedGroupId        = startIntent.getExtras().getLong  (START_INTENT_EXTRA_GROUP_ID);
             Log.i(LOG_TAG, "SelectedSubject (" + mSelectedSubjectId +", " + mSelectedGroupId + " [" + mSelectedCategoryId + "]) : " + mSelectedSubjectLabel);
-        }        
+        }
         
         // Map la description du sujet pour la renseigner
         TextView SubjectsDescription = (TextView)findViewById(R.id.subject_label);
-        SubjectsDescription.setText(mSelectedSubjectLabel);        
+        SubjectsDescription.setText(mSelectedSubjectLabel);
         
         // Récupére un curseur sur les données (les messages) en filtrant sur l'id du sujet sélectionné
         mCursor = managedQuery( SJLB.Msg.CONTENT_URI, null,
                                 SJLB.Msg.SUBJECT_ID + "=" + mSelectedSubjectId,
                                 null, null);
 
-        // Les colonnes à mapper :
-        String[]    from = new String[] { SJLB.Msg.AUTHOR, SJLB.Msg.DATE, SJLB.Msg.TEXT };
-        
-        // Les ID des views sur lesquels les mapper :
-        int[]       to   = new int[]    { R.id.msgAuthor, R.id.msgDate, R.id.msgText };
-
         // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
-        mAdapter = new SimpleCursorAdapter( this,
-                                            R.layout.msg,
-                                            mCursor,
-                                            from,
-                                            to);
+        mAdapter = new MessageListItemAdapter(  this,
+                                                R.layout.msg,
+                                                mCursor);
         
         mMsgListView = (ListView)findViewById(R.id.msg_listview);
         mMsgListView.setAdapter (mAdapter);
         // Scroll tout en bas de la liste des messages
-        mMsgListView.setSelection(mMsgListView.getCount()-1);
+        mMsgListView.setSelection(mMsgListView.getCount()-1);    
         
-        // Enregister les listener d'IHM que la classe implémente        
+        // Enregister les listener d'IHM que la classe implémente
         mMsgListView.setOnTouchListener(this);
         mMsgListView.getRootView().setOnTouchListener(this);
     }
@@ -97,6 +97,18 @@ public class ActivityForumMessages extends ActivityTouchListener {
         mCursor.requery();
         mAdapter.notifyDataSetChanged();
     }
+
+    @Override
+    protected void onDestroy () {
+        super.onDestroy ();
+        
+        // Efface les flags "unread" des messages lus lorsqu'on quitte !
+        ContentValues values = new ContentValues();
+        values.put(SJLB.Msg.UNREAD, -1); // on les passe à "-1" ce qui indique qu'il faut encore signaler le site Web SJLB du fait qu'on les a lu !
+        String where = "(" + SJLB.Msg.SUBJECT_ID + "=" + mSelectedSubjectId + " AND " + SJLB.Msg.UNREAD + "=1)";
+        getContentResolver ().update(SJLB.Msg.CONTENT_URI, values, where, null);        
+    }
+    
     
     /**
      * Annule l'éventuelle notification de Msg non lus
@@ -174,4 +186,68 @@ public class ActivityForumMessages extends ActivityTouchListener {
     }
 
     // TODO SRO : onRightGesture
+    
+    
+    // Adaptateur mappant les données du curseur dans des objets du cache du pool d'objets View utilisés par la ListView
+    private final class MessageListItemAdapter extends ResourceCursorAdapter {
+        public MessageListItemAdapter(Context context, int layout, Cursor cursor) {
+            super(context, layout, cursor);
+        }
+
+        // Met à jour avec un nouveau contenu un objet de cache du pool de view utilisées par la ListView 
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            final MessageListItemCache  cache = (MessageListItemCache) view.getTag();
+            
+            // Fixe la barre de titre du message 
+            String  title = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.User.PSEUDO)); // on utilise le champ "PSEUDO" issu du croisement avec la table 
+            String  strDate = ForumMessage.getDateString (new Date(cursor.getLong(cursor.getColumnIndexOrThrow(SJLB.Msg.DATE)))) ;
+            cache.titleView.setText(title + "\n" + strDate);
+            // Fixe le contenu du message 
+            String  text = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.Msg.TEXT));
+            cache.textView.setText(text);
+            // Fixe l'icone de 
+            // TODO SRO : positionner le niveau de l'image "unread" !
+            cache.imageView.setImageLevel(cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.UNREAD))); 
+
+            // Récupère le contact éventuellement associé à l'utilisateur (Uri et photo)
+            ApplicationSJLB appSJLB = (ApplicationSJLB)getApplication ();
+            UserContactDescr user = appSJLB.mUserContactList.get(cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.User._ID)));
+            // Fixe la barre de QuickContact
+            cache.quickContactView.assignContactUri(user.lookupUri);
+            
+            // Affiche la photo du contact si elle existe (sinon petite icone de robot par défaut)
+            if (null != user.photo) {
+                cache.quickContactView.setImageBitmap(user.photo);
+            } else {
+                cache.quickContactView.setImageResource(R.drawable.ic_contact_picture);
+            }
+        }
+
+        // Création d'une nouvelle View et de son objet de cache (vide) pour le pool
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            View view = super.newView(context, cursor, parent);
+            
+            // Construction d'un nouvel objet de cache
+            MessageListItemCache cache = new MessageListItemCache();
+            // et binding sur les View décrites par le Layout
+            cache.quickContactView  = (QuickContactBadge)   view.findViewById(R.id.msgBadge);
+            cache.titleView         = (TextView)            view.findViewById(R.id.msgTitre);
+            cache.textView          = (TextView)            view.findViewById(R.id.msgText);
+            cache.imageView         = (ImageView)           view.findViewById(R.id.msgNew);
+            // enregistre cet objet de cache
+            view.setTag(cache);
+
+            return view;
+        }
+    }
+
+    // Objet utilisé comme cache des données d'une View, dans un pool d'objets utilisés par la ListView
+    final static class MessageListItemCache {
+        public QuickContactBadge    quickContactView;
+        public TextView             titleView;
+        public TextView             textView;
+        public ImageView            imageView;
+    }
 }

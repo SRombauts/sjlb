@@ -96,7 +96,7 @@ public class ContentProviderPM extends ContentProvider {
      */
     public boolean insertPM(PrivateMessage aPM) {
       ContentValues newPMValues = new ContentValues();
-      newPMValues.put(SJLB.PM.ID,        aPM.getId());
+      newPMValues.put(SJLB.PM._ID,        aPM.getId());
       newPMValues.put(SJLB.PM.DATE,      aPM.getDate());
       newPMValues.put(SJLB.PM.AUTHOR_ID, aPM.getAuthorId());
       newPMValues.put(SJLB.PM.AUTHOR,    aPM.getAuthor());
@@ -106,7 +106,7 @@ public class ContentProviderPM extends ContentProvider {
 
     // retire un PM juste par son ID
     public boolean removePM(long aId) {
-      return mDBHelper.getWritableDatabase().delete(SJLB.PM.TABLE_NAME, SJLB.PM.ID + "=" + aId, null) > 0;
+      return mDBHelper.getWritableDatabase().delete(SJLB.PM.TABLE_NAME, SJLB.PM._ID + "=" + aId, null) > 0;
     }
 
     // vide la table des PM
@@ -117,7 +117,7 @@ public class ContentProviderPM extends ContentProvider {
     // récupère un cursor avec la liste de tous les PM
     public Cursor getAllPM () {
         return mDBHelper.getReadableDatabase().query(   SJLB.PM.TABLE_NAME,
-                                                       new String[] {  SJLB.PM.ID,
+                                                       new String[] {  SJLB.PM._ID,
                                                                         SJLB.PM.DATE,
                                                                         SJLB.PM.AUTHOR_ID,
                                                                         SJLB.PM.AUTHOR,
@@ -132,7 +132,7 @@ public class ContentProviderPM extends ContentProvider {
                                                                                 SJLB.PM.AUTHOR_ID,
                                                                                 SJLB.PM.AUTHOR,
                                                                                 SJLB.PM.TEXT},
-                                                                SJLB.PM.ID + "=" + aId,
+                                                                SJLB.PM._ID + "=" + aId,
                                                                 null, null, null, null, null);
         if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
             throw new SQLException("Pas de PM pour l'Id " + aId);
@@ -143,8 +143,8 @@ public class ContentProviderPM extends ContentProvider {
     // teste l'existence d'un PM particulier
     public Boolean isExist (int aId) {
         Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.PM.TABLE_NAME,
-                                                                new String[]{SJLB.PM.ID},
-                                                                SJLB.PM.ID + "=" + aId,
+                                                                new String[]{SJLB.PM._ID},
+                                                                SJLB.PM._ID + "=" + aId,
                                                                 null, null, null, null, null);
         return (0 < cursor.getCount());
     }

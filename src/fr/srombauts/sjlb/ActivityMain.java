@@ -26,8 +26,8 @@ import android.widget.AdapterView.OnItemClickListener;
  * Activité du menu principal, qui lance le service si besoin et permet de naviguer entre PM et Msg
  * @author 27/06/2010 srombauts
  */
-public class ActivitySJLB extends ActivityTouchListener implements OnItemClickListener {
-    private static final String LOG_TAG         = "ActivitySJLB";
+public class ActivityMain extends ActivityTouchListener implements OnItemClickListener {
+    private static final String LOG_TAG         = "ActivityMain";
 
     private static final String SAVE_FILENAME   = "SavedIntent";
 
@@ -68,7 +68,6 @@ public class ActivitySJLB extends ActivityTouchListener implements OnItemClickLi
         mCategoriesListView.setOnTouchListener(this);
         mCategoriesListView.getRootView().setOnTouchListener(this);
 
-
         // Restaure les valeurs du dernier intent
         SharedPreferences settings = getSharedPreferences(SAVE_FILENAME, 0);
         mSelectedCategoryId     = settings.getLong  ("mSelectedCategoryId",     0);
@@ -77,6 +76,8 @@ public class ActivitySJLB extends ActivityTouchListener implements OnItemClickLi
         mSavedIntent.putExtra(ActivityForumSubjects.START_INTENT_EXTRA_CAT_ID,    mSelectedCategoryId);
         mSavedIntent.putExtra(ActivityForumSubjects.START_INTENT_EXTRA_CAT_LABEL, mSelectedCategoryLabel);
         Log.i (LOG_TAG, "onCreate: restaure l'intent sauvegarde (" + mSelectedCategoryId +", " + mSelectedCategoryLabel + ")" );
+
+        getApplicationContext ();
         
         // Lance le service, si pas déjà lancé, et provoque un rafraichissement
         IntentReceiverStartService.startService (this, LOG_TAG);
@@ -85,26 +86,38 @@ public class ActivitySJLB extends ActivityTouchListener implements OnItemClickLi
     @Override
     public void onDestroy () {
         super.onDestroy();
+        
         // Sauvegarde les valeurs du dernier intent
         Log.d (LOG_TAG, "onDestroy: Sauvegarde les valeurs du dernier intent (" + mSelectedCategoryId +", " + mSelectedCategoryLabel + ")" );
         SharedPreferences           settings    = getSharedPreferences(SAVE_FILENAME, 0);
         SharedPreferences.Editor    editor      = settings.edit();
         editor.putLong  ("mSelectedCategoryId",     mSelectedCategoryId);
         editor.putString("mSelectedCategoryLabel",  mSelectedCategoryLabel);
-        editor.commit();        
+        editor.commit();
+        
+        // Provoque un rafraichissement des infos anticipé,
+        // TODO SRO : ce qui permettra aussi de signaler au site web SJLB la lecture des messages  
+        // TODO voir si c'est la meilleurs manière de faire...
+        IntentReceiverStartService.startService (this, LOG_TAG);
     }
 
     @SuppressWarnings("unchecked")
     public void onItemClick(AdapterView adpter, View view, int index, long arg3) {
-        // Lance l'activité correspondante avec en paramètre l'id et le label de la catégorie sélectionnée
-        mSavedIntent = new Intent(this, ActivityForumSubjects.class);
-        String[] categoryLabels = getResources().getStringArray(R.array.category_labels);
-        mSelectedCategoryId     = index+1;
-        mSelectedCategoryLabel  = categoryLabels[index];
-        mSavedIntent.putExtra(ActivityForumSubjects.START_INTENT_EXTRA_CAT_ID,    mSelectedCategoryId);
-        mSavedIntent.putExtra(ActivityForumSubjects.START_INTENT_EXTRA_CAT_LABEL, mSelectedCategoryLabel);
-        Log.d (LOG_TAG, "onItemClick: mSavedIntent.putExtra(" + mSelectedCategoryId + ", " + mSelectedCategoryLabel + ")");
-        startActivity (mSavedIntent);
+        // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
+        if (PrefsLoginPassword.AreFilled (this)) {
+            // Lance l'activité correspondante avec en paramètre l'id et le label de la catégorie sélectionnée
+            mSavedIntent = new Intent(this, ActivityForumSubjects.class);
+            String[] categoryLabels = getResources().getStringArray(R.array.category_labels);
+            mSelectedCategoryId     = index+1;
+            mSelectedCategoryLabel  = categoryLabels[index];
+            mSavedIntent.putExtra(ActivityForumSubjects.START_INTENT_EXTRA_CAT_ID,    mSelectedCategoryId);
+            mSavedIntent.putExtra(ActivityForumSubjects.START_INTENT_EXTRA_CAT_LABEL, mSelectedCategoryLabel);
+            Log.d (LOG_TAG, "onItemClick: mSavedIntent.putExtra(" + mSelectedCategoryId + ", " + mSelectedCategoryLabel + ")");
+            startActivity (mSavedIntent);
+        } else {
+            // Toast notification signalant l'absence de login/password
+            Toast.makeText(this, getString(R.string.toast_auth_needed), Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -126,9 +139,15 @@ public class ActivitySJLB extends ActivityTouchListener implements OnItemClickLi
         
         switch (item.getItemId()) {
             case (R.id.menu_show_online): {
-				// lien vers le Forum sur le Site Web :
-				Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_uri)));
-				startActivity(intent);
+                // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
+                if (PrefsLoginPassword.AreFilled (this)) {
+    				// lien vers le Forum sur le Site Web :
+    				Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_uri)));
+    				startActivity(intent);
+                } else {
+                    // Toast notification signalant l'absence de login/password
+                    Toast.makeText(this, getString(R.string.toast_auth_needed), Toast.LENGTH_SHORT).show();
+                }
                 break;
             }
             case (R.id.menu_show_pm): {
@@ -138,10 +157,11 @@ public class ActivitySJLB extends ActivityTouchListener implements OnItemClickLi
             case (R.id.menu_update): {
                 // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
                 if (PrefsLoginPassword.AreFilled (this)) {
-                    // Toast notification de début de rafraichissement
-                    Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
+                    // Rafraichissement des infos
                     // TODO voir si c'est la meilleurs manière de faire...
                     IntentReceiverStartService.startService (this, LOG_TAG);
+                    // Toast notification de début de rafraichissement
+                    Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
                 } else {
                     // Toast notification signalant l'absence de login/password
                     Toast.makeText(this, getString(R.string.toast_auth_needed), Toast.LENGTH_SHORT).show();
@@ -149,13 +169,13 @@ public class ActivitySJLB extends ActivityTouchListener implements OnItemClickLi
                 break;
             }
             case (R.id.menu_reset): {
-                ContentProviderUser users = new ContentProviderUser (this);
+                ContentProviderUser users   = new ContentProviderUser (this);
                 users.clearUser();
-                ContentProviderPM   pms = new ContentProviderPM (this);
+                ContentProviderPM   pms     = new ContentProviderPM (this);
                 pms.clearPM();
-                ContentProviderSubj subjs = new ContentProviderSubj (this);
+                ContentProviderSubj subjs   = new ContentProviderSubj (this);
                 subjs.clearSubj();
-                ContentProviderMsg  msgs = new ContentProviderMsg (this);
+                ContentProviderMsg  msgs    = new ContentProviderMsg (this);
                 msgs.clearMsg();
                 break;
             }

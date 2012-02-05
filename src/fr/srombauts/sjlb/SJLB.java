@@ -11,7 +11,7 @@ public final class SJLB {
     private SJLB() {}
 
     public static final String DATABASE_NAME        = "SJLB.db";
-    public static final int    DATABASE_VERSION     = 4;
+    public static final int    DATABASE_VERSION     = 6;
     
     
     /**
@@ -78,12 +78,6 @@ public final class SJLB {
         private PM() {}
 
         /**
-         * L'id du PM
-         * <P>Type: INTEGER</P>
-         */
-        public static final String  ID                  = "_id";
-        
-        /**
          * Date en secondes depuis le 1er janvier 1970
          * <P>Type: TEXT</P>
          */
@@ -110,14 +104,14 @@ public final class SJLB {
         /**
          * The default sort order for this table
          */
-        public static final String  DEFAULT_SORT_ORDER  = "_id ASC";
+        public static final String  DEFAULT_SORT_ORDER  = _ID + " ASC";
 
 
 
         public static final String  TABLE_NAME   = "private_messages";
 
         public static final String  TABLE_CREATE = "create table " + TABLE_NAME + " ("
-                                                    + ID        + " integer primary key, "
+                                                    + _ID       + " integer primary key, "
                                                     + DATE      + " text, "
                                                     + AUTHOR_ID + " integer, "
                                                     + AUTHOR    + " text, "
@@ -170,12 +164,6 @@ public final class SJLB {
         private Subj() {}
 
         /**
-         * L'id du PM
-         * <P>Type: INTEGER</P>
-         */
-        public static final String  ID                  = "_id";
-        
-        /**
          * L'id de la catégorie de ratachement du sujet
          * <P>Type: INTEGER</P>
          */
@@ -198,18 +186,23 @@ public final class SJLB {
          * <P>Type: INTEGER</P>
          */
         public static final String  TEXT                = "text";
+        
+        /**
+         * The default sort order for this table
+         */
+        public static final String  DEFAULT_SORT_ORDER  = LAST_DATE + " DESC";
 
 
         public static final String  TABLE_NAME   = "forum_subjects";
 
-        public static final String TABLE_CREATE = "create table " + TABLE_NAME + " ("
-                                                    + ID       + " integer primary key, "
+        public static final String  TABLE_CREATE = "create table " + TABLE_NAME + " ("
+                                                    + _ID      + " integer primary key, "
                                                     + CAT_ID   + " integer, "
                                                     + GROUP_ID + " integer, "
                                                     + LAST_DATE+ " date, "
                                                     + TEXT     + " text);";
 
-        public static final String TABLE_DROP   = "DROP TABLE IF EXISTS " + SJLB.Subj.TABLE_NAME;
+        public static final String  TABLE_DROP   = "DROP TABLE IF EXISTS " + SJLB.Subj.TABLE_NAME;
 
 
         /**
@@ -245,11 +238,6 @@ public final class SJLB {
          * Le matcher d'URI pour un live folder de Subj
          */
         public static final String  MATCHER_LIVE_FOLDER = "live_folders/subj";
-        
-        /**
-         * The default sort order for this table
-         */
-        public static final String  DEFAULT_SORT_ORDER  = "last_date DESC";
     }
 
 
@@ -261,23 +249,11 @@ public final class SJLB {
         private Msg() {}
 
         /**
-         * L'id du Msg
+         * Date en secondes depuis le 1er janvier 1970
          * <P>Type: INTEGER</P>
          */
-        public static final String  ID                  = "_id";
-        
-        /**
-         * Date en secondes depuis le 1er janvier 1970
-         * <P>Type: TEXT</P>
-         */
         public static final String  DATE                = "date";
-
-        /**
-         * L'auteur/expéditeur du Msg
-         * <P>Type: TEXT</P>
-         */
-        public static final String  AUTHOR              = "author";
-
+        
         /**
          * L'id de l'auteur/expéditeur du Msg
          * <P>Type: INTEGER</P>
@@ -291,21 +267,32 @@ public final class SJLB {
         public static final String  SUBJECT_ID          = "subject_id";
 
         /**
-         * Le texte du Msg
+         * Flag (transitoire) indiquant que le message n'a pas encore été lu
          * <P>Type: INTEGER</P>
          */
-        public static final String  TEXT                = "text";
+        public static final String  UNREAD          	= "unread";
 
+        /**
+         * Le texte du Msg
+         * <P>Type: TEXT</P>
+         */
+        public static final String  TEXT                = "text";
+        
+        /**
+         * The default sort order for this table
+         */
+        public static final String  DEFAULT_SORT_ORDER  = DATE + " ASC";
+        
 
         public static final String  TABLE_NAME   = "forum_messages";
 
         public static final String TABLE_CREATE = "create table " + SJLB.Msg.TABLE_NAME + " ("
-                                                    + SJLB.Msg.ID        + " integer primary key, "
-                                                    + SJLB.Msg.DATE      + " text, "
-                                                    + SJLB.Msg.AUTHOR_ID + " integer, "
-                                                    + SJLB.Msg.AUTHOR    + " text, "
-                                                    + SJLB.Msg.SUBJECT_ID+ " integer, "
-                                                    + SJLB.Msg.TEXT      + " text);";
+                                                    + _ID       + " integer primary key, "
+                                                    + DATE      + " integer, "
+                                                    + AUTHOR_ID + " integer, "
+                                                    + SUBJECT_ID+ " integer, "
+                                                    + UNREAD	+ " integer, "
+                                                    + TEXT      + " text);";
 
         public static final String TABLE_DROP   = "DROP TABLE IF EXISTS " + SJLB.Msg.TABLE_NAME;        
 
@@ -343,14 +330,6 @@ public final class SJLB {
          * Le matcher d'URI pour un live folder de Msg
          */
         public static final String  MATCHER_LIVE_FOLDER = "live_folders/msg";
-        
-        /**
-         * The default sort order for this table
-         */
-        // TODO SRO : il nous faut conserver un champ Date en plus de la "DateString"
-        //public static final String  DEFAULT_SORT_ORDER  = "date ASC";
-        public static final String  DEFAULT_SORT_ORDER  = "_id ASC";
-
     }
 
     /**
@@ -361,28 +340,29 @@ public final class SJLB {
         private User() {}
 
         /**
-         * L'id de l'utilisateur
-         * <P>Type: INTEGER</P>
-         */
-        public static final String  ID                  = "_id";
-        
-        /**
          * Le pseudonyme/login de l'utilisateur
          * <P>Type: TEXT</P>
          */
         public static final String  PSEUDO              = "pseudo";
         
         /**
+         * Le nom complet de l'utilisateur
+         * <P>Type: TEXT</P>
+         */
+        public static final String  NAME              	= "name";
+        
+        /**
          * The default sort order for this table
          */
-        public static final String  DEFAULT_SORT_ORDER  = "_id ASC";
+        public static final String  DEFAULT_SORT_ORDER  = _ID + " ASC";
 
 
         public static final String  TABLE_NAME   = "users";
 
         public static final String  TABLE_CREATE = "create table " + TABLE_NAME + " ("
-                                                    + ID      + " integer primary key, "
-                                                    + PSEUDO  + " text);";
+                                                    + _ID     + " integer primary key, "
+                                                    + PSEUDO  + " text, "
+        											+ NAME    + " text);";
 
         public static final String  TABLE_DROP   = "DROP TABLE IF EXISTS " + TABLE_NAME;
 

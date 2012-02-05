@@ -2,11 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="fr.srombauts.sjlb"
       android:installLocation="auto"
-      android:versionCode="33"
-      android:versionName="0.3.3">
+      android:versionCode="34"
+      android:versionName="0.3.4">
       
-    <application android:icon="@drawable/launcher_icon" android:label="@string/app_name" android:debuggable="false">
-        <activity android:name=".ActivitySJLB"
+    <application android:name=".ApplicationSJLB"
+    			 android:label="@string/app_name"
+    			 android:icon="@drawable/launcher_icon"
+    			 android:debuggable="true">
+        <activity android:name=".ActivityMain"
                   android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,6 +55,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.VIBRATE" /> 
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <uses-sdk android:minSdkVersion="8"
               android:targetSdkVersion="8" />

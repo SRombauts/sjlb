@@ -1,5 +1,6 @@
 package fr.srombauts.sjlb;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -10,9 +11,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
+import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
@@ -30,9 +32,9 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     public  static final String START_INTENT_EXTRA_CAT_ID       = "CategoryId";
     public  static final String START_INTENT_EXTRA_CAT_LABEL    = "CategoryLabel";
     
-    private Cursor              mCursor             = null;
-    private SimpleCursorAdapter mAdapter            = null;
-    private ListView            mSubjectsListView   = null;
+    private Cursor                  mCursor             = null;
+    private SubjectListItemAdapter  mAdapter            = null;
+    private ListView                mSubjectsListView   = null;
     
     private long                mSelectedCategoryId     = 0;
     private String              mSelectedCategoryLabel  = "";
@@ -41,6 +43,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     private String              mSelectedSubjLabel      = "";
     
     private Intent              mSavedIntent            = null;
+    
     
     /** Called when the activity is first created. */
     @Override
@@ -64,22 +67,15 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         CategoryDescription.setText(mSelectedCategoryLabel);        
         
         // Récupére un curseur sur les données (les sujets) en filtrant sur l'id de la catégorie sélectionnée
-        mCursor = managedQuery( SJLB.Subj.CONTENT_URI, null,
-                                SJLB.Subj.CAT_ID + "=" + mSelectedCategoryId,
-                                null, null);
-
-        // Les colonnes à mapper :
-        String[]    from = new String[] { SJLB.Subj.TEXT };
-        
-        // Les ID des views sur lesquels les mapper :
-        int[]       to   = new int[]    { R.id.subjText };
+        mCursor = managedQuery( SJLB.Subj.CONTENT_URI,
+        						null,
+                                SJLB.Subj.CAT_ID + "=" + mSelectedCategoryId, null,
+                                null);
 
         // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
-        mAdapter = new SimpleCursorAdapter( this,
-                                            R.layout.subj,
-                                            mCursor,
-                                            from,
-                                            to);
+        mAdapter = new SubjectListItemAdapter(  this,
+                                                R.layout.subj,
+                                                mCursor);
         
         mSubjectsListView = (ListView)findViewById(R.id.subj_listview);
         mSubjectsListView.setAdapter (mAdapter);
@@ -108,6 +104,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     protected void onResume () {
         super.onResume();
 
+        // tentative de refresh des données affichées (nb de new msg)
         mCursor.requery();
         mAdapter.notifyDataSetChanged();
     }
@@ -123,6 +120,10 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         editor.putString("mSelectedSubjLabel",  mSelectedSubjLabel);
         editor.putLong  ("mSelectedGroupId",    mSelectedGroupId);
         editor.commit();
+
+        // tentative de refresh des données affichées (nb de new msg)
+        mCursor.requery();
+        mAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -155,16 +156,13 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
                 break;
             }
             case (R.id.menu_update): {
-                // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
-                if (PrefsLoginPassword.AreFilled (this)) {
-                    // Toast notification de début de rafraichissement
-                    Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
-                    // TODO voir si c'est la meilleurs manière de faire...
-                    IntentReceiverStartService.startService (this, LOG_TAG);
-                } else {
-                    // Toast notification signalant l'absence de login/password
-                    Toast.makeText(this, getString(R.string.toast_auth_needed), Toast.LENGTH_SHORT).show();
-                }
+                // Toast notification de début de rafraichissement
+                Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
+                // TODO voir si c'est la meilleurs manière de faire...
+                IntentReceiverStartService.startService (this, LOG_TAG);
+                // TODO SRO : trouver un moyen de rafraichir la liste à l'échéance de la tache de rafraichissement
+                mCursor.requery();
+                mAdapter.notifyDataSetChanged();
                 break;
             }
             case (R.id.menu_prefs): {
@@ -186,11 +184,10 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
      *  Sur sélection d'un sujet, lance l'activité "messages du forum" avec en paramètre l'id du sujet :
      */
     @SuppressWarnings("unchecked")
-    @Override
     public void onItemClick(AdapterView adapter, View view, int index, long arg3) {
         mSavedIntent = new Intent(this, ActivityForumMessages.class);
         mCursor.moveToPosition(index);
-        mSelectedSubjId      = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.ID));
+        mSelectedSubjId      = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj._ID));
         mSelectedSubjLabel   = mCursor.getString(mCursor.getColumnIndexOrThrow(SJLB.Subj.TEXT));
         mSelectedGroupId     = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.GROUP_ID));
         mSavedIntent.putExtra(ActivityForumMessages.START_INTENT_EXTRA_CAT_ID,        mSelectedCategoryId);
@@ -224,4 +221,56 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         return bActionTraitee;
     }
     
+    
+    
+    // TODO SRO : en tests
+    // Adaptateur mappant les données du curseur dans des objets du cache du pool d'objets View utilisés par la ListView
+    private final class SubjectListItemAdapter extends ResourceCursorAdapter {
+        public SubjectListItemAdapter(Context context, int layout, Cursor c) {
+            super(context, layout, c);
+        }
+
+        // Met à jour avec un nouveau contenu un objet de cache du pool de view utilisées par la ListView 
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            final SubjectListItemCache  cache = (SubjectListItemCache)view.getTag();
+            
+            // TODO SRO : à remplacer par une sub-querry SQL, technique bien plus optimisée car travail fait en amont de l'affichage (meilleurs scroll de la ListView) !
+            Cursor subCursor = managedQuery(SJLB.Msg.CONTENT_URI,
+                                            null,
+                                            "(" +       SJLB.Msg.SUBJECT_ID + "=" + cursor.getString(cursor.getColumnIndexOrThrow(SJLB.Subj._ID))
+                                            + " AND " + SJLB.Msg.UNREAD + "=1" + ")",
+                                            null,
+                                            null);
+            
+            // Fixe le nom
+            // TODO SRO : à optimiser à l'aide d'un #define sur l'ID de la colonne ! 
+            String  text = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.Subj.TEXT));
+            if (0 < subCursor.getCount()) {
+                text += " (" + subCursor.getCount() + ")";
+            }
+            cache.nameView.setText(text);
+        }
+
+        // Création d'une nouvelle View et de son objet de cache (vide) pour le pool
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            View view = super.newView(context, cursor, parent);
+            
+            // Construction d'un nouvel objet de cache
+            SubjectListItemCache cache = new SubjectListItemCache();
+            // et binding sur les View décrites par le Layout
+            cache.nameView  = (TextView)view.findViewById(R.id.subjText);
+            // enregistre cet objet de cache
+            view.setTag(cache);
+
+            return view;
+        }
+    }
+    
+    // Objet utilisé comme cache des données d'une View, dans un pool d'objets utilisés par la ListView
+        // TODO SRO : en tests
+    final static class SubjectListItemCache {
+        public TextView nameView;
+    }    
 }

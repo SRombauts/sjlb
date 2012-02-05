@@ -20,10 +20,11 @@ public class ActivityTouchListener extends Activity implements OnTouchListener {
     protected float         mTouchStartPositionX    = 0;
     protected float         mTouchStartPositionY    = 0;
     
+    private   float         mSensibility            = (float)0.4;   // Ampleur (seuil) du mouvement nécessaire pour déclencher une action
+    
     /**
      * Callback d'évènements générique, mutualisée entre les différentes activités de l'application
      */
-    @Override
     public boolean onTouch(View aView, MotionEvent aMotionEvent) {
               boolean   bActionTraitee  = false;
         final int       touchAction     = aMotionEvent.getAction();
@@ -47,7 +48,7 @@ public class ActivityTouchListener extends Activity implements OnTouchListener {
                 //Log.d (LOG_TAG, "onTouch: deltas proportionnels : (" + proportionalDeltaX + ", " + proportionalDeltaY + ")");
                 
                 // Teste si le mouvement correspond à un mouvement franc, d'ampleur suffisante en regard de la taille de la vue
-                if (Math.abs(proportionalDeltaX) > 0.2) {
+                if (Math.abs(proportionalDeltaX) > mSensibility) {
                     // Teste si le mouvement correspond à un mouvement horizontal (X) ou vertical (Y)
                     if (Math.abs(proportionalDeltaX)/Math.abs(proportionalDeltaY) > 1.0) {
                         // Teste le sens du mouvement horizontal, et l'inverse éventuellement selon les préférences
@@ -81,6 +82,13 @@ public class ActivityTouchListener extends Activity implements OnTouchListener {
         
         // Si on retourne false, on n'est plus notifié des évènements suivants
         return true;
+    }
+    
+    /**
+     *  Permet de règler l'mpleur (seuil) du mouvement nécessaire pour déclencher une action    
+     */
+    protected void setSensibility (float aSensibility) {
+        mSensibility = aSensibility;
     }
     
     /**

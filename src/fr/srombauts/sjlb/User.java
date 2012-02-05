@@ -8,10 +8,12 @@ package fr.srombauts.sjlb;
 public class User {
     private int     mId;
     private String  mPseudo;
+    private String  mNom;
 
-    public User(int aId,String aPseudo) {
+    public User(int aId, String aPseudo, String aNom) {
         mId     = aId;
         mPseudo = aPseudo;
+        mNom    = aNom;
     }
     
     public int getId () {
@@ -20,11 +22,14 @@ public class User {
     public String getPseudo () {
         return mPseudo;
     }
+    public String getNom () {
+        return mNom;
+    }
     
     /**
      * Retourne une description résumée en une unique chaine
      */
     public String toString () {
-        return mPseudo + " (" + mId + ")";
+        return mNom + " (" + mPseudo + ", id=" + mId + ")";
     }
 }

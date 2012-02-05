@@ -96,14 +96,15 @@ public class ContentProviderUser extends ContentProvider {
      */
     public boolean insertUser(User aUser) {
       ContentValues newUserValues = new ContentValues();
-      newUserValues.put(SJLB.User.ID,        aUser.getId());
+      newUserValues.put(SJLB.User._ID,       aUser.getId());
       newUserValues.put(SJLB.User.PSEUDO,    aUser.getPseudo());
+      newUserValues.put(SJLB.User.NAME,      aUser.getNom());
       return mDBHelper.getWritableDatabase().insert(SJLB.User.TABLE_NAME, null, newUserValues) > 0;
     }
 
     // retire un User juste par son ID
     public boolean removeUser(long aId) {
-      return mDBHelper.getWritableDatabase().delete(SJLB.User.TABLE_NAME, SJLB.User.ID + "=" + aId, null) > 0;
+      return mDBHelper.getWritableDatabase().delete(SJLB.User.TABLE_NAME, SJLB.User._ID + "=" + aId, null) > 0;
     }
 
     // vide la table des User
@@ -114,16 +115,18 @@ public class ContentProviderUser extends ContentProvider {
     // récupère un cursor avec la liste de tous les User
     public Cursor getAllUsers () {
         return mDBHelper.getReadableDatabase().query(   SJLB.User.TABLE_NAME,
-                                                       new String[] {   SJLB.User.ID,
-                                                                        SJLB.User.PSEUDO},
+                                                       new String[] {   SJLB.User._ID,
+                                                                        SJLB.User.PSEUDO,
+                                                                        SJLB.User.NAME},
                                                        null, null, null, null, null);
     }
     
     // récupère un cursor sur un User particulier
     public Cursor getUser (int aId) {
         Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.User.TABLE_NAME,
-                                                                new String[]{SJLB.User.PSEUDO},
-                                                                SJLB.User.ID + "=" + aId,
+                                                                new String[]{   SJLB.User.PSEUDO,
+                                                                                SJLB.User.NAME},
+                                                                SJLB.User._ID + "=" + aId,
                                                                 null, null, null, null, null);
         if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
             throw new SQLException("Pas de User pour l'Id " + aId);

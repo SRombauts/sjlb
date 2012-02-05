@@ -30,7 +30,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ParseException;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -73,9 +72,11 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     static final private String ATTR_NAME_FORUM_MSG_AUTHOR      = "auteur";
     static final private String ATTR_NAME_FORUM_MSG_DATE        = "date";
     static final private String ATTR_NAME_FORUM_MSG_SUBJECT_ID  = "id_sujet";
+    static final private String ATTR_NAME_FORUM_MSG_UNREAD      = "unread";
     
     static final private String ATTR_NAME_USER_ID               = "id";
     static final private String ATTR_NAME_USER_PSEUDO           = "pseudo";
+    static final private String ATTR_NAME_USER_NAME             = "nom";
 
     private ServiceRefresh  mContext        = null;
     private int             mNbPM           = 0;    // Nombre de PM de l'utilisateur (issu directement dans la liste XML)
@@ -214,10 +215,11 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             String  strIdUser   = user.getAttribute(ATTR_NAME_USER_ID);
                             int     idUser      = Integer.parseInt(strIdUser);
                             String  strPseudo   = user.getAttribute(ATTR_NAME_USER_PSEUDO);
+                            String  strName     = user.getAttribute(ATTR_NAME_USER_NAME);
                             
-                            Log.d(LOG_TAG, "User " + idUser + " " + strPseudo);
+                            Log.d(LOG_TAG, "User " + idUser + " " + strPseudo + " " + strName);
                             
-                            User newUser = new User(idUser, strPseudo);
+                            User newUser = new User(idUser, strPseudo, strName);
                             
                             // Renseigne la bdd si User inconnu
                             // TODO SRO : un peu moche, provoque une exception SQL si le PM est déjà en base (pas propre en débug)
@@ -518,9 +520,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             long    longLastDate= (long)Integer.parseInt(strLastDate);
                             Date    lastDate    = new Date(longLastDate*1000);
                             
-                         // Log.d(LOG_TAG, "Subj " + idSubj + " " + idCat + " " + idGroup + " (" + lastDate + ") : '"  + strText + "'");
-                            
                             ForumSubject newSubj = new ForumSubject(idSubj, idCat, idGroup, lastDate, strText);
+                            Log.d(LOG_TAG, "Subj " + newSubj);
                             
                             // Renseigne la bdd SSI le sujet n'existe pas, sinon le met simplement à jour
                             if (mSubjDBAdapter.isExist(idSubj)) {
@@ -560,10 +561,11 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             String  strAuthor   = Msg.getAttribute(ATTR_NAME_FORUM_MSG_AUTHOR);
                             String  strIdSubject= Msg.getAttribute(ATTR_NAME_FORUM_MSG_SUBJECT_ID);
                             int     idSubject   = Integer.parseInt(strIdSubject);
+                            String  strUnread   = Msg.getAttribute(ATTR_NAME_FORUM_MSG_UNREAD);
+                            boolean bUnread     = (0 != Integer.parseInt(strUnread));
                             
-                         // Log.d(LOG_TAG, "Msg " + idMsg + " " + strAuthor + " ("+ idAuthor +") " + strDate + " sujet=" + idSubject + " : '"  + strText + "' (" + strText.length() + ")");
-                            
-                            ForumMessage newMsg = new ForumMessage(idMsg, date, idAuthor, strAuthor, idSubject, strText);
+                            ForumMessage newMsg = new ForumMessage(idMsg, date, idAuthor, strAuthor, idSubject, bUnread, strText);
+                            Log.d(LOG_TAG, "Msg " + newMsg);
                             
                             // Renseigne la bdd SSI le message n'est pas déjà inséré, sinon fait un update
                             if (mMsgDBAdapter.isExist(idMsg)) {
@@ -674,13 +676,14 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         
         // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
         // => lien Site Web :
-        Intent          notificationIntent  = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(mContext.getString(R.string.sjlb_forum_uri)));
-        PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
+// TODO SRO : ancienne méthode
+//        Intent          notificationIntent  = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(mContext.getString(R.string.sjlb_forum_uri)));
+//        PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
         // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
         // => lien activité principale :
 // TODO SRO : pas encore au point
-//        Intent          notificationIntent  = new Intent(mContext, ActivitySJLB.class);
-//        PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
+        Intent          notificationIntent  = new Intent(mContext, ActivityMain.class);
+        PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
 
         // Préparation du résumé de notification
         // TODO SRO : utiliser une icone pour les PM, et une autre pour les Posts

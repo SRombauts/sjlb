@@ -9,44 +9,51 @@ import java.util.Date;
  */
 public class ForumMessage {
     private int     mId;
-    private String  mDate;
+    private Date    mDate;
     private int     mAuthorId;
-    private String  mAuthor;
     private int     mSubjectId;
+    private boolean mbUnread;
     private String  mText;
 
-    public ForumMessage(int aId, Date aDate, int aAuthorId, String aAuthor, int aSubjectId, String aText) {
-        SimpleDateFormat    sdf         = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        String              dateString  = sdf.format(aDate);
-
+    public ForumMessage(int aId, Date aDate, int aAuthorId, String aAuthor, int aSubjectId, boolean abUnread, String aText) {
         mId         = aId;
-        mDate       = dateString;
+        mDate       = aDate;
         mAuthorId   = aAuthorId;
-        mAuthor     = aAuthor;
         mSubjectId  = aSubjectId;
+        mbUnread    = abUnread;
         mText       = aText;
     }
     
     public int getId () {
         return mId;
     }
-    public String getDate () {
+    public Date getDate () {
         return mDate;
     }
     public int getAuthorId () {
         return mAuthorId;
     }
-    public String getAuthor () {
-        return mAuthor;
-    }
     public int getSubjectId () {
         return mSubjectId;
+    }
+    public boolean isUnread () {
+        return mbUnread;
     }
     public String getText () {
         return mText;
     }
-    
+
+    // Résumé du contenu de l'objet sous forme d'une chaîne de caractère
     public String toString () {
-		return "" + mId + ": " + mDate + " " + mAuthor + " (" + mAuthorId + ") " + mSubjectId + " : " + mText;
+		return mId + ": " + getDateString (mDate) + " " + mAuthorId + " subj=" + mSubjectId + " unread=" + mbUnread + " : " + mText;
     }    
+
+
+    // Formatte une date en chaîne de caractère
+    static public String getDateString (Date aDate) {
+        SimpleDateFormat    sdf         = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String              dateString  = sdf.format(aDate);
+
+        return dateString;
+    }
 }

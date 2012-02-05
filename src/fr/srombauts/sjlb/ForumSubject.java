@@ -37,4 +37,11 @@ public class ForumSubject {
         return mText;
     }
     
+
+    // Résumé du contenu de l'objet sous forme d'une chaîne de caractère
+    public String toString () {
+        return mId + ": cat=" + mCategoryId + " group=" + mGroupId + " (" + mLastDate + ") : " + mText;
+    }    
+    
+    
 }

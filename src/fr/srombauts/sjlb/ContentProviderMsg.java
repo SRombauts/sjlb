@@ -1,9 +1,5 @@
 package fr.srombauts.sjlb;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,6 +7,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.net.Uri;
+import android.util.Log;
 
 
 /**
@@ -79,10 +76,13 @@ public class ContentProviderMsg extends ContentProvider {
 	 * @todo SRO : ajouter un filtrage sur un "id" donné lorsque l'utilisateur fourni une URI de type "content:path/id"
 	 */
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        if (null == selection) selection = ""; 
+        String selectionCplx = "(" + selection + ") AND (" + SJLB.Msg.TABLE_NAME+"."+SJLB.Msg.AUTHOR_ID+"="+SJLB.User.TABLE_NAME+"."+SJLB.User._ID + ")"; 
+        Log.e ("ContentProvider", selectionCplx);
         return mDBHelper.getReadableDatabase().query(
-                    SJLB.Msg.TABLE_NAME,
+                    SJLB.Msg.TABLE_NAME + ", " + SJLB.User.TABLE_NAME,
                     projection,
-                    selection,
+                    selectionCplx,
                     selectionArgs,
                     null, // groupBy
                     null, // having
@@ -91,9 +91,8 @@ public class ContentProviderMsg extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues arg1, String arg2, String[] arg3) {
-        // TODO Auto-generated method stub
-        return 0;
+    public int update(Uri uri, ContentValues values, String where, String[] selectionArgs) {
+        return mDBHelper.getWritableDatabase().update(SJLB.Msg.TABLE_NAME, values, where, selectionArgs);
     }
     
     public void close () {
@@ -107,11 +106,11 @@ public class ContentProviderMsg extends ContentProvider {
      */
     public boolean insertMsg(ForumMessage aMsg) {
       ContentValues newMsgValues = new ContentValues();
-      newMsgValues.put(SJLB.Msg.ID,        aMsg.getId());
-      newMsgValues.put(SJLB.Msg.DATE,      aMsg.getDate());
+      newMsgValues.put(SJLB.Msg._ID,       aMsg.getId());
+      newMsgValues.put(SJLB.Msg.DATE,      aMsg.getDate().getTime());
       newMsgValues.put(SJLB.Msg.AUTHOR_ID, aMsg.getAuthorId());
-      newMsgValues.put(SJLB.Msg.AUTHOR,    aMsg.getAuthor());
       newMsgValues.put(SJLB.Msg.SUBJECT_ID,aMsg.getSubjectId());
+      newMsgValues.put(SJLB.Msg.UNREAD,    aMsg.isUnread());
       newMsgValues.put(SJLB.Msg.TEXT,      aMsg.getText());
       return mDBHelper.getWritableDatabase().insert(SJLB.Msg.TABLE_NAME, null, newMsgValues) > 0;
     }
@@ -119,13 +118,13 @@ public class ContentProviderMsg extends ContentProvider {
     // Met à jout un Msg qui a été édité (ne fonctionne que si Msg déjà connu)
     public boolean updateMsg(ForumMessage aMsg) {
       ContentValues newMsgValues = new ContentValues();
-      newMsgValues.put(SJLB.Msg.ID,        aMsg.getId());
-      newMsgValues.put(SJLB.Msg.DATE,      aMsg.getDate());
+      newMsgValues.put(SJLB.Msg._ID,       aMsg.getId());
+      newMsgValues.put(SJLB.Msg.DATE,      aMsg.getDate().getTime());
       newMsgValues.put(SJLB.Msg.AUTHOR_ID, aMsg.getAuthorId());
-      newMsgValues.put(SJLB.Msg.AUTHOR,    aMsg.getAuthor());
       newMsgValues.put(SJLB.Msg.SUBJECT_ID,aMsg.getSubjectId());
+      newMsgValues.put(SJLB.Msg.UNREAD,    aMsg.isUnread());
       newMsgValues.put(SJLB.Msg.TEXT,      aMsg.getText());
-      return mDBHelper.getWritableDatabase().update(SJLB.Msg.TABLE_NAME, newMsgValues, SJLB.Msg.ID + "=" + aMsg.getId(), null) > 0;
+      return mDBHelper.getWritableDatabase().update(SJLB.Msg.TABLE_NAME, newMsgValues, SJLB.Msg._ID + "=" + aMsg.getId(), null) > 0;
     }
     
     // Récupère la date du dernier message
@@ -135,14 +134,7 @@ public class ContentProviderMsg extends ContentProvider {
         if (0 < cur.getCount())
         {
             cur.moveToLast();
-            try {
-                String              strDate = cur.getString(cur.getColumnIndex(SJLB.Msg.DATE));
-                SimpleDateFormat    sdf     = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                Date                date    = sdf.parse(strDate);
-                nbSeconds = (date.getTime()/1000);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            nbSeconds = cur.getLong(cur.getColumnIndex(SJLB.Msg.DATE))/1000;
         }
         return nbSeconds;
     }
@@ -151,11 +143,11 @@ public class ContentProviderMsg extends ContentProvider {
     public Cursor getAllMsg () {
         // TODO SRO : croiser avec la table des sujets pour obtenir l'intitulé du sujet
         return mDBHelper.getReadableDatabase().query(   SJLB.Msg.TABLE_NAME,
-                                                       new String[] {   SJLB.Msg.ID,
+                                                       new String[] {   SJLB.Msg._ID,
                                                                         SJLB.Msg.DATE,
                                                                         SJLB.Msg.AUTHOR_ID,
-                                                                        SJLB.Msg.AUTHOR,
                                                                         SJLB.Msg.SUBJECT_ID,
+                                                                        SJLB.Msg.UNREAD,
                                                                         SJLB.Msg.TEXT},
                                                        null, null, null, null, null);
     }
@@ -166,10 +158,10 @@ public class ContentProviderMsg extends ContentProvider {
         Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.Msg.TABLE_NAME,
                                                                 new String[]{   SJLB.Msg.DATE,
                                                                                 SJLB.Msg.AUTHOR_ID,
-                                                                                SJLB.Msg.AUTHOR,
                                                                                 SJLB.Msg.SUBJECT_ID,
+                                                                                SJLB.Msg.UNREAD,
                                                                                 SJLB.Msg.TEXT},
-                                                                SJLB.Msg.ID + "=" + aId,
+                                                                SJLB.Msg._ID + "=" + aId,
                                                                 null, null, null, null, null);
         if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
             throw new SQLException("Pas de Msg pour l'Id " + aId);
@@ -180,8 +172,8 @@ public class ContentProviderMsg extends ContentProvider {
     // teste l'existence d'un Msg particulier
     public Boolean isExist (int aId) {
         Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.Msg.TABLE_NAME,
-                                                                new String[]{SJLB.Msg.ID},
-                                                                SJLB.Msg.ID + "=" + aId,
+                                                                new String[]{SJLB.Msg._ID},
+                                                                SJLB.Msg._ID + "=" + aId,
                                                                 null, null, null, null, null);
         return (0 < cursor.getCount());
     }

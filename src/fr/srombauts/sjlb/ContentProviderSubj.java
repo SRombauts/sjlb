@@ -78,14 +78,22 @@ public class ContentProviderSubj extends ContentProvider {
 	 * @todo SRO : ajouter un filtrage sur un "id" donné lorsque l'utilisateur fourni une URI de type "content:path/id"
 	 */
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        // TODO SRO : c'est nul, et finalement ce "nb_msg" n'est pas utilisé
+        if (null == selection) selection = ""; 
+        String selectionCplx = "(" + selection + ") AND (" + SJLB.Subj.TABLE_NAME+"."+SJLB.Subj._ID+"="+SJLB.Msg.TABLE_NAME+"."+SJLB.Msg.SUBJECT_ID + ")"; 
         return mDBHelper.getReadableDatabase().query(
-                    SJLB.Subj.TABLE_NAME,
-                    projection,
-                    selection,
+                    SJLB.Subj.TABLE_NAME + ", " + SJLB.Msg.TABLE_NAME,
+                    new String [] {	SJLB.Subj.TABLE_NAME+"."+SJLB.Subj._ID,
+                    				SJLB.Subj.TABLE_NAME+"."+SJLB.Subj.CAT_ID,
+                    				SJLB.Subj.TABLE_NAME+"."+SJLB.Subj.GROUP_ID,
+                    				SJLB.Subj.TABLE_NAME+"."+SJLB.Subj.LAST_DATE,
+                    				SJLB.Subj.TABLE_NAME+"."+SJLB.Subj.TEXT,
+                    				"COUNT(*) AS nb_msg"},
+                    selectionCplx,
                     selectionArgs,
-                    null, // groupBy
+                    SJLB.Subj.TABLE_NAME+"."+SJLB.Subj._ID, // group by
                     null, // having
-                    (null!=sortOrder)?sortOrder:SJLB.Subj.DEFAULT_SORT_ORDER
+                    (null!=sortOrder)?(sortOrder):(SJLB.Subj.DEFAULT_SORT_ORDER)
                     );
     }
 
@@ -106,7 +114,7 @@ public class ContentProviderSubj extends ContentProvider {
      */
     public boolean insertSubj(ForumSubject aSubj) {
       ContentValues newSubjValues = new ContentValues();
-      newSubjValues.put(SJLB.Subj.ID,        aSubj.getId());
+      newSubjValues.put(SJLB.Subj._ID,       aSubj.getId());
       newSubjValues.put(SJLB.Subj.CAT_ID,    aSubj.getCategoryId());
       newSubjValues.put(SJLB.Subj.GROUP_ID,  aSubj.getGroupId());
       newSubjValues.put(SJLB.Subj.LAST_DATE, aSubj.getLastDate().getTime());
@@ -116,12 +124,12 @@ public class ContentProviderSubj extends ContentProvider {
 
     public boolean updateSubj(ForumSubject aSubj) {
         ContentValues newSubjValues = new ContentValues();
-        newSubjValues.put(SJLB.Subj.ID,        aSubj.getId());
+        newSubjValues.put(SJLB.Subj._ID,       aSubj.getId());
         newSubjValues.put(SJLB.Subj.CAT_ID,    aSubj.getCategoryId());
         newSubjValues.put(SJLB.Subj.GROUP_ID,  aSubj.getGroupId());
         newSubjValues.put(SJLB.Subj.LAST_DATE, aSubj.getLastDate().getTime());
         newSubjValues.put(SJLB.Subj.TEXT,      aSubj.getText());
-        return mDBHelper.getWritableDatabase().update(SJLB.Subj.TABLE_NAME, newSubjValues, SJLB.Subj.ID + "=" + aSubj.getId(), null) > 0;
+        return mDBHelper.getWritableDatabase().update(SJLB.Subj.TABLE_NAME, newSubjValues, SJLB.Subj._ID + "=" + aSubj.getId(), null) > 0;
     }
         
     // vide la table des Subj
@@ -132,7 +140,7 @@ public class ContentProviderSubj extends ContentProvider {
     // récupère un cursor avec la liste de tous les Subj
     public Cursor getAllSubj () {
         return mDBHelper.getReadableDatabase().query(   SJLB.Subj.TABLE_NAME,
-                                                       new String[] {  SJLB.Subj.ID,
+                                                       new String[] {  SJLB.Subj._ID,
                                                                        SJLB.Subj.CAT_ID,
                                                                        SJLB.Subj.GROUP_ID,
                                                                        SJLB.Subj.LAST_DATE,
@@ -148,7 +156,7 @@ public class ContentProviderSubj extends ContentProvider {
                                                                                 SJLB.Subj.GROUP_ID,
                                                                                 SJLB.Subj.LAST_DATE,
                                                                                 SJLB.Subj.TEXT},
-                                                                SJLB.Subj.ID + "=" + aId,
+                                                                SJLB.Subj._ID + "=" + aId,
                                                                 null, null, null, null, null);
         if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
             throw new SQLException("Pas de Subj pour l'Id " + aId);
@@ -159,8 +167,8 @@ public class ContentProviderSubj extends ContentProvider {
     // teste l'existence d'un Sujet particulier
     public Boolean isExist (int aId) {
         Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.Subj.TABLE_NAME,
-                                                                new String[]{SJLB.Subj.ID},
-                                                                SJLB.Subj.ID + "=" + aId,
+                                                                new String[]{SJLB.Subj._ID},
+                                                                SJLB.Subj._ID + "=" + aId,
                                                                 null, null, null, null, null);
         return (0 < cursor.getCount());
     }

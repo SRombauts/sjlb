@@ -10,21 +10,30 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         >
-        <TextView
-            android:id="@+id/msgAuthor"
+        <QuickContactBadge xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/msgBadge"
+            android:layout_marginLeft="2dip"
+            android:layout_marginRight="14dip"
+            android:layout_marginTop="4dip"
+            android:layout_marginBottom="3dip"
+            android:layout_height= "wrap_content"
+            android:layout_width= "wrap_content"
+            android:src="@drawable/ic_contact_picture"
+            style="?android:attr/quickContactBadgeStyleWindowSmall" />
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/msgTitre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="22px"
+            android:paddingRight="4px"
             android:textColor="#FFF"
             android:background="#000"
             />
-        <TextView
-            android:id="@+id/msgDate"
-            android:layout_width="fill_parent"
+        <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/msgNew"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="22px"
-            android:textColor="#FFF"
-            android:background="#000"
+            android:src="@drawable/level_list_new"
             android:gravity="right"
             />
     </LinearLayout>
