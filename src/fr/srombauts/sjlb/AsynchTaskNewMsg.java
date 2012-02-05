@@ -25,20 +25,20 @@ import android.widget.Toast;
  * Travail en tâche de fond, chargée d'envoyer un nouveau message du forum
  */
 class AsynchTaskNewMsg extends AsyncTask<String, Void, Boolean> {
-    private static final String  LOG_TAG        = "NewMsgTask";
+    private static final String  LOG_TAG            = "NewMsgTask";
 
-    private Context             mContext        = null;
-    private OnTransferDone      mOnTransferDone = null;
+    private Context             mContext            = null;
+    private CallbackTransfer    mCallbackTransfer   = null;
     
-    private ContentProviderMsg  mMsgDBAdapter   = null;
+    private ContentProviderMsg  mMsgDBAdapter       = null;
       
     /**
      * Constructeur utilisé pour mémorisée la référence sur le service appelant
-     * @param context
+     * @param context Activité lançant le transfert, devant implémenter l'interface CallbackTransfer
      */
-    public AsynchTaskNewMsg(Context context/*, OnTransferDone onTransferDone*/) {
+    public AsynchTaskNewMsg(Context context) {
         mContext        = context;
-        mOnTransferDone = (OnTransferDone)context/*onTransferDone*/;
+        mCallbackTransfer = (CallbackTransfer)context;
                                 
         mMsgDBAdapter   = new ContentProviderMsg(context);
     }
@@ -154,7 +154,7 @@ class AsynchTaskNewMsg extends AsyncTask<String, Void, Boolean> {
         }
         
         // Notifie l'activité appelante à l'aide d'une callback
-        mOnTransferDone.onTransferDone(abResult);
+        mCallbackTransfer.onTransferDone(abResult);
     }
 }
 

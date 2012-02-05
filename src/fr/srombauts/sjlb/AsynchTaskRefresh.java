@@ -83,7 +83,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     private ServiceRefresh  mContext        = null;
     private int             mNbPM           = 0;    // Nombre de PM de l'utilisateur (issu directement dans la liste XML)
     private int             mNbNewPM        = 0;    // Nombre d'ID de PM inconnus (issu de la comparaison de la liste XML avec la BDD)
-    private int             mNbMsg          = 0;    // Nombre de messages non lus par l'utilisateur (issu directement de la liste XML)
+    private int             mNbUnreadMsg    = 0;    // Nombre de messages non lus par l'utilisateur (issu directement de la liste XML)
     private int             mNbNewMsg       = 0;    // Nombre de messages non lus pour l'utilisateur
     
     private ContentProviderPM       mPMDBAdapter    = null;
@@ -136,14 +136,6 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         fetchPM ();
         fetchMsg ();
         
-        // TODO SRO : tests en cours
-        Cursor cursorFiles = mFileDBAdapter.getAllFiles();
-        Log.d(LOG_TAG, "countFiles = " + cursorFiles.getCount());
-        for (int i=0; i<cursorFiles.getCount(); i++) {
-            cursorFiles.moveToPosition(i);
-            Log.d(LOG_TAG, "Fichier " + cursorFiles.getInt(cursorFiles.getColumnIndexOrThrow(SJLB.File.MSG_ID)) + ": "  + cursorFiles.getString(cursorFiles.getColumnIndexOrThrow(SJLB.File.FILENAME)));
-        }
-        
         return null;
     }
     
@@ -162,7 +154,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
           notifyUserPM ();
       }
       // s'il y a de nouveaux messages non lus :
-      if (0 < mNbNewMsg) {
+      // TODO SRO : tests en cours - supprimer l'éventuelle notification s'il n'y a plus de messages non lus 
+      if ( (0 < mNbNewMsg) || (0 == mNbUnreadMsg) ) {
           // Notification dans la barre de status
           notifyUserMsg ();
       }
@@ -352,8 +345,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 Element     eltMsg  = (Element)docElement.getElementsByTagName(NODE_NAME_FORUM_MSG).item(0);
                 NodeList    listMsg = eltMsg.getElementsByTagName(NODE_NAME_FORUM_MSG_ID);
                 if (null != listMsg) {
-                    mNbMsg = listMsg.getLength();
-                    for (int i = 0; i < mNbMsg; i++) {
+                    mNbUnreadMsg = listMsg.getLength();
+                    for (int i = 0; i < mNbUnreadMsg; i++) {
                         Element msg      = (Element)listMsg.item(i);
                         String  strIdMsg = msg.getFirstChild().getNodeValue();
                         int     idMsg    = Integer.parseInt(strIdMsg);
@@ -380,7 +373,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                     Log.d(LOG_TAG, "clearMsgUnread = " + nbCleared);
                 }
                 
-                Log.d(LOG_TAG, "refreshInfos... ok : mNbNewPM="+mNbNewPM+" ("+mNbPM+"), mNbNewMsg="+mNbNewMsg+" ("+mNbMsg+")");
+                Log.d(LOG_TAG, "refreshInfos... ok : mNbNewPM="+mNbNewPM+" ("+mNbPM+"), mNbNewMsg="+mNbNewMsg+" ("+mNbUnreadMsg+")");
             }
                
         } catch (LoginPasswordException e) {
@@ -732,56 +725,61 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     private void notifyUserMsg () {
         Log.d(LOG_TAG, "notifyUserMsg");
         
-        // Récupère les préférences de notification :
-        PrefsNotification    notificationPrefs        = new PrefsNotification(mContext);
-
         // Récupère une reference sur le NotificationManager :
         String              ns                      = Context.NOTIFICATION_SERVICE;
         NotificationManager notificationManager     = (NotificationManager) mContext.getSystemService(ns);
-
-        // Définition du message détaillé à afficher dans le volet de notification
-        Context         context             = mContext.getApplicationContext();
-        CharSequence    contentTitle        = mContext.getString(R.string.notification_title_msg);
-        CharSequence    contentText         = mNbMsg + " " + mContext.getString(R.string.notification_text_msg) + " (" + mNbNewMsg + mContext.getString(R.string.notification_new) + ")";
+    
+        if (0 < mNbUnreadMsg) {
+            // Récupère les préférences de notification :
+            PrefsNotification    notificationPrefs        = new PrefsNotification(mContext);
         
-        // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
-        // => lien Site Web :
-// TODO SRO : ancienne méthode
-//        Intent          notificationIntent  = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(mContext.getString(R.string.sjlb_forum_uri)));
-//        PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
-        // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
-        // => lien activité principale :
-// TODO SRO : pas encore au point
-        Intent          notificationIntent  = new Intent(mContext, ActivityMain.class);
-        PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
-
-        // Préparation du résumé de notification
-        // TODO SRO : utiliser une icone pour les PM, et une autre pour les Posts
-        int          icon        = R.drawable.status_icon;
-        CharSequence tickerText  = mContext.getString(R.string.app_name) + ": " + mNbMsg + " " + mContext.getString(R.string.notification_text_msg) + " (" + mNbNewMsg + mContext.getString(R.string.notification_new) + ")";
-        long         when        = System.currentTimeMillis();
-
-        // et instanciation de la Notification :
-        Notification notification = new Notification(icon, tickerText, when);
-
-        notification.number     = mNbMsg;
-
-        notification.defaults   = 0;
-        if (notificationPrefs.mbSound) {
-            notification.defaults   |= Notification.DEFAULT_SOUND;
-        }
-        if (notificationPrefs.mbLight) {
-            notification.defaults   |= Notification.DEFAULT_LIGHTS;
-        }
-        if (notificationPrefs.mbVibrate) {
-	        notification.vibrate    = new long[]{0, 200, 300, 200, 300, 200};
-        }
+            // Définition du message détaillé à afficher dans le volet de notification
+            Context         context             = mContext.getApplicationContext();
+            CharSequence    contentTitle        = mContext.getString(R.string.notification_title_msg);
+            CharSequence    contentText         = mNbUnreadMsg + " " + mContext.getString(R.string.notification_text_msg) + " (" + mNbNewMsg + mContext.getString(R.string.notification_new) + ")";
+            
+            // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
+            // => lien Site Web :
+        // TODO SRO : ancienne méthode
+        //        Intent          notificationIntent  = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(mContext.getString(R.string.sjlb_forum_uri)));
+        //        PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
+            // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
+            // => lien activité principale :
+        // TODO SRO : pas encore au point
+            Intent          notificationIntent  = new Intent(mContext, ActivityMain.class);
+            PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
         
-        // Assemblage final de la notification
-        notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
-
-        // Passage de la Notification au NotificationManager:
-        notificationManager.notify(NOTIFICATION_NEW_MSG_ID, notification);
+            // Préparation du résumé de notification
+            // TODO SRO : utiliser une icone pour les PM, et une autre pour les Posts
+            int          icon        = R.drawable.status_icon;
+            CharSequence tickerText  = mContext.getString(R.string.app_name) + ": " + mNbUnreadMsg + " " + mContext.getString(R.string.notification_text_msg) + " (" + mNbNewMsg + mContext.getString(R.string.notification_new) + ")";
+            long         when        = System.currentTimeMillis();
+        
+            // et instanciation de la Notification :
+            Notification notification = new Notification(icon, tickerText, when);
+        
+            notification.number     = mNbUnreadMsg;
+        
+            notification.defaults   = 0;
+            if (notificationPrefs.mbSound) {
+                notification.defaults   |= Notification.DEFAULT_SOUND;
+            }
+            if (notificationPrefs.mbLight) {
+                notification.defaults   |= Notification.DEFAULT_LIGHTS;
+            }
+            if (notificationPrefs.mbVibrate) {
+                notification.vibrate    = new long[]{0, 200, 300, 200, 300, 200};
+            }
+            
+            // Assemblage final de la notification
+            notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
+        
+            // Passage de la Notification au NotificationManager:
+            notificationManager.notify(NOTIFICATION_NEW_MSG_ID, notification);
+        } else {
+            // Suppression de la Notification
+            notificationManager.cancel(NOTIFICATION_NEW_MSG_ID);
+        }
     }    
 }
 

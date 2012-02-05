@@ -17,7 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -37,7 +36,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
  * Activité présentant la liste des sujets de la catégorie sélectionnée
  * @author 22/08/2010 srombauts
  */
-public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, OnTransferDone {
+public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, CallbackTransfer {
     private static final String LOG_TAG = "ActivityMsg";
     
     public  static final String START_INTENT_EXTRA_CAT_ID       = "CategoryId";
@@ -47,7 +46,9 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     
     private Cursor                  mCursor         = null;
     private MessageListItemAdapter  mAdapter        = null;
-    private ListView                mMsgListView    = null;
+    // TODO SRO : tests en cours:
+//  private ListView                mMsgListView    = null;
+    private static ListView                mMsgListView    = null;
     private EditText                mEditText       = null;
     private Button                  mEditButton     = null;
     
@@ -251,6 +252,9 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         // TODO SRO : Scroll tout en bas de la liste des messages ne marche pas :(
         mMsgListView.setSelection(0);         
         mMsgListView.setSelection(mMsgListView.getCount()-1);        
+
+// TODO SRO : tests en cours
+        mMsgListView.getParent().requestLayout();
     }
     
     /**
@@ -262,7 +266,6 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         if (-1 != mOriginalMsgListHeight) {
             params.height = mOriginalMsgListHeight;
         }
-        mMsgListView.requestLayout();
         // On fait disparaître la zone d'édition
         mEditText.setVisibility(View.GONE);
         mEditButton.setVisibility(View.GONE);
@@ -270,6 +273,9 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         // et cache lève le clavier virtuel
         InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         mgr.showSoftInput(mEditText, InputMethodManager.HIDE_IMPLICIT_ONLY);   
+
+        mMsgListView.invalidate();
+        mMsgListView.getParent().requestLayout();
     }
     
     /**
@@ -423,7 +429,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     
     
     // TODO SRO : documentation !
-    private class FileListItemAdapter extends ArrayAdapter<FileListItem> implements OnClickListener {
+    private class FileListItemAdapter extends ArrayAdapter<FileListItem> {
 
         private FileListItem[] mListeItem;
 
@@ -434,48 +440,64 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            //Log.d (LOG_TAG, "getView(" + position + "," + convertView + "," + parent + ")" );
+
             View view = convertView;
             if (view == null) {
                 LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = vi.inflate(R.layout.file, null);
-            }
 
-            FileListItem it = mListeItem[position];
-            if (it != null) {
-                it.imageViewFile = (ImageView) view.findViewById(R.id.fileImage);
-                //it.imageViewFile.setOnClickListener(this);
-                //it.imageViewFile.setTag(it.filename);
-                if (   (it.imageViewFile != null)
-                    && (it.imageBitmap != null) ) {
-                    // TODO SRO : je pense qu'il faut faire un reset du champ imageBitmap à un moment donné
-                    it.imageViewFile.setImageBitmap(it.imageBitmap);
-                } else {
-                    // TODO SRO : il faut lancer le téléchargement du fichier en tache de fond (SSI il s'agit bien d'une image !)
+                // TODO SRO : tests en cours
+                FileListItem it = mListeItem[position];
+                if (it != null) {
+                    Log.i (LOG_TAG, "getView(" + it.filename + ")" );
+                    
+                    it.imageViewFile = (ImageView) view.findViewById(R.id.fileImage);
+                    
+                    // TODO SRO : il faut lancer ici le téléchargement du fichier en tache de fond (SSI il s'agit bien d'une image !)
+                    if (null == it.imageBitmap) {
+                        AsynchTaskDownloadImage ImageDownloader = new AsynchTaskDownloadImage(it);
+                        ImageDownloader.execute(getString(R.string.sjlb_fichiers_attaches) + it.filename);
+                    }
+                    
+                    // Affiche le nom du fichier
+                    it.textViewFile  = (TextView) view.findViewById(R.id.filename);
+                    it.textViewFile.setText (it.filename);
                 }
-                it.textViewFile  = (TextView) view.findViewById(R.id.filename);
-                it.textViewFile.setText (it.filename);
+                // Mémorise dans la vue les infos sous-jacentes
+                view.setTag (it);
+
             }
-            // Mémorise dans la vue les infos sous-jacentes
-            view.setTag (it);
-
             return view;
-        }
-
-        @Override
-        public void onClick(View view) {
-            // lien vers le fichier sur le Site Web :
-            final String  filename = (String) view.getTag();
-            Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_fichiers_attaches) + filename));
-            Log.d (LOG_TAG, "onClick: " + getString(R.string.sjlb_fichiers_attaches) + filename );                
-            startActivity(intent);
         }
     }    
         
     // Objet représentant une image et le nom du fichier associé
-    final static class FileListItem {
+    final static class FileListItem implements CallbackImageDownload {
         public ImageView    imageViewFile;
         public TextView     textViewFile;
         public Bitmap       imageBitmap;
         public String       filename;
+        
+        public void onImageDownloaded(Bitmap aBitmap) {
+            if (null != aBitmap) {
+                Log.i (LOG_TAG, "onImageDownloaded(" + aBitmap + ")" );
+                textViewFile.setVisibility(TextView.GONE);
+                imageViewFile.setImageBitmap(aBitmap);
+                imageViewFile.setAdjustViewBounds(true);
+                imageViewFile.setHorizontalScrollBarEnabled(true);
+                //imageViewFile.getSuggestedMinimumHeight(); 
+                // TODO SRO : tests en cours
+                imageViewFile.invalidate ();
+                imageViewFile.requestLayout();
+                imageViewFile.getParent().requestLayout();
+                imageViewFile.getParent().recomputeViewAttributes (imageViewFile);
+                mMsgListView.invalidate();
+                mMsgListView.requestLayout();
+            } else {
+                Log.e (LOG_TAG, "onImageDownloaded(" + aBitmap + ")" );
+            }
+        }
+        
     }
 }
