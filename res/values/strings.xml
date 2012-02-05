@@ -64,9 +64,9 @@
 
     <!-- Toast notifications -->
     <string name="toast_auth_needed">       Action not available : need login/password ! </string>
-    <string name="toast_refreshing">        Refreshing...       </string>
-    <string name="toast_deleting">          Deleting...         </string>
-    <string name="toast_sending">           Sending...          </string>
+    <string name="toast_refreshing">        Refreshing&#8230;   </string>
+    <string name="toast_deleting">          Deleting&#8230;     </string>
+    <string name="toast_sending">           Sending&#8230;      </string>
     <string name="toast_sent">              Message sent !      </string>
     <string name="toast_not_sent">          Message NOT sent !  </string>
     <string name="toast_deleted">           Message deleted !   </string>

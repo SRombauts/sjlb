@@ -47,7 +47,6 @@
     <string name="menu_send_pm">        Envoyer le message  </string>
     <string name="menu_new_subj">       Nouveau topic       </string>
     <string name="menu_new_msg">        Répondre            </string>
-    <string name="menu_send_msg">       Envoyer le message  </string>
     <string name="menu_update">         Rafraîchir          </string>
     <string name="menu_reset">          Vider la base locale</string>
     <string name="menu_delete_all_pm">  Supprimer tous les messages   </string>
@@ -64,12 +63,12 @@
 
     <!-- Toast notifications -->
     <string name="toast_auth_needed">       Action non disponible : nécessite login/mot de passe ! </string>
-    <string name="toast_refreshing">        En cours de rafraichissement... </string>
-    <string name="toast_deleting">          Effacement demandé...           </string>
-    <string name="toast_sending">           Envoi en cours...               </string>
-    <string name="toast_sent">              Message envoyé !                </string>
-    <string name="toast_not_sent">          Message NON envoyé !            </string>
-    <string name="toast_deleted">           Message effacé !                </string>
+    <string name="toast_refreshing">        En cours de rafraichissement&#8230; </string>
+    <string name="toast_deleting">          Effacement demandé&#8230;           </string>
+    <string name="toast_sending">           Envoi en cours&#8230;               </string>
+    <string name="toast_sent">              Message envoyé !                    </string>
+    <string name="toast_not_sent">          Message NON envoyé !                </string>
+    <string name="toast_deleted">           Message effacé !                    </string>
 
     <!-- Notifications -->
     <string name="notification_title_pm">   Message(s) Privé(s) </string>
