@@ -127,11 +127,14 @@ public class ContentProviderMsg extends ContentProvider {
       return mDBHelper.getWritableDatabase().update(SJLB.Msg.TABLE_NAME, newMsgValues, SJLB.Msg._ID + "=" + aMsg.getId(), null) > 0;
     }
     
-    // Récupère la date du premier message
+    // Récupère la date du premier (plus vieux) message
     public long getFirstMsgDate () {
         long nbSeconds = 0;
-        Cursor cursor = getAllMsg ();
-        if (0 < cursor.getCount())
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Msg.TABLE_NAME,
+                                                                new String[] { SJLB.Msg.DATE },
+                                                                null,
+                                                                null, null, null, SJLB.Msg.DEFAULT_SORT_ORDER, "1");
+        if (1 == cursor.getCount())
         {
             cursor.moveToFirst();
             nbSeconds = cursor.getLong(cursor.getColumnIndex(SJLB.Msg.DATE))/1000;
@@ -140,33 +143,22 @@ public class ContentProviderMsg extends ContentProvider {
         return nbSeconds;
     }
     
-    // Récupère la date du dernier message
+    // Récupère la date du dernier (plus récent) message
     public long getLastMsgDate () {
         long nbSeconds = 0;
-        Cursor cursor = getAllMsg ();
-        if (0 < cursor.getCount())
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Msg.TABLE_NAME,
+                                                                new String[] { SJLB.Msg.DATE },
+                                                                null,
+                                                                null, null, null, SJLB.Msg.REVERSE_SORT_ORDER, "1");
+        if (1 == cursor.getCount())
         {
-            cursor.moveToLast();
+            cursor.moveToFirst();
             nbSeconds = cursor.getLong(cursor.getColumnIndex(SJLB.Msg.DATE))/1000;
         }
         cursor.close();
         return nbSeconds;
     }
     
-    // récupère un cursor avec la liste de tous les Msg
-    public Cursor getAllMsg () {
-        return mDBHelper.getReadableDatabase().query(   SJLB.Msg.TABLE_NAME,
-                                                       new String[] {   SJLB.Msg._ID,
-                                                                        SJLB.Msg.DATE,
-                                                                        SJLB.Msg.AUTHOR_ID,
-                                                                        SJLB.Msg.SUBJECT_ID,
-                                                                        SJLB.Msg.UNREAD,
-                                                                        SJLB.Msg.TEXT},
-                                                       null,
-                                                       null, null, null, SJLB.Msg.DEFAULT_SORT_ORDER);
-        // TODO SRO : mDBHelper.close(); ?
-    }
-
     // récupère un cursor avec la liste des Msg marqués UNREAD_LOCALY non lus mais localement lus 
     public Cursor getMsgUnread () {
         return mDBHelper.getReadableDatabase().query(   SJLB.Msg.TABLE_NAME,

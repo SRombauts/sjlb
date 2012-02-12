@@ -285,6 +285,7 @@ public final class SJLB {
          * The default sort order for this table
          */
         public static final String  DEFAULT_SORT_ORDER  = DATE + " ASC";
+        public static final String  REVERSE_SORT_ORDER  = DATE + " DESC";
         
 
         public static final String  TABLE_NAME   = "forum_messages";
