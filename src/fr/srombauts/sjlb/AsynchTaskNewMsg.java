@@ -44,7 +44,7 @@ class AsynchTaskNewMsg extends AsyncTask<String, Void, Boolean> {
     }
 
     protected void onPreExecute() {
-        // Toast notification de début de rafraichissement
+        // Toast notification de début de rafraîchissement
         Toast.makeText(mContext, mContext.getString(R.string.toast_sending), Toast.LENGTH_SHORT).show();
     }
     

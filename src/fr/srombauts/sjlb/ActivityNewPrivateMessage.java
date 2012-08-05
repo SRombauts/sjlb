@@ -39,7 +39,7 @@ public class ActivityNewPrivateMessage extends Activity {
         // Layout de l'activité
         setContentView(R.layout.pm_new);
 
-        // Récupére un curseur sur les données (les utilisateurs) 
+        // Récupère un curseur sur les données (les utilisateurs) 
         mCursor = managedQuery( SJLB.User.CONTENT_URI, null,
                                 null,
                                 null, null);

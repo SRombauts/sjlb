@@ -13,9 +13,10 @@ import android.util.Log;
 
 
 /**
- * Service en tâche de fond, chargé de lancer périodirquement la tâche de rafraichissement
- * @author srombauts
+ * Service en tâche de fond, chargé de lancer périodiquement la tâche de rafraîchissement
+ * @author SRombauts
  */
+// TODO SRombauts : utiliser à la place un IntentService gérant une file d'Intent
 public class ServiceRefresh extends Service {
     private static final String  LOG_TAG = "SJLBService";
 
@@ -28,7 +29,7 @@ public class ServiceRefresh extends Service {
      * Lancement de l'alarme périodique
      */
     public void onCreate() {
-        // Récupère dans les préférences les valeurs de rafraichissement  :
+        // Récupère dans les préférences les valeurs de rafraîchissement  :
         SharedPreferences   prefs           = PreferenceManager.getDefaultSharedPreferences(this);
         Boolean             bAutoUpdate     = prefs.getBoolean(SJLB.PREFS.AUTO_UPDATE,      true);
         String              freqUpdate      = prefs.getString(SJLB.PREFS.UPDATE_FREQ,       "900");   // 15 min
@@ -50,7 +51,7 @@ public class ServiceRefresh extends Service {
     }    
 
     /**
-     * Exécution de la tache de rafraichissement
+     * Exécution de la tache de rafraîchissement
      */
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
@@ -60,12 +61,12 @@ public class ServiceRefresh extends Service {
         if (   (mRefreshTask == null)
             || (mRefreshTask.getStatus() == AsyncTask.Status.FINISHED))
         {
-            // lance un rafraichissement de la liste des messages non lus
+            // lance un rafraîchissement de la liste des messages non lus
             mRefreshTask = new AsynchTaskRefresh(this);
             mRefreshTask.execute((Void) null);
         }
         
-        // Le service peut être arrêter dès que le rafraichissement est terminé, l'alarme le réveillera régulièrement
+        // Le service peut être arrêter dès que le rafraîchissement est terminé, l'alarme le réveillera régulièrement
         return Service.START_NOT_STICKY;
     }
     

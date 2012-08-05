@@ -40,8 +40,9 @@ public class IntentReceiverStartService extends BroadcastReceiver {
     }
 
     /**
-     * Lance le service de rafraichissemment, si pas déjà lancé
+     * Lance le service de rafraîchissement, si pas déjà lancé
      */
+    // TODO SRombauts : rendre privée et encapsuler par des méthodes publiques précisant la demande (refresh, send...) 
     public static void startService (Context context, String aLogTag) {
         Intent  intentService = new Intent();
         intentService.setClassName( "fr.srombauts.sjlb", "fr.srombauts.sjlb.ServiceRefresh");

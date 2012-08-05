@@ -43,12 +43,12 @@ public final class SJLB {
         
         
         /**
-         * La clef activant le rafraichissement automatique cyclique en tache de fond (si non, rafraichissement uniquement au lancement de l'appli)
+         * La clef activant le rafraîchissement automatique cyclique en tache de fond (si non, rafraîchissement uniquement au lancement de l'appli)
          */
         public static final String AUTO_UPDATE  = "PREF_AUTO_UPDATE";
 
         /**
-         * La clef spécifiant la fréquence (la période) des rafraichissement automatique le cas échéant
+         * La clef spécifiant la fréquence (la période) des rafraîchissement automatique le cas échéant
          */
         public static final String UPDATE_FREQ  = "PREF_UPDATE_FREQ";
         

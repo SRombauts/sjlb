@@ -64,7 +64,7 @@ class AsynchTaskDeletePM extends AsyncTask<String, Void, Void> {
     }
 
     protected void onPreExecute() {
-        // Toast notification de début de rafraichissement
+        // Toast notification de début de rafraîchissement
         Toast.makeText(mContext, mContext.getString(R.string.toast_deleting), Toast.LENGTH_SHORT).show();
     }
     

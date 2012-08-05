@@ -47,6 +47,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d (LOG_TAG, "onCreate...");
         
         // Layout de l'activité
         setContentView(R.layout.main);
@@ -98,9 +99,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         mSavedIntent.putExtra(ActivityForumSubjects.START_INTENT_EXTRA_CAT_LABEL, mSelectedCategoryLabel);
         Log.i (LOG_TAG, "onCreate: restaure l'intent sauvegarde (" + mSelectedCategoryId +", " + mSelectedCategoryLabel + ")" );
 
-        getApplicationContext ();
-        
-        // Lance le service, si pas déjà lancé, et provoque un rafraichissement
+        // Lance le service, si pas déjà lancé, et provoque un rafraîchissement
         IntentReceiverStartService.startService (this, LOG_TAG);
     }
 
@@ -114,7 +113,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
 
         DBOpenHelper DBHelper = new DBOpenHelper(this, SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
         
-        // rafraichi la liste des category 
+        // Rafraîchit la liste des categories
         // Récupération de la liste des catégories, avec le nombre de msg non lus :
         mCategories.clear();
         String [] categories = getResources().getStringArray(R.array.category_labels);
@@ -155,13 +154,12 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         editor.putString("mSelectedCategoryLabel",  mSelectedCategoryLabel);
         editor.commit();
         
-        // Provoque un rafraichissement des infos anticipé,
-        // TODO SRO : ce qui permettra aussi de signaler au site web SJLB la lecture des messages  
-        // TODO voir si c'est la meilleurs manière de faire...
+        // Provoque un rafraîchissement des infos anticipé,
+        // qui permet de signaler au site web SJLB les messages qui ont été lus   
         IntentReceiverStartService.startService (this, LOG_TAG);
     }
 
-    public void onItemClick(AdapterView adpter, View view, int index, long arg3) {
+    public void onItemClick(AdapterView<?> parent, View view, int index, long arg3) {
         // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
         if (PrefsLoginPassword.AreFilled (this)) {
             // Lance l'activité correspondante avec en paramètre l'id et le label de la catégorie sélectionnée
@@ -182,7 +180,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
     /**
      *  Sur long clic sur un sujet, envoie sur le site Web sur la catégorie concernée
      */
-    public boolean onItemLongClick(AdapterView adapter, View view, int index, long id) {
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int index, long id) {
         // lien vers le Forum sur le Site Web, à la catégorie correspondant à l'index cliqué dans la liste des catégories :
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_cat_uri) + (index+1)));
         Log.d (LOG_TAG, "onItemLongClick: show_online: " + getString(R.string.sjlb_forum_subj_uri) + (index+1));                
@@ -227,13 +225,12 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
             case (R.id.menu_update): {
                 // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
                 if (PrefsLoginPassword.AreFilled (this)) {
-                    // Rafraichissement des infos
-                    // TODO voir si c'est la meilleurs manière de faire...
+                    // Demande de rafraîchissement asynchrone des informations
+                    // TODO mettre en place une callback ou un Receiver d'Intent capable de rafraîchir l'Activity visible en haut de la stack
+                    //      à l'aide du notifyDatasetChanged() adéquat (correspondant à l'Activity visible au moment en question)
                     IntentReceiverStartService.startService (this, LOG_TAG);
-                    // Toast notification de début de rafraichissement
+                    // Toast notification de début de rafraîchissement
                     Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
-                    // rafraichi la liste des categories 
-                    mAA.notifyDataSetChanged();
                 } else {
                     // Toast notification signalant l'absence de login/password
                     Toast.makeText(this, getString(R.string.toast_auth_needed), Toast.LENGTH_SHORT).show();
@@ -297,7 +294,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
     
     @Override
     protected boolean onLeftGesture () {
-        Log.i (LOG_TAG, "onTouch: va a l'ecran de gauche... quitte l'activite et l'application !");
+        Log.i (LOG_TAG, "onTouch: va a l'ecran de gauche... quitte l'activité principale et donc l'application !");
         finish ();
         return true;
     }
@@ -307,7 +304,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         boolean bActionTraitee = false;
         
         if (null != mSavedIntent) {
-            Log.d (LOG_TAG, "onTouch: va a l'ecran de droite... relance le dernier intent sauvegarde");
+            Log.d (LOG_TAG, "onTouch: va a l'écran de droite... relance le dernier intent sauvegardé");
             startActivity (mSavedIntent);
             bActionTraitee = true;
         } else {
