@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -64,6 +65,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d (LOG_TAG, "onCreate...");
         
         // Layout de l'activité
         setContentView(R.layout.msg_list);
@@ -83,7 +85,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         TextView SubjectsDescription = (TextView)findViewById(R.id.subject_label);
         SubjectsDescription.setText(mSelectedSubjectLabel);
         
-        // Récupére un curseur sur les données (les messages) en filtrant sur l'id du sujet sélectionné
+        // Récupère un curseur sur les données (les messages) en filtrant sur l'id du sujet sélectionné
         mCursor = managedQuery( SJLB.Msg.CONTENT_URI, null,
                                 SJLB.Msg.SUBJECT_ID + "=" + mSelectedSubjectId,
                                 null, null);
@@ -127,10 +129,6 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         super.onResume();
         
         clearNotificationMsg ();
-        
-        // TODO SRO : tentative de refresh des données affichées (nb de new msg)
-        //mCursor.requery();    // => inutile car on utilise managedQuery !
-        //mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -184,11 +182,11 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                 break;
             }
             case (R.id.menu_update): {
-                // Toast notification de début de rafraichissement
+                // Toast notification de début de rafraîchissement
                 Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
                 // TODO voir si c'est la meilleurs manière de faire : donnerait plus de contrôle si l'on pouvait faire un accès direct à la AsynchTask...
                 IntentReceiverStartService.startService (this, LOG_TAG);
-                // TODO SRO : trouver un moyen de rafraichir la liste à l'échéance de la tache de rafraichissement
+                // TODO SRO : trouver un moyen de rafraîchir la liste à l'échéance de la tache de rafraîchissement
                 mCursor.requery();
                 mAdapter.notifyDataSetChanged();
                 break;            }
@@ -208,16 +206,16 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     }
        
     /**
-     *  Sur clic sur un message, fait apparaitre la boîte de réponse
+     *  Sur clic sur un message, fait apparaître la boîte de réponse
      */
-    public void onItemClick(AdapterView adapter, View view, int index, long arg3) {
+    public void onItemClick(AdapterView<?> parent, View view, int index, long arg3) {
         openEditText ();
     }
     
     /**
      *  Sur long clic sur un message, envoie sur le site Web à la page du sujet contenant ce message
      */
-    public boolean onItemLongClick(AdapterView adapter, View view, int index, long id) {
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int index, long id) {
         // lien vers le Forum sur le Site Web :
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + mSelectedSubjectId + getString(R.string.sjlb_forum_subj_dernier)));
         Log.d (LOG_TAG, "onItemLongClick: show_online: " + getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + mSelectedSubjectId + getString(R.string.sjlb_forum_subj_dernier));                
@@ -226,7 +224,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     }
     
     /**
-     *  Fait apparaitre la boîte de réponse directement en bas de la liste de messages
+     *  Fait apparaître la boîte de réponse directement en bas de la liste de messages
      */
     public void openEditText () {
         // Pour ça, on va réduire la taille occupé par la liste de message
@@ -234,7 +232,8 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         if (-1 == mOriginalMsgListHeight) {
             mOriginalMsgListHeight = params.height;
         }
-        params.height = 420; // pixels
+        // TODO SRO : remplacer le nombre de pixel par des "sp" ou trouver une manière vraiment plus élégante de faire 
+        params.height = getWindowManager().getDefaultDisplay().getHeight() - 380;
         mMsgListView.requestLayout();
         // On fait apparaître la zone d'édition
         //mMsgListView.setVisibility(View.VISIBLE);
@@ -256,7 +255,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     }
     
     /**
-     *  Fait disparaitre la boîte de réponse du bas de la liste de messages
+     *  Fait disparaître la boîte de réponse du bas de la liste de messages
      */
     public void closeEditText () {
         // Pour ça, on va restaurer la taille occupé par la liste de message
@@ -300,12 +299,12 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     
     @Override
     protected boolean onLeftGesture () {
-        Log.i (LOG_TAG, "onTouch: va a l'ecran de gauche... quitte l'activite pour retour à la liste des sujets");
+        Log.i (LOG_TAG, "onTouch: va a l'ecran de gauche... quitte l'activité pour retour à la liste des sujets");
         finish ();
         return true;
     }
 
-    // TODO SRO : onRightGesture
+    // TODO SRO : onRightGesture ?
     
     
     
@@ -353,7 +352,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             // cursor.getColumnIndexOrThrow(SJLB.Msg._ID) retourne 6 !
             int msgId = cursor.getInt(0); // SJLB.Msg._ID, à ne pas confondre avec SJLB.Msg
             
-            // Récupére un curseur sur les données (les fichiers) en filtrant sur l'id du sujet sélectionné
+            // Récupère un curseur sur les données (les fichiers) en filtrant sur l'id du sujet sélectionné
             Cursor cursorFiles = managedQuery(  SJLB.File.CONTENT_URI, null,
                                                 SJLB.File.MSG_ID + "=" + msgId,
                                                 null, null);
@@ -404,7 +403,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         /**
          *  Sur clic sur un fichier, l'affiche ou le télécharge
          */
-        public void onItemClick(AdapterView adapter, View view, int index, long arg3) {
+        public void onItemClick(AdapterView<?> parent, View view, int index, long arg3) {
             // lien vers le fichier sur le Site Web :
             final FileListItem  file = (FileListItem) view.getTag();
             Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_fichiers_attaches) + file.filename));
