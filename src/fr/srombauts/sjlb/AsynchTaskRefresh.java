@@ -29,12 +29,12 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.net.ParseException;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 
 
@@ -327,14 +327,24 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             HttpClient  httpClient  = new DefaultHttpClient();  
             HttpPost    httpPost    = new HttpPost(mContext.getString(R.string.sjlb_polling_uri));  
                
-            // Ajout des paramètres
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);  
+            // Ajout des 8 paramètres
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(8);  
+            // commence par les 2 infos de login et le password
             nameValuePairs.add(new BasicNameValuePair("login",    loginPassword.mLogin));  
             nameValuePairs.add(new BasicNameValuePair("password", loginPassword.mPasswordMD5));  
+            // puis la liste des messages lus localement
             if (0 < nbMsgLus) {
                 Log.d(LOG_TAG, "strMsgLus=" + strMsgLus);
                 nameValuePairs.add(new BasicNameValuePair("msg_lus", strMsgLus));
             }
+            // y ajoute les 5 informations de version de l'équipement et de l'application
+            Log.i(LOG_TAG, "device: " + Build.MODEL + " (" + Build.MANUFACTURER + "/" + Build.BRAND + ") " + Build.VERSION.RELEASE + " (api_level=" + Build.VERSION.SDK_INT + ")");
+            nameValuePairs.add(new BasicNameValuePair("model",      Build.MODEL));
+            nameValuePairs.add(new BasicNameValuePair("brand",      Build.BRAND));
+            nameValuePairs.add(new BasicNameValuePair("android",    Build.VERSION.RELEASE));
+            nameValuePairs.add(new BasicNameValuePair("api",        Integer.toString(Build.VERSION.SDK_INT)));
+            nameValuePairs.add(new BasicNameValuePair("appli",      Integer.toString(mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), PackageManager.GET_ACTIVITIES).versionCode)));
+            // puis place tous ces paramètres dans la requête HTTP POST
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
             
             // Execute HTTP Post Request  
@@ -442,6 +452,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         } catch (ClassCastException e) {        
             e.printStackTrace();
         } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (NameNotFoundException e) {
             e.printStackTrace();
         }
         mMsgDBAdapter.close();
@@ -576,20 +588,22 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             HttpClient  httpClient  = new DefaultHttpClient();  
             HttpPost    httpPost    = new HttpPost(mContext.getString(R.string.sjlb_msg_uri));  
                
-            // Ajout des paramètres
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);  
-            nameValuePairs.add(new BasicNameValuePair("login",    loginPassword.mLogin));  
-            nameValuePairs.add(new BasicNameValuePair("password", loginPassword.mPasswordMD5));
+            // Prépare les 4 paramètres POST
+            // commence par les 2 infos de login et le password
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(4);
+            nameValuePairs.add(new BasicNameValuePair("login",      loginPassword.mLogin));  
+            nameValuePairs.add(new BasicNameValuePair("password",   loginPassword.mPasswordMD5));
+            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
             if (   (0 < firstMsgDate)
                 && (0 < lastMsgDate) )
             {
-                // TODO SRO : la récupération des anciens messages pose actuellement trop de problèmes de performances
+                // et si disponibles (ie après la première fois) les 2 dates du plus vieux et du plus récent message
+                // TODO SRO : la récupération des anciens messages pose actuellement trop de problèmes de performances dans la vue des sujets
                 //nameValuePairs.add(new BasicNameValuePair("date_premier", Long.toString(firstMsgDate)));
                 nameValuePairs.add(new BasicNameValuePair("date_dernier", Long.toString(lastMsgDate)));
                 Log.d(LOG_TAG, "fetchMsg (" + firstMsgDate +"," + lastMsgDate + ")");
             }
-            // Ajoute finalement le code de version de l'application
-            nameValuePairs.add(new BasicNameValuePair("version", Integer.toString(mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), PackageManager.GET_ACTIVITIES).versionCode)));
+            // puis place tous ces paramètres dans la requête HTTP POST
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
             
             // Execute HTTP Post Request  
@@ -738,8 +752,6 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         } catch (ClassCastException e) {        
             e.printStackTrace();
         } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (NameNotFoundException e) {
             e.printStackTrace();
         }
         mMsgDBAdapter.close();

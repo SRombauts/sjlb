@@ -106,8 +106,8 @@ public final class R {
         public static final int no=0x7f06002d;
         public static final int notification_new=0x7f060039;
         public static final int notification_text_msg=0x7f060038;
-        public static final int notification_text_pm=0x7f060037;
-        public static final int notification_title_msg=0x7f060036;
+        public static final int notification_text_pm=0x7f060036;
+        public static final int notification_title_msg=0x7f060037;
         /**  Notifications 
  Notifications 
          */

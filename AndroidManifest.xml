@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- ATTENTION, le versionCode ne doit être incrémenté que pour l'ultime compilation en release pour publication,
+     PAS pour les tests, car cette valeur est utilisée pour signaler automatiquement une mise à jour disponible -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="fr.srombauts.sjlb"
       android:versionCode="54"
       android:versionName="0.5.4">
-<!--  android:installLocation="auto" -->
+<!--  android:installLocation="auto" : seulement à partir de l'API level 8 -->
       
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -11,16 +13,16 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <uses-sdk android:minSdkVersion="7"
-              android:targetSdkVersion="7" />
+              android:targetSdkVersion="10" />
     
     <application android:name=".ApplicationSJLB"
-    			 android:label="@string/app_name"
-    			 android:icon="@drawable/launcher_icon"
-    			 android:debuggable="false">
+                 android:label="@string/app_name"
+                 android:icon="@drawable/launcher_icon" >
+            <!-- android:debuggable="false" : géré automatiquement par Eclipse --> 
                  
         <activity android:name=".ActivityMain"
                   android:label="@string/app_name"
-                  android:launchMode="singleTop">
+                  android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -33,7 +35,7 @@
             >
         </activity>
         <activity android:name=".ActivityPrivateMessages"
-                  android:launchMode="singleTop">
+                  android:launchMode="singleTask">
         </activity>
         <activity android:name=".ActivityNewPrivateMessage">
         </activity>

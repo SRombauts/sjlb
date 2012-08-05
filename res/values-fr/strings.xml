@@ -4,8 +4,8 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Meilleurs gestion d\'un mauvais login ou mot de passe\n
-        - Chargement des vieux messages en tâche de fond\n
+        - Correction des détections de gestes gauche/droite\n
+        - Correction de la fenêtre d\'édition pour les petits écrans\n
     </string>
     <string name="loginscreen_title">   Login et mot de passe                                                           </string>
     <string name="loginscreen_message"> Veuillez saisir votre login et votre mot de passe dans le menu des préférences  </string>
@@ -72,10 +72,10 @@
     <string name="toast_deleted">           Message effacé !                    </string>
 
     <!-- Notifications -->
-    <string name="notification_title_pm">   Message(s) Privé(s) </string>
-    <string name="notification_title_msg">  Post(s) non lu(s)   </string>
-    <string name="notification_text_pm">    message(s) privé(s) </string>
-    <string name="notification_text_msg">   post(s) non lu(s)   </string>
-    <string name="notification_new">        nouveau(x)          </string>
+    <string name="notification_title_pm">   Message(s) Privé(s)             </string>
+    <string name="notification_text_pm">    nouveau(x) message(s) privé(s)  </string>
+    <string name="notification_title_msg">  Post(s) non lu(s)               </string>
+    <string name="notification_text_msg">   post(s) non lu(s)               </string>
+    <string name="notification_new">        nouveau(x)                      </string>
     <!-- URI -->
 </resources>

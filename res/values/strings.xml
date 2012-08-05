@@ -4,8 +4,8 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Better handling of login/password error\n
-        - Back loading of old messages\n
+        - Fix left/right swipe and touch events\n
+        - Fix edit edit dialog on small screen\n
     </string>
     <string name="loginscreen_title">   Login/password                                          </string>
     <string name="loginscreen_message"> Enter your login and password in the preferences menu   </string>
@@ -73,11 +73,11 @@
     <string name="toast_deleted">           Message deleted !   </string>
 
     <!-- Notifications -->
-    <string name="notification_title_pm">   Private Message(s)  </string>
-    <string name="notification_title_msg">  Unread Message(s)   </string>
-    <string name="notification_text_pm">    private message(s)  </string>
-    <string name="notification_text_msg">   unread message(s)   </string>
-    <string name="notification_new">        new                 </string>
+    <string name="notification_title_pm">   Private Message(s)      </string>
+    <string name="notification_text_pm">    new private message(s)  </string>
+    <string name="notification_title_msg">  Unread Message(s)       </string>
+    <string name="notification_text_msg">   unread message(s)       </string>
+    <string name="notification_new">        new                     </string>
 
     <!-- URI -->
     <string name="sjlb_forum_uri">      http://www.sjlb.fr/Site/Forum.php                       </string>
