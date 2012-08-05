@@ -29,6 +29,9 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.net.ParseException;
 import android.os.AsyncTask;
@@ -48,8 +51,6 @@ import android.util.Log;
 class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     private static final String  LOG_TAG                    = "RefreshTask";
 
-    public static final int     DATE_PREMIER_MSG            = 1051690936;   //!< Date du premier message publié sur SJLB
-    
     public static final int     NOTIFICATION_NEW_PM_ID      = 1;
     public static final int     NOTIFICATION_NEW_MSG_ID     = 2;
 
@@ -116,7 +117,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
      * Cette méthode est synchronisée avec le thread main, donc on peut y demander des modifs de GUI (notifications...)
      */
     protected void onPreExecute() {
-        // Toast notification de début de rafraichissement
+        // Toast notification de début de rafraîchissement
         // SRO COMMENTE : comme on tourne dans un service en tache de fond, on ne veut pas gêner l'utilisateur avec une notification
         // Toast.makeText(mContext, mContext.getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
     }
@@ -136,9 +137,9 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             // Recherche d'éventuelles nouveautés ()
             refreshInfos ();
             
-            // et récupération de ces éventuels nouveaux contenus (seulement si nécessaire)
-            fetchPM ();
-            fetchMsg ();
+            // et récupération de ces éventuels nouveaux contenus
+            fetchPM ();  // récupère la liste des PM seulement si nécessaire
+            fetchMsg (); // récupère systématiquement la liste des nouveaux messages, éventuellement vide
             
         } catch (LoginPasswordBadException e) {
             //e.printStackTrace();
@@ -168,14 +169,13 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
           // Notification dans la barre de status
           notifyUserPM ();
       }
-      // s'il y a de nouveaux messages non lus :
-      // TODO SRO : tests en cours - supprimer l'éventuelle notification s'il n'y a plus de messages non lus 
+      // s'il y a de nouveaux messages non lus (ou au contraire, s'il ne reste plus de messages non lus) :
       if ( (0 < mNbNewMsg) || (0 == mNbUnreadMsg) ) {
-          // Notification dans la barre de status
+          // Notification dans la barre de status (ou suppression de la notification)
           notifyUserMsg ();
       }
       
-      // Le service peut dès lors être interrompu une fois qu'il a effectué le rafraichissement
+      // Le service peut dès lors être interrompu une fois qu'il a effectué le rafraîchissement
       mContext.stopSelf ();
     }
 
@@ -249,7 +249,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                                     User newUser = new User(idUser, strPseudo, strName);
                                     
                                     // Renseigne la bdd si User inconnu
-                                    // TODO SRO : un peu moche, provoque une exception SQL si le PM est déjà en base (pas propre en débug)
+                                    // TODO SRO : un peu moche, provoque une exception SQL si l'utilisateur est déjà en base (mais ne survient pas, cf TODO plus haut)
                                     mUserDBAdapter.insertUser(newUser);
                                 }
                                 
@@ -305,6 +305,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             // Utilise les préférences pour récupérer le login/mot de passe :
             PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
 
+            // Établi la liste des messages lus localement, à transmettre au site SJLB pour qu'il se mette à jour
             // TODO SRO : déplacer ce qui suit dans une méthode dédiée
             Cursor cursor = mMsgDBAdapter.getMsgUnread ();
             String strMsgLus = "";
@@ -322,7 +323,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             }
             cursor.close ();
             
-            // Instancie un client http et un header de requète "POST"
+            // Instancie un client HTTP et un header de requête "POST"
             HttpClient  httpClient  = new DefaultHttpClient();  
             HttpPost    httpPost    = new HttpPost(mContext.getString(R.string.sjlb_polling_uri));  
                
@@ -372,9 +373,10 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                                     }
                                 }
                             }
-                            // Détection du cas où l'on dispose de PLUS de PM en BDD locale qu'il n'en reste sur le site !
+                            // Si aucun nouveau PM n'est détecté,
                             if (0 == mNbNewPM ) {
                                 int nbPMInBdd = (int)mPMDBAdapter.countPM();
+                                // détection du cas où l'on dispose de PLUS de PM en BDD locale qu'il n'en reste sur le site !
                                 if (mNbPM < nbPMInBdd) {
                                     // nombre négatif, un(des) PM a(ont) été supprimé(s)  !
                                     mNbNewPM = mNbPM - nbPMInBdd;
@@ -396,7 +398,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             int     idMsg    = Integer.parseInt(strIdMsg);
                             
                             if (0 < idMsg) {
-                                // Teste si le message est nouveau, et le met en base plus bas, dans "fetchMsg()"
+                                // Teste si le message est nouveau 
+                                // (sinon c'est qu'il s'agit d'un message déjà récupéré, tel quel ou entre temps modifié)
                                 if (false == mMsgDBAdapter.isExist(idMsg)) {
                                     Log.d(LOG_TAG, "Msg " + idMsg + " nouveau");
                                     mNbNewMsg++;
@@ -410,7 +413,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                         }
                     }
                     
-                    // TODO SRO : démarquer UNREAD les messages lus localement
+                    // Efface les flags UNREAD_LOCALY des messages lus localement
                     if (0 < nbMsgLus) {
                         int nbCleared = mMsgDBAdapter.clearMsgUnread ();
                         Log.d(LOG_TAG, "clearMsgUnread = " + nbCleared);
@@ -453,9 +456,6 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     
         // s'il y a de nouveaux PM (ou au contraire s'il y en a moins) :
         if (0 != mNbNewPM) {
-            // Le nombre de nouveau PM va être recalculé par rapport à ce qui sera réellement mis en BDD (pour servir ensuite à la notification)
-            // TODO SRO : seulement lorsqu'on ne fera plus un "clearAllPM" avant de re-peupler la base
-            //mNbNewPM = 0;
     
             try {
                 Log.d(LOG_TAG, "fetchPM...");
@@ -463,7 +463,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 // Utilise les préférences pour récupérer le login/mot de passe :
                 PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
                 
-                // Instancie un client http et un header de requète "POST"  
+                // Instancie un client HTTP et un header de requête "POST"  
                 HttpClient  httpClient  = new DefaultHttpClient();  
                 HttpPost    httpPost    = new HttpPost(mContext.getString(R.string.sjlb_pm_uri));  
                    
@@ -493,7 +493,7 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                         if (null != listPM) {
                         
                             // Vide la table des messages privés
-                            // TODO SRO : c'est moche, au lieu de tout vider il faudrait plutôt supprimer les messages ayant disparus, et ne réinserer que les nouveaux !
+                            // (plus simple que de supprimer les messages ayant disparus et ne réinsérer que les nouveaux)
                             mPMDBAdapter.clearPM ();
                             
                             mNbPM = listPM.getLength();
@@ -519,8 +519,6 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                                 Boolean bInserted = mPMDBAdapter.insertPM(newPM);
                                 if (bInserted) {
                                     Log.d(LOG_TAG, "PM " + idPM + " inserted");                                
-                                    // TODO SRO : seulement lorsqu'on ne fera plus un "clearAllPM" avant de re-peupler la base
-                                    //mNbNewPM++;
                                 }
                             }
                         } else {
@@ -557,197 +555,201 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     
     /**
      * Récupération du contenu des messages du forum
+     * 
+     * Récupère la liste des messages flagués comme "non lus" sur le site SJLB, c'est à dire :
+     * - les nouveaux messages (bien qu'il puisent avoir déjà été récupérés par l'application mobile)
+     * - les messages modifiés (qui ont déjà été récupéré, mais dont le contenu a changé entre temps)
      */
     void fetchMsg () {
 
-        // s'il y a de nouveaux Msg
-//      if (0 < mNbNewMsg) {
-        // En fait même pas, il faut simplement toujours demander la liste des derniers messages, elle sera souvent vide
-        // ET EN PLUS il faut aussi redemander les messages marqués "non lus" qui ont en fait simplement été édités par un user, alors qu'on les avait déjà !  
-        if (true) {
-            // Le nombre de nouveau Msg va être recalculé par rapport à ce qui sera réellement mis en BDD (pour servir ensuite à la notification)
-            // TODO SRO mNbNewMsg   = 0;
-            try {
-                Log.d(LOG_TAG, "fetchMsg...");
-                
-                // Utilise les préférences pour récupérer le login/mot de passe :
-                PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
+        try {
+            Log.d(LOG_TAG, "fetchMsg...");
+            
+            // Utilise les préférences pour récupérer le login/mot de passe :
+            PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
 
-                // Récupère la date du message le plus vieux en base, et du plus récent
-                long firstMsgDate   = mMsgDBAdapter.getFirstMsgDate();
-                long lastMsgDate    = mMsgDBAdapter.getLastMsgDate();
+            // Récupère la date du message le plus vieux (le premier) et du plus récent (le dernier) connus
+            long firstMsgDate   = mMsgDBAdapter.getFirstMsgDate();
+            long lastMsgDate    = mMsgDBAdapter.getLastMsgDate();
+            
+            // Instancie un client HTTP et un header de requête "POST"  
+            HttpClient  httpClient  = new DefaultHttpClient();  
+            HttpPost    httpPost    = new HttpPost(mContext.getString(R.string.sjlb_msg_uri));  
+               
+            // Ajout des paramètres
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);  
+            nameValuePairs.add(new BasicNameValuePair("login",    loginPassword.mLogin));  
+            nameValuePairs.add(new BasicNameValuePair("password", loginPassword.mPasswordMD5));
+            if (   (0 < firstMsgDate)
+                && (0 < lastMsgDate) )
+            {
+                // TODO SRO : la récupération des anciens messages pose actuellement trop de problèmes de performances
+                //nameValuePairs.add(new BasicNameValuePair("date_premier", Long.toString(firstMsgDate)));
+                nameValuePairs.add(new BasicNameValuePair("date_dernier", Long.toString(lastMsgDate)));
+                Log.d(LOG_TAG, "fetchMsg (" + firstMsgDate +"," + lastMsgDate + ")");
+            }
+            // Ajoute finalement le code de version de l'application
+            nameValuePairs.add(new BasicNameValuePair("version", Integer.toString(mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), PackageManager.GET_ACTIVITIES).versionCode)));
+            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
+            
+            // Execute HTTP Post Request  
+            HttpResponse response = httpClient.execute(httpPost);
+            if (HttpStatus.SC_OK == response.getStatusLine ().getStatusCode()) {
+                Log.d(LOG_TAG, "HttpStatus OK");
+
+                // Récupère le contenu de la réponse
+                InputStream             in          = response.getEntity().getContent();
+            
+                // Parse de la page XML
+                DocumentBuilderFactory  dbf         = DocumentBuilderFactory.newInstance();
+                dbf.setCoalescing(true);
+                DocumentBuilder         db          = dbf.newDocumentBuilder();
+                Document                dom         = db.parse(in);
+                Element                 docElement  = dom.getDocumentElement();
                 
-                // Instancie un client http et un header de requète "POST"  
-                HttpClient  httpClient  = new DefaultHttpClient();  
-                HttpPost    httpPost    = new HttpPost(mContext.getString(R.string.sjlb_msg_uri));  
-                   
-                // Ajout des paramètres
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);  
-                nameValuePairs.add(new BasicNameValuePair("login",    loginPassword.mLogin));  
-                nameValuePairs.add(new BasicNameValuePair("password", loginPassword.mPasswordMD5));
-                if (   (0 < firstMsgDate)
-                    && (0 < lastMsgDate) )
-                {
-                    nameValuePairs.add(new BasicNameValuePair("date_premier", Long.toString(firstMsgDate)));
-                    nameValuePairs.add(new BasicNameValuePair("date_dernier", Long.toString(lastMsgDate)));
-                    Log.d(LOG_TAG, "fetchMsg (" + firstMsgDate +"," + lastMsgDate + ")");
-                }
-                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
-                
-                // Execute HTTP Post Request  
-                HttpResponse response = httpClient.execute(httpPost);
-                if (HttpStatus.SC_OK == response.getStatusLine ().getStatusCode()) {
-                    // Récupère le contenu de la réponse
-                    InputStream             in          = response.getEntity().getContent();
-                
-                    // Parse de la page XML
-                    DocumentBuilderFactory  dbf         = DocumentBuilderFactory.newInstance();
-                    dbf.setCoalescing(true);
-                    DocumentBuilder         db          = dbf.newDocumentBuilder();
-                    Document                dom         = db.parse(in);
-                    Element                 docElement  = dom.getDocumentElement();
-                    
-                    if (null != docElement) {
-                        // Récupère la liste des Sujets
-                        NodeList    listSubj = docElement.getElementsByTagName(NODE_NAME_FORUM_SUBJ);
-                        if (null != listSubj) {
-                            int nbSubj = listSubj.getLength();
-                            Log.d(LOG_TAG, "listSubj.getLength() = " + nbSubj);
-                            for (int i = 0; i < nbSubj; i++) {
-                                Element Subj      = (Element)listSubj.item(i);
-                                
-                                String  strText     = Subj.getFirstChild().getNodeValue();
-    
-                                String  strIdSubj   = Subj.getAttribute(ATTR_NAME_FORUM_SUBJ_ID);
-                                int     idSubj      = Integer.parseInt(strIdSubj);
-                                String  strIdCat    = Subj.getAttribute(ATTR_NAME_FORUM_SUBJ_CAT_ID);
-                                int     idCat       = Integer.parseInt(strIdCat);
-                                String  strIdGroup  = Subj.getAttribute(ATTR_NAME_FORUM_SUBJ_GROUP_ID);
-                                int     idGroup     = Integer.parseInt(strIdGroup);
-                                String  strLastDate = Subj.getAttribute(ATTR_NAME_FORUM_SUBJ_DERNIERE_DATE);
-                                long    longLastDate= (long)Integer.parseInt(strLastDate);
-                                Date    lastDate    = new Date(longLastDate*1000);
-                                
-                                ForumSubject newSubj = new ForumSubject(idSubj, idCat, idGroup, lastDate, strText);
-                                Log.d(LOG_TAG, "Subj " + newSubj);
-                                
-                                // Renseigne la bdd SSI le sujet n'existe pas, sinon le met simplement à jour
-                                if (mSubjDBAdapter.isExist(idSubj)) {
-                                    if (mSubjDBAdapter.updateSubj(newSubj)) {
-                                        Log.d(LOG_TAG, "Subj " + idSubj + " updated");                                
-                                    } else {
-                                        Log.e(LOG_TAG, "Subj " + idSubj + " NOT updated !");
-                                    }
+                if (null != docElement) {
+                    // Récupère la liste des Sujets
+                    NodeList    listSubj = docElement.getElementsByTagName(NODE_NAME_FORUM_SUBJ);
+                    if (null != listSubj) {
+                        int nbSubj = listSubj.getLength();
+                        Log.d(LOG_TAG, "listSubj.getLength() = " + nbSubj);
+                        for (int i = 0; i < nbSubj; i++) {
+                            Element Subj      = (Element)listSubj.item(i);
+                            
+                            String  strText     = Subj.getFirstChild().getNodeValue();
+
+                            String  strIdSubj   = Subj.getAttribute(ATTR_NAME_FORUM_SUBJ_ID);
+                            int     idSubj      = Integer.parseInt(strIdSubj);
+                            String  strIdCat    = Subj.getAttribute(ATTR_NAME_FORUM_SUBJ_CAT_ID);
+                            int     idCat       = Integer.parseInt(strIdCat);
+                            String  strIdGroup  = Subj.getAttribute(ATTR_NAME_FORUM_SUBJ_GROUP_ID);
+                            int     idGroup     = Integer.parseInt(strIdGroup);
+                            String  strLastDate = Subj.getAttribute(ATTR_NAME_FORUM_SUBJ_DERNIERE_DATE);
+                            long    longLastDate= (long)Integer.parseInt(strLastDate);
+                            Date    lastDate    = new Date(longLastDate*1000);
+                            
+                            ForumSubject newSubj = new ForumSubject(idSubj, idCat, idGroup, lastDate, strText);
+                            Log.d(LOG_TAG, "Subj " + newSubj);
+                            
+                            // Renseigne la bdd SSI le sujet n'existe pas, sinon le met simplement à jour
+                            if (mSubjDBAdapter.isExist(idSubj)) {
+                                if (mSubjDBAdapter.updateSubj(newSubj)) {
+                                    Log.d(LOG_TAG, "Subj " + idSubj + " updated");                                
                                 } else {
-                                    if (mSubjDBAdapter.insertSubj(newSubj)) {
-                                        Log.d(LOG_TAG, "Subj " + idSubj + " inserted");                                
-                                    } else {
-                                        Log.e(LOG_TAG, "Subj " + idSubj + " NOT inserted !");
-                                    }                                
+                                    Log.e(LOG_TAG, "Subj " + idSubj + " NOT updated !");
                                 }
-                                
-                            }
-                        }
-                        
-                        // Récupère la liste des Msg
-                        NodeList    listMsg = docElement.getElementsByTagName(NODE_NAME_FORUM_MSG);
-                        if (null != listMsg) {
-                            int nbMsg = listMsg.getLength();
-                            Log.d(LOG_TAG, "listMsg.getLength() = " + nbMsg);
-                            for (int i = 0; i < nbMsg; i++) {
-                                Element Msg      = (Element)listMsg.item(i);
-                                
-                                String  strText     = Msg.getFirstChild().getNodeValue();
-    
-                                String  strIdMsg    = Msg.getAttribute(ATTR_NAME_FORUM_MSG_ID);
-                                int     idMsg       = Integer.parseInt(strIdMsg);
-                                String  strDate     = Msg.getAttribute(ATTR_NAME_FORUM_MSG_DATE);
-                                long    longDate    = (long)Integer.parseInt(strDate);
-                                Date    date        = new Date(longDate*1000);
-                                String  strIdAuthor = Msg.getAttribute(ATTR_NAME_FORUM_MSG_AUTHOR_ID);
-                                int     idAuthor    = Integer.parseInt(strIdAuthor);
-                                String  strAuthor   = Msg.getAttribute(ATTR_NAME_FORUM_MSG_AUTHOR);
-                                String  strIdSubject= Msg.getAttribute(ATTR_NAME_FORUM_MSG_SUBJECT_ID);
-                                int     idSubject   = Integer.parseInt(strIdSubject);
-                                String  strUnread   = Msg.getAttribute(ATTR_NAME_FORUM_MSG_UNREAD);
-                                boolean bUnread     = (0 != Integer.parseInt(strUnread));
-                                
-                                ForumMessage newMsg = new ForumMessage(idMsg, date, idAuthor, strAuthor, idSubject, bUnread, strText);
-                                Log.d(LOG_TAG, "Msg " + newMsg);
-                                
-                                // Renseigne la bdd SSI le message n'est pas déjà inséré, sinon fait un update
-                                if (mMsgDBAdapter.isExist(idMsg)) {
-                                    if (mMsgDBAdapter.updateMsg(newMsg)) {
-                                        Log.d(LOG_TAG, "Msg " + idMsg + " updated");
-                                    } else {
-                                        Log.e(LOG_TAG, "Msg " + idMsg + " NOT updated !");
-                                    }
+                            } else {
+                                if (mSubjDBAdapter.insertSubj(newSubj)) {
+                                    Log.d(LOG_TAG, "Subj " + idSubj + " inserted");                                
                                 } else {
-                                    if (mMsgDBAdapter.insertMsg(newMsg)) {
-                                        Log.d(LOG_TAG, "Msg " + idMsg + " inserted");                                
-                                    } else {
-                                        Log.e(LOG_TAG, "Msg " + idMsg + " NOT inserted !");
-                                    }                                
-                                }
-    
-                                // Récupère la liste des fichiers attachés au Msg
-                                NodeList    listFile = Msg.getElementsByTagName(NODE_NAME_FORUM_FILE);
-                                if (null != listFile) {
-                                    int nbFile = listFile.getLength();
-                                    //Log.d(LOG_TAG, "listFile.getLength() = " + nbFile);
-                                    for (int j = 0; j < nbFile; j++) {
-                                        Element FileElement = (Element)listFile.item(j);
-    //                                    String  FileNameX   = FileElement.getNodeValue();
-    //                                    Node    NodeFile    = FileElement.getFirstChild();
-                                        String  FileName    = FileElement.getFirstChild().getNodeValue();
-    
-                                        AttachedFile newAttachedFile = new AttachedFile(idMsg, FileName);
-                                        Log.d(LOG_TAG, "Fichier " + newAttachedFile);
-                                        
-                                        if (mFileDBAdapter.insertFile(newAttachedFile)) {
-                                            Log.d(LOG_TAG, "AttachedFile " + FileName + " inserted");                                
-                                        } else {
-                                            Log.e(LOG_TAG, "AttachedFile " + FileName + " NOT inserted !");
-                                        }
-                                    }
-                                }
+                                    Log.e(LOG_TAG, "Subj " + idSubj + " NOT inserted !");
+                                }                                
                             }
-                        } else {
-                            Log.e(LOG_TAG, "fetchMsg: no XML document: server error");
+                            
                         }
                     }
-                
-                    Log.d(LOG_TAG, "fetchMsg... ok");                        
+                    
+                    // Récupère la liste des Msg
+                    NodeList    listMsg = docElement.getElementsByTagName(NODE_NAME_FORUM_MSG);
+                    if (null != listMsg) {
+                        int nbMsg = listMsg.getLength();
+                        Log.d(LOG_TAG, "listMsg.getLength() = " + nbMsg);
+                        for (int i = 0; i < nbMsg; i++) {
+                            Element Msg      = (Element)listMsg.item(i);
+                            
+                            String  strText     = Msg.getFirstChild().getNodeValue();
 
-                } else {
-                    Log.e(LOG_TAG, "fetchMsg: http error");
+                            String  strIdMsg    = Msg.getAttribute(ATTR_NAME_FORUM_MSG_ID);
+                            int     idMsg       = Integer.parseInt(strIdMsg);
+                            String  strDate     = Msg.getAttribute(ATTR_NAME_FORUM_MSG_DATE);
+                            long    longDate    = (long)Integer.parseInt(strDate);
+                            Date    date        = new Date(longDate*1000);
+                            String  strIdAuthor = Msg.getAttribute(ATTR_NAME_FORUM_MSG_AUTHOR_ID);
+                            int     idAuthor    = Integer.parseInt(strIdAuthor);
+                            String  strAuthor   = Msg.getAttribute(ATTR_NAME_FORUM_MSG_AUTHOR);
+                            String  strIdSubject= Msg.getAttribute(ATTR_NAME_FORUM_MSG_SUBJECT_ID);
+                            int     idSubject   = Integer.parseInt(strIdSubject);
+                            String  strUnread   = Msg.getAttribute(ATTR_NAME_FORUM_MSG_UNREAD);
+                            boolean bUnread     = (0 != Integer.parseInt(strUnread));
+                            
+                            ForumMessage newMsg = new ForumMessage(idMsg, date, idAuthor, strAuthor, idSubject, bUnread, strText);
+                            Log.d(LOG_TAG, "Msg " + newMsg);
+                            
+                            // Renseigne la bdd SSI le message n'est pas déjà inséré, sinon fait un update
+                            if (mMsgDBAdapter.isExist(idMsg)) {
+                                if (mMsgDBAdapter.updateMsg(newMsg)) {
+                                    Log.d(LOG_TAG, "Msg " + idMsg + " updated");
+                                } else {
+                                    Log.e(LOG_TAG, "Msg " + idMsg + " NOT updated !");
+                                }
+                            } else {
+                                if (mMsgDBAdapter.insertMsg(newMsg)) {
+                                    Log.d(LOG_TAG, "Msg " + idMsg + " inserted");                                
+                                } else {
+                                    Log.e(LOG_TAG, "Msg " + idMsg + " NOT inserted !");
+                                }                                
+                            }
+
+                            // Récupère la liste des fichiers attachés au Msg
+                            NodeList    listFile = Msg.getElementsByTagName(NODE_NAME_FORUM_FILE);
+                            if (null != listFile) {
+                                int nbFile = listFile.getLength();
+                                //Log.d(LOG_TAG, "listFile.getLength() = " + nbFile);
+                                for (int j = 0; j < nbFile; j++) {
+                                    Element FileElement = (Element)listFile.item(j);
+//                                    String  FileNameX   = FileElement.getNodeValue();
+//                                    Node    NodeFile    = FileElement.getFirstChild();
+                                    String  FileName    = FileElement.getFirstChild().getNodeValue();
+
+                                    AttachedFile newAttachedFile = new AttachedFile(idMsg, FileName);
+                                    Log.d(LOG_TAG, "Fichier " + newAttachedFile);
+                                    
+                                    if (mFileDBAdapter.insertFile(newAttachedFile)) {
+                                        Log.d(LOG_TAG, "AttachedFile " + FileName + " inserted");                                
+                                    } else {
+                                        Log.e(LOG_TAG, "AttachedFile " + FileName + " NOT inserted !");
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        Log.e(LOG_TAG, "fetchMsg: no XML document: server error");
+                    }
                 }
-                
-            } catch (LoginPasswordEmptyException e) {
-                // e.printStackTrace();
-                Log.w(LOG_TAG, "fetchMsg: No Login/Password set in Preferences");                                        
-            } catch (ParserConfigurationException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (SAXException e) {
-                e.printStackTrace();
-            } catch (ClassCastException e) {        
-                e.printStackTrace();
-            } catch (ParseException e) {
-                e.printStackTrace();
+            
+                Log.d(LOG_TAG, "fetchMsg... ok");                        
+
+            } else {
+                Log.e(LOG_TAG, "fetchMsg: http error");
             }
-            mMsgDBAdapter.close();
-            mSubjDBAdapter.close();
-            mFileDBAdapter.close();
+            
+        } catch (LoginPasswordEmptyException e) {
+            // e.printStackTrace();
+            Log.w(LOG_TAG, "fetchMsg: No Login/Password set in Preferences");                                        
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            Log.w(LOG_TAG, "fetchMsg: SAXException");                                        
+            e.printStackTrace();
+        } catch (ClassCastException e) {        
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (NameNotFoundException e) {
+            e.printStackTrace();
         }
+        mMsgDBAdapter.close();
+        mSubjDBAdapter.close();
+        mFileDBAdapter.close();
     }
     
     
     /**
-     *  Notifie à l'utilisateur les évolutions du nombre de messages privés non lus
+     * Notifie à l'utilisateur le nombre de messages privés lorsqu'un ou plusieurs PM a été reçu
      */
     private void notifyUserPM () {
         Log.d(LOG_TAG, "notifyUserPM");
@@ -762,21 +764,20 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         // Définition du message détaillé à afficher dans le volet de notification
         Context         context             = mContext.getApplicationContext();
         CharSequence    contentTitle        = mContext.getString(R.string.notification_title_pm);
-        CharSequence    contentText         = mNbPM + " " + mContext.getString(R.string.notification_text_pm) + " (" + mNbNewPM + mContext.getString(R.string.notification_new) + ")";
+        CharSequence    contentText         = mNbNewPM + " " + mContext.getString(R.string.notification_text_pm);
         
         // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
         Intent          notificationIntent  = new Intent(mContext, ActivityPrivateMessages.class);
         PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
 
         // Préparation du résumé de notification
-        // TODO SRO : utiliser une icone pour les PM, et une autre pour les Posts
         int             icon            = R.drawable.status_icon;
-        CharSequence    tickerText      = mContext.getString(R.string.app_name) + ": " + mNbPM + " " + mContext.getString(R.string.notification_text_pm) + " (" + mNbNewPM + mContext.getString(R.string.notification_new) + ")";
+        CharSequence    tickerText      = mContext.getString(R.string.app_name) + ": " + mNbNewPM + " " + mContext.getString(R.string.notification_text_pm);
         long            when            = System.currentTimeMillis();
         // ... et instanciation de la Notification :
         Notification    notification    = new Notification(icon, tickerText, when);
 
-        notification.number     = mNbPM;
+        notification.number     = mNbNewPM;
         
         notification.defaults   = 0;
         if (notificationPrefs.mbSound) {
@@ -798,6 +799,8 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
 
     /**
      *  Notifie à l'utilisateur les évolutions du nombre de messages non lus
+     *  
+     *  Génère une notification indiquant le nombre de messages non lus, dont le nombre 
      */
     private void notifyUserMsg () {
         Log.d(LOG_TAG, "notifyUserMsg");
@@ -821,7 +824,6 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             PendingIntent   contentIntent       = PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
         
             // Préparation du résumé de notification
-            // TODO SRO : utiliser une icone pour les PM, et une autre pour les Posts
             int          icon        = R.drawable.status_icon;
             CharSequence tickerText  = mContext.getString(R.string.app_name) + ": " + mNbUnreadMsg + " " + mContext.getString(R.string.notification_text_msg) + " (" + mNbNewMsg + mContext.getString(R.string.notification_new) + ")";
             long         when        = System.currentTimeMillis();
