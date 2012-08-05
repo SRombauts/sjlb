@@ -50,6 +50,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d (LOG_TAG, "onCreate...");
 
         // Layout de l'activité
         setContentView(R.layout.subj_list);
@@ -67,7 +68,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         TextView CategoryDescription = (TextView)findViewById(R.id.category_label);
         CategoryDescription.setText(mSelectedCategoryLabel);        
         
-        // Récupére un curseur sur les données (les sujets) en filtrant sur l'id de la catégorie sélectionnée
+        // Récupère un curseur sur les données (les sujets) en filtrant sur l'id de la catégorie sélectionnée
         mCursor = managedQuery( SJLB.Subj.CONTENT_URI,
         						null,
                                 SJLB.Subj.CAT_ID + "=" + mSelectedCategoryId,
@@ -81,7 +82,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         mSubjectsListView = (ListView)findViewById(R.id.subj_listview);
         mSubjectsListView.setAdapter (mAdapter);
 
-        // Enregister les listener d'IHM que la classe implémente        
+        // Enregistrer les listener d'IHM que la classe implémente        
         mSubjectsListView.setOnItemClickListener(this);
         mSubjectsListView.setOnItemLongClickListener(this);
         mSubjectsListView.setOnTouchListener(this);
@@ -107,8 +108,9 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         super.onResume();
 
         // TODO SRO : tentative de refresh des données affichées (nb de new msg)
-        mCursor.requery();              // => inutile car on utilise managedQuery !
-        mAdapter.notifyDataSetChanged();// ne marche pas !
+        //         => NE PEUT PAS MARCHER en l'état car cela ne rafraîchit pas les sous requêtes faites dans l'adapteur !
+        //mCursor.requery();              // => inutile car on utilise managedQuery !
+        //mAdapter.notifyDataSetChanged();// ne marche pas !
     }
 
     
@@ -155,11 +157,11 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
                 break;
             }
             case (R.id.menu_update): {
-                // Toast notification de début de rafraichissement
+                // Toast notification de début de rafraîchissement
                 Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
                 // TODO voir si c'est la meilleurs manière de faire...
                 IntentReceiverStartService.startService (this, LOG_TAG);
-                // TODO SRO : trouver un moyen de rafraichir la liste à l'échéance de la tache de rafraichissement
+                // TODO SRO : trouver un moyen de rafraîchir la liste à l'échéance de la tache de rafraîchissement
                 mCursor.requery();
                 mAdapter.notifyDataSetChanged();
                 break;
@@ -182,7 +184,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     /**
      *  Sur sélection d'un sujet, lance l'activité "messages du forum" avec en paramètre l'id du sujet :
      */
-    public void onItemClick(AdapterView adapter, View view, int index, long arg3) {
+    public void onItemClick(AdapterView<?> parent, View view, int index, long arg3) {
         mSavedIntent = new Intent(this, ActivityForumMessages.class);
         mCursor.moveToPosition(index);
         mSelectedSubjId      = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj._ID));
@@ -200,7 +202,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     /**
      *  Sur long clic sur un sujet, envoie sur le site Web sur le sujet concerné
      */
-    public boolean onItemLongClick(AdapterView adapter, View view, int index, long id) {
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int index, long id) {
         // lien vers le Forum sur le Site Web :
         mCursor.moveToPosition(index);
         long selectedSubjectId = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj._ID));
@@ -212,7 +214,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     
     @Override
     protected boolean onLeftGesture () {
-        Log.i (LOG_TAG, "onTouch: va a l'ecran de gauche... pour retour à l'ecran principal");
+        Log.i (LOG_TAG, "onTouch: va a l'écran de gauche... quitte l'activité courante pour retour à l'écran principal");
         // Quitte l'activité
         finish ();
         return true;
@@ -222,12 +224,13 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     protected boolean onRightGesture () {
         boolean bActionTraitee = false;
         
-        if (null != mSavedIntent) {
-            Log.d (LOG_TAG, "onTouch: va a l'ecran de droite... relance le dernier intent sauvegarde");
+        // Ne restaure l'Intent sauvegardé que s'il existe et que l'Id du sujet sélectionné n'est pas 0
+        if ( (null != mSavedIntent) && (0 != mSelectedSubjId) ) {
+            Log.d (LOG_TAG, "onTouch: va a l'écran de droite... relance le dernier intent sauvegardé");
             startActivity (mSavedIntent);
             bActionTraitee = true;
         } else {
-           Log.w (LOG_TAG, "onTouch: pas d'intent sauvegardé");
+           Log.w (LOG_TAG, "onTouch: pas d'intent sauvegardé, ou sujet null");
         }
         
         return bActionTraitee;
@@ -235,7 +238,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     
     
     
-    // TODO SRO : en tests
+    // TODO SRO : en tests => revenir à une SimpleCursorAdapteur dès que la subquery sera en place
     // Adaptateur mappant les données du curseur dans des objets du cache du pool d'objets View utilisés par la ListView
     private final class SubjectListItemAdapter extends ResourceCursorAdapter {
         public SubjectListItemAdapter(Context context, int layout, Cursor c) {
@@ -246,8 +249,13 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
             final SubjectListItemCache  cache = (SubjectListItemCache)view.getTag();
+
+            // Récupère le titre du sujet
+            // TODO SRO : à optimiser à l'aide d'un #define sur l'ID de la colonne ! 
+            String  title = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.Subj.TEXT));
             
-            // TODO SRO : à remplacer par une sub-querry SQL, technique bien plus optimisée car travail fait en amont de l'affichage (meilleurs scroll de la ListView) !
+            // TODO SRO : à remplacer par une sub-query SQL, technique bien plus optimisée car travail fait en amont de l'affichage (meilleurs scroll de la ListView) !
+            // => OU ALORS, on pourrait (bidouiller) calculer le nombre de messages non lus par sujet à l'insertion, et le mettre à jour sur consultation du sujet en questio !
             Cursor subCursor = managedQuery(SJLB.Msg.CONTENT_URI,
                                             null,
                                             "(" +       SJLB.Msg.SUBJECT_ID + "=" + cursor.getString(cursor.getColumnIndexOrThrow(SJLB.Subj._ID))
@@ -255,9 +263,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
                                             null,
                                             null);
             
-            // Fixe le nom
-            // TODO SRO : à optimiser à l'aide d'un #define sur l'ID de la colonne ! 
-            String  title = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.Subj.TEXT));
+            // et lui ajoute le nb de messages non lus
             if (0 < subCursor.getCount()) {
                 title += " (" + subCursor.getCount() + ")";
             }
@@ -281,7 +287,6 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     }
     
     // Objet utilisé comme cache des données d'une View, dans un pool d'objets utilisés par la ListView
-        // TODO SRO : en tests
     final static class SubjectListItemCache {
         public TextView nameView;
     }    
