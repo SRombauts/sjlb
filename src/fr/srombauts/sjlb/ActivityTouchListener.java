@@ -1,6 +1,7 @@
 package fr.srombauts.sjlb;
 
 import android.app.Activity;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -40,17 +41,18 @@ public class ActivityTouchListener extends Activity implements OnTouchListener {
                 break;
             }
             case MotionEvent.ACTION_UP: {
-                // TODO SRO : utiliser les dimensions de l'écran à la place
-                final float proportionalDeltaX = (touchX - mTouchStartPositionX) / (float)aView.getWidth();
-                final float proportionalDeltaY = (touchY - mTouchStartPositionY) / (float)aView.getHeight();
+                // Calcul l'ampleur du mouvement par rapport aux dimensions de l'écran
+                final Display display = getWindowManager().getDefaultDisplay();
+                final float proportionalDeltaX = (touchX - mTouchStartPositionX) / (float)display.getWidth();
+                final float proportionalDeltaY = (touchY - mTouchStartPositionY) / (float)display.getHeight();
 
                 //Log.d (LOG_TAG, "onTouch (ACTION_UP) : touch (" + touchX + ", " + touchY + ")");
                 //Log.d (LOG_TAG, "onTouch: deltas proportionnels : (" + proportionalDeltaX + ", " + proportionalDeltaY + ")");
                 
-                // Teste si le mouvement correspond à un mouvement franc, d'ampleur suffisante en regard de la taille de la vue
-                if (Math.abs(proportionalDeltaX) > mSensibility) {
-                    // Teste si le mouvement correspond à un mouvement horizontal (X) ou vertical (Y)
-                    if (Math.abs(proportionalDeltaX)/Math.abs(proportionalDeltaY) > 1.0) {
+                // Teste si le mouvement correspond à un mouvement horizontal (X) ou vertical (Y)
+                if (Math.abs(proportionalDeltaX)/Math.abs(proportionalDeltaY) > 1.0) {
+                    // Teste si le mouvement correspond à un mouvement franc, d'ampleur suffisante en regard de la largeur de l'écran (> 40%)
+                    if (Math.abs(proportionalDeltaX) > mSensibility) {
                         // Teste le sens du mouvement horizontal, et l'inverse éventuellement selon les préférences
                         if (   (proportionalDeltaX > 0) ==  (false == PrefsInterface.inverseSwitchScreenDirection(this)) )   {
                             bActionTraitee = onRightGesture ();
@@ -58,7 +60,10 @@ public class ActivityTouchListener extends Activity implements OnTouchListener {
                         else {
                             bActionTraitee = onLeftGesture ();
                         }
-                    } else {
+                    }
+                } else {
+                    // Teste si le mouvement correspond à un mouvement franc, d'ampleur suffisante en regard de la hauteur de l'écran (> 40%)
+                    if (Math.abs(proportionalDeltaY) > mSensibility) {
                         // Teste le sens du mouvement vertical (sans inversion possible)
                         if (proportionalDeltaY > 0)   {
                             bActionTraitee = onUpGesture ();
@@ -85,7 +90,7 @@ public class ActivityTouchListener extends Activity implements OnTouchListener {
     }
     
     /**
-     *  Permet de règler l'mpleur (seuil) du mouvement nécessaire pour déclencher une action    
+     *  Permet de régler l'ampleur (seuil) du mouvement nécessaire pour déclencher une action    
      */
     protected void setSensibility (float aSensibility) {
         mSensibility = aSensibility;
