@@ -3,6 +3,9 @@ package fr.srombauts.sjlb;
 import java.io.InputStream;
 import java.util.Vector;
 
+import fr.srombauts.sjlb.db.SJLB;
+import fr.srombauts.sjlb.model.UserContactDescr;
+
 import android.app.Application;
 import android.content.ContentUris;
 import android.database.Cursor;
