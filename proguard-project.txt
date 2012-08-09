@@ -1,0 +1,9 @@
+# Ce fichier est inclus par "project.properties" en seconde position
+# après "${sdk.dir}/tools/proguard/proguard-android-optimize.txt"
+# de manière à permettre une customisation spécifique au projet
+# s'appuyant sur la configuration standard proposée par le SDK Android
+# 2012-08-09 SRombauts
+-assumenosideeffects class android.util.Log {
+    public static *** d(...);
+    public static *** v(...);
+}
