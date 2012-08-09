@@ -4,8 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Correction des détections de gestes gauche/droite\n
-        - Correction de la fenêtre d\'édition pour les petits écrans\n
+        - Quelques optimisations\n
     </string>
     <string name="loginscreen_title">   Login et mot de passe                                                           </string>
     <string name="loginscreen_message"> Veuillez saisir votre login et votre mot de passe dans le menu des préférences  </string>
