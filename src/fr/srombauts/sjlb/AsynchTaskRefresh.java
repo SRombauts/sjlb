@@ -338,12 +338,14 @@ class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 nameValuePairs.add(new BasicNameValuePair("msg_lus", strMsgLus));
             }
             // y ajoute les 5 informations de version de l'équipement et de l'application
+            // TODO SRO : ne transmettre que lorsque différent !
             Log.i(LOG_TAG, "device: " + Build.MODEL + " (" + Build.MANUFACTURER + "/" + Build.BRAND + ") " + Build.VERSION.RELEASE + " (api_level=" + Build.VERSION.SDK_INT + ")");
             nameValuePairs.add(new BasicNameValuePair("model",      Build.MODEL));
             nameValuePairs.add(new BasicNameValuePair("brand",      Build.BRAND));
             nameValuePairs.add(new BasicNameValuePair("android",    Build.VERSION.RELEASE));
             nameValuePairs.add(new BasicNameValuePair("api",        Integer.toString(Build.VERSION.SDK_INT)));
             nameValuePairs.add(new BasicNameValuePair("appli",      Integer.toString(mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), PackageManager.GET_ACTIVITIES).versionCode)));
+            // TODO SRO : ajouter l'état de l'application (ouverte/fermée) + le nombre de messages récupérés localement
             // puis place tous ces paramètres dans la requête HTTP POST
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
             
