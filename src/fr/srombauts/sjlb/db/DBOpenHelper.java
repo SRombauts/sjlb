@@ -38,8 +38,13 @@ public class DBOpenHelper extends SQLiteOpenHelper {
      * La version de la BDD est définie dans SJLB.DATABASE_VERSION
     */     
     public void onUpgrade(SQLiteDatabase aDatabase, int aOldVersion, int aNewVersion) {
-        if (   (6 == aOldVersion)
-            && (7 == aNewVersion) )
+        if (   (7                     == aOldVersion)
+            && (SJLB.DATABASE_VERSION == aNewVersion) )
+        {
+            Log.i(LOG_TAG, "Upgrading from version 7 to 8, wich will preserve data");
+            aDatabase.execSQL("ALTER TABLE " + SJLB.Subj.TABLE_NAME + " ADD " + SJLB.Subj.NB_UNREAD + " integer");
+        } else if (   (6 == aOldVersion)
+                   && (7 == aNewVersion) )
         {
             Log.i(LOG_TAG, "Upgrading from version 6 to 7, wich will preserve data");
             aDatabase.execSQL(SJLB.File.TABLE_CREATE);

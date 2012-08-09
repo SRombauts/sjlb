@@ -619,8 +619,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 && (0 < lastMsgDate) )
             {
                 // et si disponibles (ie après la première fois) les 2 dates du plus vieux et du plus récent message
-                // TODO SRO : la récupération des anciens messages pose actuellement trop de problèmes de performances dans la vue des sujets
-                //nameValuePairs.add(new BasicNameValuePair("date_premier", Long.toString(firstMsgDate)));
+                nameValuePairs.add(new BasicNameValuePair("date_premier", Long.toString(firstMsgDate)));
                 nameValuePairs.add(new BasicNameValuePair("date_dernier", Long.toString(lastMsgDate)));
                 Log.d(LOG_TAG, "fetchMsg (" + firstMsgDate +"," + lastMsgDate + ")");
             }
@@ -724,6 +723,18 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                                     Log.e(LOG_TAG, "Msg " + idMsg + " NOT inserted !");
                                 }                                
                             }
+                            
+                            // Dans le cas d'un message non lu, met aussi à jour le compteur de messages non lus
+                            if (bUnread) {
+                                final int NbUnread = mMsgDBAdapter.getNbUnread(idSubject);
+                                if (mSubjDBAdapter.updateNbUnread(idSubject, NbUnread))
+                                {
+                                    Log.d(LOG_TAG, "strUnread=" + strUnread + " NbUnread(" + idSubject + ")=" + NbUnread);                                
+                                } else {
+                                    Log.e(LOG_TAG, "strUnread=" + strUnread + " NbUnread(" + idSubject + ")=" + NbUnread);
+                                }                                
+                            }
+                            
 
                             // Récupère la liste des fichiers attachés au Msg
                             NodeList    listFile = Msg.getElementsByTagName(NODE_NAME_FORUM_FILE);

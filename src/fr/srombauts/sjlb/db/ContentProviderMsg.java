@@ -76,7 +76,6 @@ public class ContentProviderMsg extends ContentProvider {
 	 * @todo SRO : ajouter un filtrage sur un "id" donné lorsque l'utilisateur fourni une URI de type "content:path/id"
 	 */
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        // TODO SRO : virer cette complexité en ne croisant plus les deux tables ?
         if (null == selection) selection = ""; 
         String selectionCplx = "(" + selection + ") AND (" + SJLB.Msg.TABLE_NAME+"."+SJLB.Msg.AUTHOR_ID+"=" + SJLB.User.TABLE_NAME+"."+SJLB.User._ID + ")"; 
         //Log.e ("ContentProvider", selectionCplx);
@@ -171,7 +170,7 @@ public class ContentProviderMsg extends ContentProvider {
     // Efface les flags UNREAD_LOCALY des messages lus localement
     public int clearMsgUnread () {
         ContentValues values = new ContentValues();
-        values.put(SJLB.Msg.UNREAD, SJLB.Msg.UNREAD_FALSE); // on les passe à UNREAD_LOCALY ce qui indique qu'il faut encore signaler le site Web SJLB du fait qu'on les a lu !
+        values.put(SJLB.Msg.UNREAD, SJLB.Msg.UNREAD_FALSE); // on les passe à UNREAD_FALSE ce qui indique qu'ils ont été déclarés lus au site Web SJLB
         String where = SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_LOCALY;
         return mDBHelper.getWritableDatabase ().update(SJLB.Msg.TABLE_NAME, values, where, null);
     }
@@ -199,7 +198,7 @@ public class ContentProviderMsg extends ContentProvider {
         Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Msg.TABLE_NAME,
                                                                 new String[]{SJLB.Msg._ID},
                                                                 SJLB.Msg._ID + "=" + aId,
-                                                                null, null, null, null, null);
+                                                                null, null, null, null);
         boolean bIsExist = (0 < cursor.getCount());
         cursor.close ();
         return bIsExist;
@@ -210,11 +209,22 @@ public class ContentProviderMsg extends ContentProvider {
       return mDBHelper.getWritableDatabase().delete(SJLB.Msg.TABLE_NAME, null, null) > 0;
     }
 
-    // compte les messages
+    // compte tous les messages
     public long getCount () {
-        // TODO SRO : comment fermer le curseur !?
         long nbMsgs = DatabaseUtils.queryNumEntries(mDBHelper.getReadableDatabase(), SJLB.Msg.TABLE_NAME);
         mDBHelper.getReadableDatabase().close();
+        return nbMsgs;
+    }
+
+    // compte les messages non lus d'un sujet donné
+    public int getNbUnread (int aSubjectId) {
+        Cursor cursor = mDBHelper.getReadableDatabase().query(SJLB.Msg.TABLE_NAME,
+                                                              null /*new String[]{SJLB.Msg._ID} TODO SRO : tests en cours */,
+                                                              "(" + SJLB.Msg.SUBJECT_ID + "=" + aSubjectId
+                                                               + " AND " + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")",
+                                                              null, null, null, null);
+        int nbMsgs = cursor.getCount();
+        cursor.close ();
         return nbMsgs;
     }
 

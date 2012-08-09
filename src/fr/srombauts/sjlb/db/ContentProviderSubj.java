@@ -112,6 +112,7 @@ public class ContentProviderSubj extends ContentProvider {
       newSubjValues.put(SJLB.Subj.GROUP_ID,  aSubj.getGroupId());
       newSubjValues.put(SJLB.Subj.LAST_DATE, aSubj.getLastDate().getTime());
       newSubjValues.put(SJLB.Subj.TEXT,      aSubj.getText());
+      newSubjValues.put(SJLB.Subj.NB_UNREAD, 0);
       return mDBHelper.getWritableDatabase().insert(SJLB.Subj.TABLE_NAME, null, newSubjValues) > 0;
     }
 
@@ -123,6 +124,12 @@ public class ContentProviderSubj extends ContentProvider {
         newSubjValues.put(SJLB.Subj.LAST_DATE, aSubj.getLastDate().getTime());
         newSubjValues.put(SJLB.Subj.TEXT,      aSubj.getText());
         return mDBHelper.getWritableDatabase().update(SJLB.Subj.TABLE_NAME, newSubjValues, SJLB.Subj._ID + "=" + aSubj.getId(), null) > 0;
+    }
+        
+    public boolean updateNbUnread(int aId, int aNbUnread) {
+        ContentValues newSubjValues = new ContentValues();
+        newSubjValues.put(SJLB.Subj.NB_UNREAD, aNbUnread);
+        return mDBHelper.getWritableDatabase().update(SJLB.Subj.TABLE_NAME, newSubjValues, SJLB.Subj._ID + "=" + aId, null) > 0;
     }
         
     // vide la table des Subj

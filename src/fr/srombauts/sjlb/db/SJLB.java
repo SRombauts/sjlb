@@ -11,7 +11,7 @@ public final class SJLB {
     private SJLB() {}
 
     public static final String DATABASE_NAME        = "SJLB.db";
-    public static final int    DATABASE_VERSION     = 7;
+    public static final int    DATABASE_VERSION     = 8;
     
     
     /**
@@ -188,6 +188,12 @@ public final class SJLB {
         public static final String  TEXT                = "text";
         
         /**
+         * Nombre de messages non lus dans le sujet
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  NB_UNREAD           = "nb_unread";
+
+        /**
          * The default sort order for this table
          */
         public static final String  DEFAULT_SORT_ORDER  = LAST_DATE + " DESC";
@@ -200,7 +206,8 @@ public final class SJLB {
                                                     + CAT_ID   + " integer, "
                                                     + GROUP_ID + " integer, "
                                                     + LAST_DATE+ " integer, "
-                                                    + TEXT     + " text);";
+                                                    + TEXT     + " text, "
+                                                    + NB_UNREAD+ " integer);";
 
         public static final String  TABLE_DROP   = "DROP TABLE IF EXISTS " + SJLB.Subj.TABLE_NAME;
 

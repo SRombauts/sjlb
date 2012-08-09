@@ -72,6 +72,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         CategoryDescription.setText(mSelectedCategoryLabel);        
         
         // Récupère un curseur sur les données (les sujets) en filtrant sur l'id de la catégorie sélectionnée
+        // TODO SRO : utiliser l'argument "projection" pour filtrer les résultats et ainsi optimiser l'utilisation mémoire
         mCursor = managedQuery( SJLB.Subj.CONTENT_URI,
         						null,
                                 SJLB.Subj.CAT_ID + "=" + mSelectedCategoryId,
@@ -241,7 +242,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     
     
     
-    // TODO SRO : en tests => revenir à une SimpleCursorAdapteur dès que la subquery sera en place
+    // TODO SRO : en tests => revenir à une SimpleCursorAdapteur !
     // Adaptateur mappant les données du curseur dans des objets du cache du pool d'objets View utilisés par la ListView
     private final class SubjectListItemAdapter extends ResourceCursorAdapter {
         public SubjectListItemAdapter(Context context, int layout, Cursor c) {
@@ -254,21 +255,13 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
             final SubjectListItemCache  cache = (SubjectListItemCache)view.getTag();
 
             // Récupère le titre du sujet
-            // TODO SRO : à optimiser à l'aide d'un #define sur l'ID de la colonne ! 
+            // TODO SRO : à optimiser à l'aide d'un #define sur l'ID de la colonne 
             String  title = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.Subj.TEXT));
-            
-            // TODO SRO : à remplacer par une sub-query SQL, technique bien plus optimisée car travail fait en amont de l'affichage (meilleurs scroll de la ListView) !
-            // => OU ALORS, on pourrait (bidouiller) calculer le nombre de messages non lus par sujet à l'insertion, et le mettre à jour sur consultation du sujet en questio !
-            Cursor subCursor = managedQuery(SJLB.Msg.CONTENT_URI,
-                                            null,
-                                            "(" +       SJLB.Msg.SUBJECT_ID + "=" + cursor.getString(cursor.getColumnIndexOrThrow(SJLB.Subj._ID))
-                                            + " AND " + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")",
-                                            null,
-                                            null);
-            
-            // et lui ajoute le nb de messages non lus
-            if (0 < subCursor.getCount()) {
-                title += " (" + subCursor.getCount() + ")";
+            // et le nb de messages non lus
+            final int NbUnread = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Subj.NB_UNREAD));
+            if (0 < NbUnread) {
+                // et ajoute au titre le nb de messages non lus si non nul
+                title += " (" + NbUnread + ")";
             }
             cache.nameView.setText(title);
         }

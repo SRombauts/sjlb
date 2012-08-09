@@ -96,7 +96,9 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         SubjectsDescription.setText(mSelectedSubjectLabel);
         
         // Récupère un curseur sur les données (les messages) en filtrant sur l'id du sujet sélectionné
-        mCursor = managedQuery( SJLB.Msg.CONTENT_URI, null,
+        // TODO SRO : utiliser l'argument "projection" pour filtrer les résultats et ainsi optimiser l'utilisation mémoire
+        mCursor = managedQuery( SJLB.Msg.CONTENT_URI,
+                                null,
                                 SJLB.Msg.SUBJECT_ID + "=" + mSelectedSubjectId,
                                 null, null);
 
@@ -109,6 +111,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         mMsgListView.setAdapter (mAdapter);
         
         // Scroll en bas de la liste des messages, sur le message précédant le premier message non lu
+        // TODO SRO : utiliser l'argument "projection" pour filtrer les résultats et ainsi optimiser l'utilisation mémoire
         Cursor subCursor = managedQuery(
                 SJLB.Msg.CONTENT_URI,
                 null,
@@ -363,6 +366,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             int msgId = cursor.getInt(0); // SJLB.Msg._ID, à ne pas confondre avec SJLB.Msg
             
             // Récupère un curseur sur les données (les fichiers) en filtrant sur l'id du sujet sélectionné
+            // TODO SRO : utiliser l'argument "projection" pour filtrer les résultats et ainsi optimiser l'utilisation mémoire
             Cursor cursorFiles = managedQuery(  SJLB.File.CONTENT_URI, null,
                                                 SJLB.File.MSG_ID + "=" + msgId,
                                                 null, null);
