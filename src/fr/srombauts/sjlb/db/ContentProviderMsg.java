@@ -31,7 +31,7 @@ public class ContentProviderMsg extends ContentProvider {
         sUriMatcher.addURI(SJLB.Msg.AUTHORITY, SJLB.Msg.MATCHER_LIVE_FOLDER,    MSG_LIVE_FOLDER);
     }
     
-    // TODO ce constructeur semble nécessaire : pour une instanciation de content provider  on dirait ?!
+    // Un constructeur public par défaut est nécessaire dès lorsque que le provider est déclaré dans le Manifeste
     public ContentProviderMsg () {
         mDBHelper = null;
     }

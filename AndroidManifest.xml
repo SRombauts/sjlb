@@ -37,11 +37,11 @@
         <activity android:name=".gui.ActivityPrivateMessages"
                   android:launchMode="singleTask">
         </activity>
-        <activity android:name=".gui.ActivityNewPrivateMessageivateMessage">
+        <activity android:name=".gui.ActivityNewPrivateMessage">
         </activity>
-        <activity android:name=".gui.ActivityPreferencesnces">
+        <activity android:name=".gui.ActivityPreferences">
         </activity>
-	    <receiver android:name=".IntentReceiverStartService">
+	    <receiver android:name=".service.IntentReceiverStartService">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -57,13 +57,13 @@
         <provider android:name=".db.ContentProviderPM"
                   android:authorities="fr.srombauts.sjlb.pm"
         />
-        <provider android:name=".db.ContentProviderSubjubj"
+        <provider android:name=".db.ContentProviderSubj"
                   android:authorities="fr.srombauts.sjlb.subj"
         />
-        <provider android:name=".db.ContentProviderMsgMsg"
+        <provider android:name=".db.ContentProviderMsg"
                   android:authorities="fr.srombauts.sjlb.msg"
         />
-        <provider android:name=".db.ContentProviderFileile"
+        <provider android:name=".db.ContentProviderFile"
                   android:authorities="fr.srombauts.sjlb.file"
         />
     </application>
