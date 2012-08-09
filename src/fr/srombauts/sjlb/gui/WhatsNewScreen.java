@@ -1,7 +1,5 @@
 package fr.srombauts.sjlb.gui;
 
-import fr.srombauts.sjlb.R;
-import fr.srombauts.sjlb.R.string;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -11,6 +9,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import fr.srombauts.sjlb.R;
 
 public class WhatsNewScreen {
     private static final String LOG_TAG                 = "WhatsNewScreen";

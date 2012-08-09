@@ -1,0 +1,364 @@
+fr.srombauts.sjlb.ApplicationSJLB -> fr.srombauts.sjlb.ApplicationSJLB:
+    java.lang.String[] CONTACTS_SUMMARY_PROJECTION -> a
+    java.util.Vector mUserContactList -> b
+    void onCreate() -> onCreate
+    void initUserContactList() -> a
+fr.srombauts.sjlb.db.ContentProviderFile -> fr.srombauts.sjlb.db.a:
+    fr.srombauts.sjlb.db.DBOpenHelper mDBHelper -> a
+    android.content.UriMatcher sUriMatcher -> b
+    boolean onCreate() -> onCreate
+    java.lang.String getType(android.net.Uri) -> getType
+    int delete(android.net.Uri,java.lang.String,java.lang.String[]) -> delete
+    android.net.Uri insert(android.net.Uri,android.content.ContentValues) -> insert
+    android.database.Cursor query(android.net.Uri,java.lang.String[],java.lang.String,java.lang.String[],java.lang.String) -> query
+    int update(android.net.Uri,android.content.ContentValues,java.lang.String,java.lang.String[]) -> update
+    void close() -> a
+    boolean insertFile(fr.srombauts.sjlb.model.AttachedFile) -> a
+    boolean clearFiles() -> b
+fr.srombauts.sjlb.db.ContentProviderMsg -> fr.srombauts.sjlb.db.b:
+    fr.srombauts.sjlb.db.DBOpenHelper mDBHelper -> a
+    android.content.UriMatcher sUriMatcher -> b
+    boolean onCreate() -> onCreate
+    java.lang.String getType(android.net.Uri) -> getType
+    int delete(android.net.Uri,java.lang.String,java.lang.String[]) -> delete
+    android.net.Uri insert(android.net.Uri,android.content.ContentValues) -> insert
+    android.database.Cursor query(android.net.Uri,java.lang.String[],java.lang.String,java.lang.String[],java.lang.String) -> query
+    int update(android.net.Uri,android.content.ContentValues,java.lang.String,java.lang.String[]) -> update
+    void close() -> a
+    boolean insertMsg(fr.srombauts.sjlb.model.ForumMessage) -> a
+    boolean updateMsg(fr.srombauts.sjlb.model.ForumMessage) -> b
+    long getFirstMsgDate() -> b
+    long getLastMsgDate() -> c
+    android.database.Cursor getMsgUnread() -> d
+    int clearMsgUnread() -> e
+    java.lang.Boolean isExist(int) -> a
+    boolean clearMsg() -> f
+    long getCount() -> g
+fr.srombauts.sjlb.db.ContentProviderPM -> fr.srombauts.sjlb.db.ContentProviderPM:
+    fr.srombauts.sjlb.db.DBOpenHelper mDBHelper -> a
+    android.content.UriMatcher sUriMatcher -> b
+    boolean onCreate() -> onCreate
+    java.lang.String getType(android.net.Uri) -> getType
+    int delete(android.net.Uri,java.lang.String,java.lang.String[]) -> delete
+    android.net.Uri insert(android.net.Uri,android.content.ContentValues) -> insert
+    android.database.Cursor query(android.net.Uri,java.lang.String[],java.lang.String,java.lang.String[],java.lang.String) -> query
+    int update(android.net.Uri,android.content.ContentValues,java.lang.String,java.lang.String[]) -> update
+    void close() -> a
+    boolean insertPM(fr.srombauts.sjlb.model.PrivateMessage) -> a
+    boolean clearPM() -> b
+    java.lang.Boolean isExist(int) -> a
+    long countPM() -> c
+fr.srombauts.sjlb.db.ContentProviderSubj -> fr.srombauts.sjlb.db.c:
+    fr.srombauts.sjlb.db.DBOpenHelper mDBHelper -> a
+    android.content.UriMatcher sUriMatcher -> b
+    boolean onCreate() -> onCreate
+    java.lang.String getType(android.net.Uri) -> getType
+    int delete(android.net.Uri,java.lang.String,java.lang.String[]) -> delete
+    android.net.Uri insert(android.net.Uri,android.content.ContentValues) -> insert
+    android.database.Cursor query(android.net.Uri,java.lang.String[],java.lang.String,java.lang.String[],java.lang.String) -> query
+    int update(android.net.Uri,android.content.ContentValues,java.lang.String,java.lang.String[]) -> update
+    void close() -> a
+    boolean insertSubj(fr.srombauts.sjlb.model.ForumSubject) -> a
+    boolean updateSubj(fr.srombauts.sjlb.model.ForumSubject) -> b
+    boolean clearSubj() -> b
+    java.lang.Boolean isExist(int) -> a
+fr.srombauts.sjlb.db.ContentProviderUser -> fr.srombauts.sjlb.db.ContentProviderUser:
+    fr.srombauts.sjlb.db.DBOpenHelper mDBHelper -> a
+    android.content.UriMatcher sUriMatcher -> b
+    boolean onCreate() -> onCreate
+    java.lang.String getType(android.net.Uri) -> getType
+    int delete(android.net.Uri,java.lang.String,java.lang.String[]) -> delete
+    android.net.Uri insert(android.net.Uri,android.content.ContentValues) -> insert
+    android.database.Cursor query(android.net.Uri,java.lang.String[],java.lang.String,java.lang.String[],java.lang.String) -> query
+    int update(android.net.Uri,android.content.ContentValues,java.lang.String,java.lang.String[]) -> update
+    void close() -> a
+    boolean insertUser(fr.srombauts.sjlb.model.User) -> a
+    boolean clearUser() -> b
+    long countUsers() -> c
+fr.srombauts.sjlb.db.DBOpenHelper -> fr.srombauts.sjlb.db.d:
+    void onCreate(android.database.sqlite.SQLiteDatabase) -> onCreate
+    void onUpgrade(android.database.sqlite.SQLiteDatabase,int,int) -> onUpgrade
+fr.srombauts.sjlb.db.SJLB -> fr.srombauts.sjlb.db.e:
+fr.srombauts.sjlb.db.SJLB$File -> fr.srombauts.sjlb.db.f:
+    android.net.Uri CONTENT_URI -> a
+fr.srombauts.sjlb.db.SJLB$Msg -> fr.srombauts.sjlb.db.g:
+    android.net.Uri CONTENT_URI -> a
+fr.srombauts.sjlb.db.SJLB$PM -> fr.srombauts.sjlb.db.h:
+    android.net.Uri CONTENT_URI -> a
+fr.srombauts.sjlb.db.SJLB$Subj -> fr.srombauts.sjlb.db.i:
+    android.net.Uri CONTENT_URI -> a
+fr.srombauts.sjlb.db.SJLB$User -> fr.srombauts.sjlb.db.j:
+    android.net.Uri CONTENT_URI -> a
+fr.srombauts.sjlb.gui.ActivityForumMessages -> fr.srombauts.sjlb.gui.ActivityForumMessages:
+    android.database.Cursor mCursor -> a
+    fr.srombauts.sjlb.gui.ActivityForumMessages$MessageListItemAdapter mAdapter -> b
+    android.widget.ListView mMsgListView -> e
+    android.widget.EditText mEditText -> f
+    android.widget.Button mEditButton -> g
+    long mSelectedCategoryId -> h
+    long mSelectedSubjectId -> i
+    java.lang.String mSelectedSubjectLabel -> j
+    long mSelectedGroupId -> k
+    int mOriginalMsgListHeight -> l
+    void onCreate(android.os.Bundle) -> onCreate
+    void onResume() -> onResume
+    void onDestroy() -> onDestroy
+    boolean onCreateOptionsMenu(android.view.Menu) -> onCreateOptionsMenu
+    boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
+    void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick
+    boolean onItemLongClick(android.widget.AdapterView,android.view.View,int,long) -> onItemLongClick
+    void openEditText() -> c
+    void onSendMsg(android.view.View) -> onSendMsg
+    void onTransferDone(boolean) -> a
+    boolean onLeftGesture() -> a
+    android.widget.ListView access$0() -> b
+fr.srombauts.sjlb.gui.ActivityForumMessages$FileListItem -> fr.srombauts.sjlb.gui.a:
+    android.widget.ImageView imageViewFile -> a
+    android.widget.TextView textViewFile -> b
+    android.graphics.Bitmap imageBitmap -> c
+    java.lang.String filename -> d
+    void onImageDownloaded(android.graphics.Bitmap) -> a
+fr.srombauts.sjlb.gui.ActivityForumMessages$FileListItemAdapter -> fr.srombauts.sjlb.gui.b:
+    fr.srombauts.sjlb.gui.ActivityForumMessages$FileListItem[] mListeItem -> b
+    fr.srombauts.sjlb.gui.ActivityForumMessages this$0 -> a
+    android.view.View getView(int,android.view.View,android.view.ViewGroup) -> getView
+fr.srombauts.sjlb.gui.ActivityForumMessages$MessageListItemAdapter -> fr.srombauts.sjlb.gui.c:
+    fr.srombauts.sjlb.gui.ActivityForumMessages this$0 -> a
+    void bindView(android.view.View,android.content.Context,android.database.Cursor) -> bindView
+    android.view.View newView(android.content.Context,android.database.Cursor,android.view.ViewGroup) -> newView
+    void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick
+fr.srombauts.sjlb.gui.ActivityForumMessages$MessageListItemCache -> fr.srombauts.sjlb.gui.d:
+    android.widget.QuickContactBadge quickContactView -> a
+    android.widget.TextView titleView -> b
+    android.widget.TextView textView -> c
+    android.widget.ImageView imageViewNew -> d
+    android.widget.ListView fileListView -> e
+fr.srombauts.sjlb.gui.ActivityForumSubjects -> fr.srombauts.sjlb.gui.ActivityForumSubjects:
+    android.database.Cursor mCursor -> a
+    fr.srombauts.sjlb.gui.ActivityForumSubjects$SubjectListItemAdapter mAdapter -> b
+    android.widget.ListView mSubjectsListView -> e
+    long mSelectedCategoryId -> f
+    java.lang.String mSelectedCategoryLabel -> g
+    long mSelectedSubjId -> h
+    long mSelectedGroupId -> i
+    java.lang.String mSelectedSubjLabel -> j
+    android.content.Intent mSavedIntent -> k
+    void onCreate(android.os.Bundle) -> onCreate
+    void onResume() -> onResume
+    void onStop() -> onStop
+    boolean onCreateOptionsMenu(android.view.Menu) -> onCreateOptionsMenu
+    boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
+    void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick
+    boolean onItemLongClick(android.widget.AdapterView,android.view.View,int,long) -> onItemLongClick
+    boolean onLeftGesture() -> a
+    boolean onRightGesture() -> a_
+fr.srombauts.sjlb.gui.ActivityForumSubjects$SubjectListItemAdapter -> fr.srombauts.sjlb.gui.e:
+    fr.srombauts.sjlb.gui.ActivityForumSubjects this$0 -> a
+    void bindView(android.view.View,android.content.Context,android.database.Cursor) -> bindView
+    android.view.View newView(android.content.Context,android.database.Cursor,android.view.ViewGroup) -> newView
+fr.srombauts.sjlb.gui.ActivityForumSubjects$SubjectListItemCache -> fr.srombauts.sjlb.gui.f:
+    android.widget.TextView nameView -> a
+fr.srombauts.sjlb.gui.ActivityMain -> fr.srombauts.sjlb.gui.ActivityMain:
+    android.widget.ListView mCategoriesListView -> e
+    android.widget.ArrayAdapter mAA -> a
+    java.util.ArrayList mCategories -> b
+    long mSelectedCategoryId -> f
+    java.lang.String mSelectedCategoryLabel -> g
+    android.content.Intent mSavedIntent -> h
+    void onCreate(android.os.Bundle) -> onCreate
+    void onNewIntent(android.content.Intent) -> onNewIntent
+    void onResume() -> onResume
+    void onDestroy() -> onDestroy
+    void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick
+    boolean onItemLongClick(android.widget.AdapterView,android.view.View,int,long) -> onItemLongClick
+    boolean onCreateOptionsMenu(android.view.Menu) -> onCreateOptionsMenu
+    boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
+    void onShowPM(android.view.View) -> onShowPM
+    void startActivityPM() -> c
+    boolean onLeftGesture() -> a
+    boolean onRightGesture() -> a_
+fr.srombauts.sjlb.gui.ActivityNewPrivateMessage -> fr.srombauts.sjlb.gui.g:
+    android.database.Cursor mCursor -> a
+    android.widget.SimpleCursorAdapter mAdapter -> b
+    android.widget.Spinner mUsersSpinner -> c
+    android.widget.EditText mText -> d
+    void onCreate(android.os.Bundle) -> onCreate
+    boolean onCreateOptionsMenu(android.view.Menu) -> onCreateOptionsMenu
+    void onCreateContextMenu(android.view.ContextMenu,android.view.View,android.view.ContextMenu$ContextMenuInfo) -> onCreateContextMenu
+    boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
+    void onSendPM(android.view.View) -> onSendPM
+fr.srombauts.sjlb.gui.ActivityPreferences -> fr.srombauts.sjlb.gui.h:
+    void onCreate(android.os.Bundle) -> onCreate
+fr.srombauts.sjlb.gui.ActivityPrivateMessages -> fr.srombauts.sjlb.gui.ActivityPrivateMessages:
+    android.database.Cursor mCursor -> a
+    fr.srombauts.sjlb.gui.ActivityPrivateMessages$PmListItemAdapter mAdapter -> b
+    android.widget.ListView mPrivateMessagesListView -> e
+    long mSelectedPmId -> f
+    void onCreate(android.os.Bundle) -> onCreate
+    void onNewIntent(android.content.Intent) -> onNewIntent
+    void onResume() -> onResume
+    boolean onLeftGesture() -> a
+    boolean onCreateOptionsMenu(android.view.Menu) -> onCreateOptionsMenu
+    boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
+    void onCreateContextMenu(android.view.ContextMenu,android.view.View,android.view.ContextMenu$ContextMenuInfo) -> onCreateContextMenu
+    boolean onContextItemSelected(android.view.MenuItem) -> onContextItemSelected
+    android.app.Dialog onCreateDialog(int) -> onCreateDialog
+    void onPrepareDialog(int,android.app.Dialog) -> onPrepareDialog
+    void deletePM(long) -> a
+    void deleteAllPM() -> c
+    void onNewPM(android.view.View) -> onNewPM
+    long access$0(fr.srombauts.sjlb.gui.ActivityPrivateMessages) -> a
+fr.srombauts.sjlb.gui.ActivityPrivateMessages$1 -> fr.srombauts.sjlb.gui.i:
+    fr.srombauts.sjlb.gui.ActivityPrivateMessages this$0 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+fr.srombauts.sjlb.gui.ActivityPrivateMessages$2 -> fr.srombauts.sjlb.gui.j:
+    fr.srombauts.sjlb.gui.ActivityPrivateMessages this$0 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+fr.srombauts.sjlb.gui.ActivityPrivateMessages$3 -> fr.srombauts.sjlb.gui.k:
+    fr.srombauts.sjlb.gui.ActivityPrivateMessages this$0 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+fr.srombauts.sjlb.gui.ActivityPrivateMessages$4 -> fr.srombauts.sjlb.gui.l:
+    fr.srombauts.sjlb.gui.ActivityPrivateMessages this$0 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+fr.srombauts.sjlb.gui.ActivityPrivateMessages$MessageListItemCache -> fr.srombauts.sjlb.gui.m:
+    android.widget.QuickContactBadge quickContactView -> a
+    android.widget.TextView titleView -> b
+    android.widget.TextView textView -> c
+fr.srombauts.sjlb.gui.ActivityPrivateMessages$PmListItemAdapter -> fr.srombauts.sjlb.gui.n:
+    fr.srombauts.sjlb.gui.ActivityPrivateMessages this$0 -> a
+    void bindView(android.view.View,android.content.Context,android.database.Cursor) -> bindView
+    android.view.View newView(android.content.Context,android.database.Cursor,android.view.ViewGroup) -> newView
+fr.srombauts.sjlb.gui.ActivityTouchListener -> fr.srombauts.sjlb.gui.o:
+    float mTouchStartPositionX -> c
+    float mTouchStartPositionY -> d
+    float mSensibility -> a
+    boolean onTouch(android.view.View,android.view.MotionEvent) -> onTouch
+    boolean onLeftGesture() -> a
+    boolean onRightGesture() -> a_
+fr.srombauts.sjlb.gui.LoginPasswordPopup -> fr.srombauts.sjlb.gui.p:
+    android.app.Activity mActivity -> a
+fr.srombauts.sjlb.gui.LoginPasswordPopup$1 -> fr.srombauts.sjlb.gui.q:
+    fr.srombauts.sjlb.gui.LoginPasswordPopup this$0 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+fr.srombauts.sjlb.gui.WhatsNewScreen -> fr.srombauts.sjlb.gui.r:
+    android.app.Activity mActivity -> a
+fr.srombauts.sjlb.gui.WhatsNewScreen$1 -> fr.srombauts.sjlb.gui.s:
+    fr.srombauts.sjlb.gui.WhatsNewScreen this$0 -> a
+    android.content.SharedPreferences val$prefs -> b
+    android.content.pm.PackageInfo val$packageInfo -> c
+    void onClick(android.content.DialogInterface,int) -> onClick
+fr.srombauts.sjlb.model.AttachedFile -> fr.srombauts.sjlb.a.a:
+    int mMessageId -> a
+    java.lang.String mFilename -> b
+    java.lang.String toString() -> toString
+fr.srombauts.sjlb.model.ForumMessage -> fr.srombauts.sjlb.a.b:
+    int mId -> a
+    java.util.Date mDate -> b
+    int mAuthorId -> c
+    int mSubjectId -> d
+    boolean mbUnread -> e
+    java.lang.String mText -> f
+    java.lang.String toString() -> toString
+    java.lang.String getDateString(java.util.Date) -> a
+fr.srombauts.sjlb.model.ForumSubject -> fr.srombauts.sjlb.a.c:
+    int mId -> a
+    int mCategoryId -> b
+    int mGroupId -> c
+    java.util.Date mLastDate -> d
+    java.lang.String mText -> e
+    java.lang.String toString() -> toString
+fr.srombauts.sjlb.model.LoginPasswordBadException -> fr.srombauts.sjlb.a.d:
+fr.srombauts.sjlb.model.LoginPasswordEmptyException -> fr.srombauts.sjlb.a.e:
+fr.srombauts.sjlb.model.PrefsLoginPassword -> fr.srombauts.sjlb.a.f:
+    java.lang.String mLogin -> a
+    java.lang.String mPasswordMD5 -> b
+    boolean AreFilled(android.content.Context) -> a
+fr.srombauts.sjlb.model.PrefsNotification -> fr.srombauts.sjlb.a.g:
+    java.lang.Boolean mbSound -> a
+    java.lang.Boolean mbVibrate -> b
+    java.lang.Boolean mbLight -> c
+fr.srombauts.sjlb.model.PrivateMessage -> fr.srombauts.sjlb.a.h:
+    int mId -> a
+    java.util.Date mDate -> b
+    int mAuthorId -> c
+    java.lang.String mAuthor -> d
+    java.lang.String mText -> e
+    java.lang.String toString() -> toString
+fr.srombauts.sjlb.model.User -> fr.srombauts.sjlb.a.i:
+    int mId -> a
+    java.lang.String mPseudo -> b
+    java.lang.String mNom -> c
+    java.lang.String toString() -> toString
+fr.srombauts.sjlb.model.UserContactDescr -> fr.srombauts.sjlb.a.j:
+    android.net.Uri lookupUri -> a
+    android.graphics.Bitmap photo -> b
+fr.srombauts.sjlb.service.AsynchTaskDeletePM -> fr.srombauts.sjlb.service.a:
+    android.content.Context mContext -> a
+    int mNbPM -> b
+    fr.srombauts.sjlb.db.ContentProviderPM mPMDBAdapter -> c
+    void onPreExecute() -> onPreExecute
+    java.lang.Void doInBackground(java.lang.String[]) -> a
+    void onPostExecute(java.lang.Object) -> onPostExecute
+    java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
+fr.srombauts.sjlb.service.AsynchTaskDownloadImage -> fr.srombauts.sjlb.service.b:
+    java.lang.String mUrl -> a
+    fr.srombauts.sjlb.service.CallbackImageDownload mCallbackDownload -> b
+    void onPreExecute() -> onPreExecute
+    android.graphics.Bitmap doInBackground(java.lang.String[]) -> a
+    void onPostExecute(java.lang.Object) -> onPostExecute
+    java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
+    void onProgressUpdate(java.lang.Object[]) -> onProgressUpdate
+fr.srombauts.sjlb.service.AsynchTaskNewMsg -> fr.srombauts.sjlb.service.c:
+    android.content.Context mContext -> a
+    fr.srombauts.sjlb.service.CallbackTransfer mCallbackTransfer -> b
+    fr.srombauts.sjlb.db.ContentProviderMsg mMsgDBAdapter -> c
+    void onPreExecute() -> onPreExecute
+    java.lang.Boolean sendMsg(java.lang.String,java.lang.String,java.lang.String,java.lang.String) -> a
+    void onPostExecute(java.lang.Object) -> onPostExecute
+    java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
+    void onProgressUpdate(java.lang.Object[]) -> onProgressUpdate
+fr.srombauts.sjlb.service.AsynchTaskNewPM -> fr.srombauts.sjlb.service.d:
+    android.content.Context mContext -> a
+    int mNbPM -> b
+    fr.srombauts.sjlb.db.ContentProviderPM mPMDBAdapter -> c
+    void onPreExecute() -> onPreExecute
+    java.lang.Boolean sendPM(java.lang.String,java.lang.String) -> a
+    void onPostExecute(java.lang.Object) -> onPostExecute
+    java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
+    void onProgressUpdate(java.lang.Object[]) -> onProgressUpdate
+fr.srombauts.sjlb.service.AsynchTaskRefresh -> fr.srombauts.sjlb.service.e:
+    fr.srombauts.sjlb.service.ServiceRefresh mContext -> a
+    int mNbPM -> b
+    int mNbNewPM -> c
+    int mNbUnreadMsg -> d
+    int mNbNewMsg -> e
+    fr.srombauts.sjlb.db.ContentProviderPM mPMDBAdapter -> f
+    fr.srombauts.sjlb.db.ContentProviderSubj mSubjDBAdapter -> g
+    fr.srombauts.sjlb.db.ContentProviderMsg mMsgDBAdapter -> h
+    fr.srombauts.sjlb.db.ContentProviderFile mFileDBAdapter -> i
+    fr.srombauts.sjlb.db.ContentProviderUser mUserDBAdapter -> j
+    void onPreExecute() -> onPreExecute
+    java.lang.Void doInBackground$10299ca() -> a
+    void refreshInfos() -> b
+    void fetchPM() -> c
+    void fetchMsg() -> d
+    void onPostExecute(java.lang.Object) -> onPostExecute
+    java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
+    void onProgressUpdate(java.lang.Object[]) -> onProgressUpdate
+fr.srombauts.sjlb.service.CallbackImageDownload -> fr.srombauts.sjlb.service.f:
+    void onImageDownloaded(android.graphics.Bitmap) -> a
+fr.srombauts.sjlb.service.CallbackTransfer -> fr.srombauts.sjlb.service.g:
+    void onTransferDone(boolean) -> a
+fr.srombauts.sjlb.service.FlushedInputStream -> fr.srombauts.sjlb.service.h:
+    long skip(long) -> skip
+fr.srombauts.sjlb.service.IntentReceiverStartService -> fr.srombauts.sjlb.service.i:
+    void onReceive(android.content.Context,android.content.Intent) -> onReceive
+    void startService(android.content.Context,java.lang.String) -> a
+fr.srombauts.sjlb.service.ServiceRefresh -> fr.srombauts.sjlb.service.ServiceRefresh:
+    fr.srombauts.sjlb.service.AsynchTaskRefresh mRefreshTask -> a
+    android.app.AlarmManager mAlarmManager -> b
+    android.app.PendingIntent mAlarmIntent -> c
+    void onCreate() -> onCreate
+    int onStartCommand(android.content.Intent,int,int) -> onStartCommand
+    void onDestroy() -> onDestroy
+    android.os.IBinder onBind(android.content.Intent) -> onBind

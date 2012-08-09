@@ -1,8 +1,5 @@
 package fr.srombauts.sjlb.gui;
 
-import fr.srombauts.sjlb.R;
-import fr.srombauts.sjlb.R.string;
-import fr.srombauts.sjlb.db.SJLB;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -10,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import fr.srombauts.sjlb.R;
+import fr.srombauts.sjlb.db.SJLB;
 
 public class LoginPasswordPopup {
     private static final String LOG_TAG                 = "LoginPasswordPopup";
