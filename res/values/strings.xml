@@ -4,8 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Fix left/right swipe and touch events\n
-        - Fix edit edit dialog on small screen\n
+        - Some optimizations\n
     </string>
     <string name="loginscreen_title">   Login/password                                          </string>
     <string name="loginscreen_message"> Enter your login and password in the preferences menu   </string>
