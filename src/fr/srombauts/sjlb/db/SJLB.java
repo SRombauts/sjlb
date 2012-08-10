@@ -164,7 +164,7 @@ public final class SJLB {
         private Subj() {}
 
         /**
-         * L'id de la catégorie de ratachement du sujet
+         * L'id de la catégorie de rattachement du sujet
          * <P>Type: INTEGER</P>
          */
         public static final String  CAT_ID              = "category_id";

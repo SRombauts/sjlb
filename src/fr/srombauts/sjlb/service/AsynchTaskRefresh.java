@@ -724,7 +724,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                                 }                                
                             }
                             
-                            // Dans le cas d'un message non lu, met aussi à jour le compteur de messages non lus
+                            // Dans le cas d'un message non lu, met aussi à jour (recalcule) le compteur de messages non lus
                             if (bUnread) {
                                 final int NbUnread = mMsgDBAdapter.getNbUnread(idSubject);
                                 if (mSubjDBAdapter.updateNbUnread(idSubject, NbUnread))

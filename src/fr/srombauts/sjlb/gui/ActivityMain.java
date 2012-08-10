@@ -75,25 +75,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
                                         android.R.layout.simple_list_item_1,
                                         mCategories);
         mCategoriesListView.setAdapter(mAA);
-        
-        // binding du champ de version
-        TextView    VersionView = (TextView)findViewById(R.id.versionView);
-        
-        // Compte le nombre de messages récupérés en base locale
-        ContentProviderMsg  msgs    = new ContentProviderMsg (this);
-        final long NbMsg = msgs.getCount();
-        msgs.close();
-        
-        // Lit les informations de version du package courant
-        PackageManager  manager = getPackageManager();
-        PackageInfo     info    = null;
-        try {
-            info = manager.getPackageInfo(getPackageName(), 0);
-            VersionView.setText("version " + info.versionName + "       " + NbMsg + " messages");
-        } catch (NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        
+
         // Enregistre les listener d'IHM que la classe implémente
         mCategoriesListView.setOnItemClickListener(this);
         mCategoriesListView.setOnItemLongClickListener(this);
@@ -115,11 +97,13 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
 
     // Appelée lorsque l'activité était déjà lancée (par exemple clic sur une notification de nouveau Msg)
     protected void onNewIntent (Intent intent) {
+        Log.d (LOG_TAG, "onNewIntent...");
     }
     
     // Appelée lorsque l'activité passe de "en pause/cachée" à "au premier plan"
     protected void onResume () {
         super.onResume();
+        Log.d (LOG_TAG, "onResume...");
 
         DBOpenHelper DBHelper = new DBOpenHelper(this, SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
         
@@ -148,8 +132,30 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
             mCategories.add(titre);            
         }
         DBHelper.close();
-        
+
+        // Signale à l'adapteur que les données ont changés
         mAA.notifyDataSetChanged();
+        
+        
+        // binding du champ de version
+        TextView    VersionView = (TextView)findViewById(R.id.versionView);
+        
+        // Compte le nombre de messages récupérés en base locale
+        ContentProviderMsg  msgs    = new ContentProviderMsg (this);
+        final long NbMsg = msgs.getCount();
+        msgs.close();
+        
+        // Lit les informations de version du package courant
+        PackageManager  manager = getPackageManager();
+        PackageInfo     info    = null;
+        try {
+            info = manager.getPackageInfo(getPackageName(), 0);
+        } catch (NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        // Puis affiches ces infos
+        VersionView.setText("version " + info.versionName + "       " + NbMsg + " messages");        
     }
     
     @Override
@@ -248,6 +254,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
                 break;
             }
             case (R.id.menu_reset): {
+                Log.d (LOG_TAG, "onOptionsItemSelected(menu_reset)");
                 ContentProviderUser users   = new ContentProviderUser (this);
                 users.clearUser();
                 users.close();

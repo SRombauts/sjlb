@@ -125,7 +125,7 @@ public class ContentProviderFile extends ContentProvider {
     // récupère un cursor avec la liste de tous les fichiers attachés
     public Cursor getAllFiles () {
         return mDBHelper.getReadableDatabase().query(   SJLB.File.TABLE_NAME,
-                                                       new String[] {  SJLB.File.MSG_ID,
+                                                       new String[] {   SJLB.File.MSG_ID,
                                                                         SJLB.File.FILENAME},
                                                        null, null, null, null, null);
     }

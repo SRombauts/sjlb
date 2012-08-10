@@ -72,9 +72,8 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         CategoryDescription.setText(mSelectedCategoryLabel);        
         
         // Récupère un curseur sur les données (les sujets) en filtrant sur l'id de la catégorie sélectionnée
-        // TODO SRO : utiliser l'argument "projection" pour filtrer les résultats et ainsi optimiser l'utilisation mémoire
         mCursor = managedQuery( SJLB.Subj.CONTENT_URI,
-        						null,
+        						null, // Pas d'argument "projection" pour filtrer les colonnes de résultats car elles sont toutes utiles
                                 SJLB.Subj.CAT_ID + "=" + mSelectedCategoryId,
                                 null, null);
 
@@ -110,11 +109,28 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     @Override
     protected void onResume () {
         super.onResume();
+        Log.d (LOG_TAG, "onResume...");
 
         // TODO SRO : tentative de refresh des données affichées (nb de new msg)
-        //         => NE PEUT PAS MARCHER en l'état car cela ne rafraîchit pas les sous requêtes faites dans l'adapteur !
-        //mCursor.requery();              // => inutile car on utilise managedQuery !
-        //mAdapter.notifyDataSetChanged();// ne marche pas !
+        //Log.w (LOG_TAG, "requery & notifyDataSetChanged");
+        //mCursor.requery();              // => inutile car on utilise managedQuery !?
+        // Récupère un nouveau curseur sur les données (les sujets) en filtrant sur l'id de la catégorie sélectionnée
+        mCursor = managedQuery( SJLB.Subj.CONTENT_URI,
+                                null, // Pas d'argument "projection" pour filtrer les colonnes de résultats car elles sont toutes utiles
+                                SJLB.Subj.CAT_ID + "=" + mSelectedCategoryId,
+                                null, null);
+        //mAdapter.changeCursor(mCursor);
+        //mAdapter.notifyDataSetChanged();// Ne marche pas !?
+
+        // Re-créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
+        Log.w (LOG_TAG, "new adapter !");
+        mAdapter = new SubjectListItemAdapter(  this,
+                                                R.layout.subj,
+                                                mCursor);
+        
+        mSubjectsListView = (ListView)findViewById(R.id.subj_listview);
+        mSubjectsListView.setAdapter (mAdapter);
+        mSubjectsListView.requestLayout();
     }
 
     
@@ -241,9 +257,8 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     }
     
     
-    
-    // TODO SRO : en tests => revenir à une SimpleCursorAdapteur !
-    // Adaptateur mappant les données du curseur dans des objets du cache du pool d'objets View utilisés par la ListView
+    // Adaptateur mappant les données du curseur dans des objets du cache du pool d'objets View utilisés par la ListView :
+    // ceci remplace un SimpleCursorAdaptor pour permettre de customiser l'affichage du nombre de messages non lus (SSI != 0)
     private final class SubjectListItemAdapter extends ResourceCursorAdapter {
         public SubjectListItemAdapter(Context context, int layout, Cursor c) {
             super(context, layout, c);
@@ -255,7 +270,6 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
             final SubjectListItemCache  cache = (SubjectListItemCache)view.getTag();
 
             // Récupère le titre du sujet
-            // TODO SRO : à optimiser à l'aide d'un #define sur l'ID de la colonne 
             String  title = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.Subj.TEXT));
             // et le nb de messages non lus
             final int NbUnread = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Subj.NB_UNREAD));
