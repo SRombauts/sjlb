@@ -4,7 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Quelques optimisations\n
+        - Récupération des anciens messages du site Web\n
     </string>
     <string name="loginscreen_title">   Login et mot de passe                                                           </string>
     <string name="loginscreen_message"> Veuillez saisir votre login et votre mot de passe dans le menu des préférences  </string>

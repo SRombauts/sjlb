@@ -57,9 +57,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     
     private Cursor                  mCursor         = null;
     private MessageListItemAdapter  mAdapter        = null;
-    // TODO SRO : tests en cours:
-//  private ListView                mMsgListView    = null;
-    private static ListView                mMsgListView    = null;
+    static private ListView         mMsgListView    = null; // TODO SRO "static" pour être accéder depuis la CallbackImageDownload
     private EditText                mEditText       = null;
     private Button                  mEditButton     = null;
     
@@ -111,10 +109,9 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         mMsgListView.setAdapter (mAdapter);
         
         // Scroll en bas de la liste des messages, sur le message précédant le premier message non lu
-        // TODO SRO : utiliser l'argument "projection" pour filtrer les résultats et ainsi optimiser l'utilisation mémoire
         Cursor subCursor = managedQuery(
                 SJLB.Msg.CONTENT_URI,
-                null,
+                new String[] {SJLB.Msg.SUBJECT_ID}, // ne récupère que le minimum pour compter le nombre de Msg non lus 
                 "(" +       SJLB.Msg.SUBJECT_ID + "=" + mSelectedSubjectId
                 + " AND " + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")",
                 null,
@@ -140,30 +137,26 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     @Override
     protected void onResume () {
         super.onResume();
-        
-        clearNotificationMsg ();
-    }
+        Log.d (LOG_TAG, "onResume... clear UNREAD flags");
 
-    @Override
-    protected void onDestroy () {
-        super.onDestroy ();
-        
-        // Efface les flags "UNREAD_TRUE" des messages lus lorsqu'on quitte !
-        ContentValues values = new ContentValues();
-        values.put(SJLB.Msg.UNREAD, SJLB.Msg.UNREAD_LOCALY); // on les passe à UNREAD_LOCALY ce qui indique qu'il faut encore signaler le site Web SJLB du fait qu'on les a lu !
-        String where = "(" + SJLB.Msg.SUBJECT_ID + "=" + mSelectedSubjectId + " AND " + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")";
-        getContentResolver ().update(SJLB.Msg.CONTENT_URI, values, where, null);        
-    }
-    
-    
-    /**
-     * Annule l'éventuelle notification de Msg non lus
-     */
-    private void clearNotificationMsg () {
+        // Supprime l'éventuelle notification de Msg non lus
         String              ns                      = Context.NOTIFICATION_SERVICE;
         NotificationManager notificationManager     = (NotificationManager) getSystemService(ns);
         notificationManager.cancel(AsynchTaskRefresh.NOTIFICATION_NEW_MSG_ID);
+
+        // Efface les flags "UNREAD_TRUE" des messages lus dès qu'on entre !
+        ContentValues values = new ContentValues();
+        values.put(SJLB.Msg.UNREAD, SJLB.Msg.UNREAD_LOCALY); // on les passe à UNREAD_LOCALY ce qui indique qu'il faut encore signaler le site Web SJLB du fait qu'on les a lu !
+        final String where = "(" + SJLB.Msg.SUBJECT_ID + "=" + mSelectedSubjectId + " AND " + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")";
+        getContentResolver ().update(SJLB.Msg.CONTENT_URI, values, where, null);        
+
+        // Met à zéro le nombre de messages non lus restant dans le sujet
+        ContentValues valuesSubj = new ContentValues();
+        valuesSubj.put(SJLB.Subj.NB_UNREAD, 0);
+        final String whereSubj = "(" + SJLB.Subj._ID + "=" + mSelectedSubjectId + ")";
+        getContentResolver ().update(SJLB.Subj.CONTENT_URI, valuesSubj, whereSubj, null);        
     }
+    
     
     /**
      * Création du menu général
