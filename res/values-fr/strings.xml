@@ -4,16 +4,18 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Récupération des anciens messages du site Web\n
+        - Ajout d\'un écran présentant la liste des utilisateurs de SJLB\n
     </string>
     <string name="loginscreen_title">   Login et mot de passe                                                           </string>
     <string name="loginscreen_message"> Veuillez saisir votre login et votre mot de passe dans le menu des préférences  </string>
     
-    <string name="pm_description">  Messages Privés             </string>
-
-    <string name="button_show_pm">  Messages Privés             </string>
-    <string name="button_send_pm">  Envoyer le message privé    </string>
-    <string name="button_send_msg"> Envoyer le message          </string>
+    <string name="pm_description">        Messages Privés            </string>
+    <string name="user_description">      Membres                    </string>
+    
+    <string name="button_show_pm">        Messages Privés            </string>
+    <string name="button_show_user_list"> Membres                    </string>
+    <string name="button_send_pm">        Envoyer le message privé   </string>
+    <string name="button_send_msg">       Envoyer le message         </string>
 
     <!-- Preferences -->
     <string name="prefs_authentication">    Authentification                </string>

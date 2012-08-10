@@ -3,8 +3,8 @@
      PAS pour les tests, car cette valeur pourrait être utilisée pour signaler automatiquement une mise à jour disponible -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="fr.srombauts.sjlb"
-      android:versionCode="56"
-      android:versionName="0.5.6">
+      android:versionCode="57"
+      android:versionName="0.5.7">
 <!--  android:installLocation="auto" : seulement à partir de l'API level 8 -->
       
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
@@ -39,6 +39,8 @@
         </activity>
         <activity android:name=".gui.ActivityPrivateMessages"
                   android:launchMode="singleTask">
+        </activity>
+        <activity android:name=".gui.ActivityUsers">
         </activity>
         <activity android:name=".gui.ActivityNewPrivateMessage">
         </activity>

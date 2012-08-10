@@ -16,7 +16,7 @@
         android:id="@+id/filename"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="18px"
+        android:textSize="10sp"
         android:textColor="#FFF"
         android:background="#000"
         />

@@ -17,7 +17,7 @@
     <EditText
         android:id="@+id/textEditText"
         android:layout_width="fill_parent"
-        android:layout_height="200px"
+        android:layout_height="200dp"
         android:gravity="top"
         android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
         android:visibility="invisible"

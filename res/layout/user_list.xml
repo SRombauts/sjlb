@@ -3,15 +3,14 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:padding="6dp"
-    >
+>
     <TextView  
-        android:id="@+id/category_label"
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content" 
+        android:text="@string/user_description"
     />
-    <ListView
-        android:id="@+id/subj_listview"
+    <ListView 
+        android:id="@+id/user_listview"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
     />    

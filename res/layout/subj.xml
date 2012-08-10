@@ -3,14 +3,14 @@
 	android:orientation="horizontal"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
-    android:paddingTop="10px"
-    android:paddingBottom="10px"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp"
    	>
     <TextView
         android:id="@+id/subjText"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="28px"
+        android:textSize="16sp"
         android:textColor="#FFF"
         android:background="#000"
         />

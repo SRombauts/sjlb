@@ -296,13 +296,35 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
     }
 
     /**
-     * Lance l'activité présentant la liste des PM, sur click du bouton correspondant 
+     * Sur click du bouton correspondant, lance l'activité d'affichage des membres du site SJLB
+     */
+    public void onShowUserList (View v) {
+        startActivityUsers ();
+    }
+
+    /**
+     * Lance l'activité présentant la liste des PM
      */
     public void startActivityPM () {
         // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
         if (PrefsLoginPassword.AreFilled (this)) {
             // Lance l'activité lisant les PM
             Intent intent = new Intent(this, ActivityPrivateMessages.class);
+            startActivity(intent);
+        } else {
+            // Toast notification signalant l'absence de login/password
+            Toast.makeText(this, getString(R.string.toast_auth_needed), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Lance l'activité présentant la liste des membres du site SJLB 
+     */
+    public void startActivityUsers () {
+        // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
+        if (PrefsLoginPassword.AreFilled (this)) {
+            // Lance l'activité lisant la liste des utilisateurs
+            Intent intent = new Intent(this, ActivityUsers.class);
             startActivity(intent);
         } else {
             // Toast notification signalant l'absence de login/password
