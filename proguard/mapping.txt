@@ -34,6 +34,7 @@ fr.srombauts.sjlb.db.ContentProviderMsg -> fr.srombauts.sjlb.db.ContentProviderM
     java.lang.Boolean isExist(int) -> a
     boolean clearMsg() -> f
     long getCount() -> g
+    int getNbUnread(int) -> b
 fr.srombauts.sjlb.db.ContentProviderPM -> fr.srombauts.sjlb.db.ContentProviderPM:
     fr.srombauts.sjlb.db.DBOpenHelper mDBHelper -> a
     android.content.UriMatcher sUriMatcher -> b
@@ -60,6 +61,7 @@ fr.srombauts.sjlb.db.ContentProviderSubj -> fr.srombauts.sjlb.db.ContentProvider
     void close() -> a
     boolean insertSubj(fr.srombauts.sjlb.model.ForumSubject) -> a
     boolean updateSubj(fr.srombauts.sjlb.model.ForumSubject) -> b
+    boolean updateNbUnread(int,int) -> a
     boolean clearSubj() -> b
     java.lang.Boolean isExist(int) -> a
 fr.srombauts.sjlb.db.ContentProviderUser -> fr.srombauts.sjlb.db.ContentProviderUser:
@@ -102,7 +104,6 @@ fr.srombauts.sjlb.gui.ActivityForumMessages -> fr.srombauts.sjlb.gui.ActivityFor
     int mOriginalMsgListHeight -> l
     void onCreate(android.os.Bundle) -> onCreate
     void onResume() -> onResume
-    void onDestroy() -> onDestroy
     boolean onCreateOptionsMenu(android.view.Menu) -> onCreateOptionsMenu
     boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
     void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick

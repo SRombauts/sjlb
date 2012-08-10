@@ -107,8 +107,9 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
 
         DBOpenHelper DBHelper = new DBOpenHelper(this, SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
         
-        // Rafraîchit la liste des categories
-        // Récupération de la liste des catégories, avec le nombre de msg non lus :
+        // Rafraîchit la liste des categories :
+        // récupération de la liste des catégories, avec le nombre de msg non lus,
+        // et la transforme en un tableau pour servir un ArrayAdapter standard.
         mCategories.clear();
         String [] categories = getResources().getStringArray(R.array.category_labels);
         for (int catIdx = 0; catIdx < categories.length; catIdx++) {
