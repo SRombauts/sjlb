@@ -36,7 +36,7 @@ import fr.srombauts.sjlb.service.IntentReceiverStartService;
 
 /**
  * Activité présentant la liste des messages privés
- * @author 14/06/2010 srombauts
+ * @author 14/06/2010 SRombauts
  */
 public class ActivityPrivateMessages extends ActivityTouchListener {
     private static final String LOG_TAG = "ActivityPM";
@@ -132,7 +132,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
                 // Toast notification de début de rafraîchissement
                 Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
                 // TODO voir si c'est la meilleurs manière de faire : donnerait plus de contrôle si l'on pouvait faire un accès direct à la AsynchTask...
-                // TODO SRO : rafraîchir la liste à l'échéance de la tache de rafraîchissement
+                // TODO SRombauts : rafraîchir la liste à l'échéance de la tache de rafraîchissement
                 //            => "suffirait" que le service lance un Intent sur cette Activity, comme lorsqu'on clique sur une notification 
                 IntentReceiverStartService.startService (this, LOG_TAG);
                 mCursor.requery();
@@ -187,7 +187,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
     /**
      * Création de la boîte de dialogue
      */
-    // TODO SRO : ne pas créer de liste directement dans le code comme ça !
+    // TODO SRombauts : ne pas créer de liste directement dans le code comme ça !
     public Dialog onCreateDialog (int id) {
         switch(id) {
             case(DIALOG_ID_PM_DELETE_ONE): {
@@ -234,7 +234,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
     public void onPrepareDialog (int id, Dialog dialog) {
         switch(id) {
             case(DIALOG_ID_PM_DELETE_ONE):
-                // TODO SRO : modifier le contenu de la boîte de dialogue pour montrer le texte du pm
+                // TODO SRombauts : modifier le contenu de la boîte de dialogue pour montrer le texte du pm
                 break;
             case(DIALOG_ID_PM_DELETE_ALL):
                 // Rien à faire

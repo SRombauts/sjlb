@@ -57,7 +57,7 @@ public class ContentProviderPM extends ContentProvider {
 
     @Override
     public String getType(Uri arg0) {
-        // TODO SRO Auto-generated method stub
+        // TODO SRombauts Auto-generated method stub
         return null;
     }
 

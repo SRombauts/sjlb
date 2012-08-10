@@ -12,8 +12,11 @@
     <uses-permission android:name="android.permission.VIBRATE" /> 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-    <uses-sdk android:minSdkVersion="7"
-              android:targetSdkVersion="10" />
+    <!-- Juliette est en 7  (2.1-update1)
+         Amélie   est en 8  (2.2)
+         Les autres   en 10 (2.3.3+) -->
+    <uses-sdk android:minSdkVersion="7"       
+              android:targetSdkVersion="11" /> <!-- 11 (3.0, Honeycomb) permet d'utiliser l'ActionBar sur une tablette -->
     
     <application android:name=".ApplicationSJLB"
                  android:label="@string/app_name"

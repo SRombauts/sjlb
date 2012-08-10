@@ -36,7 +36,7 @@ import fr.srombauts.sjlb.service.IntentReceiverStartService;
 
 /**
  * Activité du menu principal, qui lance le service si besoin et permet de naviguer entre PM et Msg
- * @author 27/06/2010 srombauts
+ * @author 27/06/2010 SRombauts
  */
 public class ActivityMain extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener {
     private static final String LOG_TAG         = "ActivityMain";

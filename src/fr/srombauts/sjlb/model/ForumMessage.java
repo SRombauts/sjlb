@@ -5,7 +5,7 @@ import java.util.Date;
 
 /**
  * Encapsulation d'un message du forum
- * @author 18/08/2010 srombauts
+ * @author 18/08/2010 SRombauts
  */
 public class ForumMessage {
     private int     mId;

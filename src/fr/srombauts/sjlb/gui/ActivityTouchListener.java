@@ -14,7 +14,7 @@ import fr.srombauts.sjlb.model.PrefsInterface;
  * Appelle une callback spécifique à chaque type de gestion reconnu,
  * en faisant entrer les préférences permettant d'inverser gauche et droite selon l'effet préféré par l'utilisateur. 
  * 
- * @author 27/08/2010 srombauts
+ * @author 27/08/2010 SRombauts
  */
 public class ActivityTouchListener extends Activity implements OnTouchListener {
 //  private static final String LOG_TAG = "ActivityTouchListener";

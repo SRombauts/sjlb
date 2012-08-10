@@ -45,7 +45,7 @@ import fr.srombauts.sjlb.service.IntentReceiverStartService;
 
 /**
  * Activité présentant la liste des sujets de la catégorie sélectionnée
- * @author 22/08/2010 srombauts
+ * @author 22/08/2010 SRombauts
  */
 public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, CallbackTransfer {
     private static final String LOG_TAG = "ActivityMsg";
@@ -57,7 +57,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     
     private Cursor                  mCursor         = null;
     private MessageListItemAdapter  mAdapter        = null;
-    static private ListView         mMsgListView    = null; // TODO SRO "static" pour être accéder depuis la CallbackImageDownload
+    static private ListView         mMsgListView    = null; // TODO SRombauts "static" pour être accéder depuis la CallbackImageDownload
     private EditText                mEditText       = null;
     private Button                  mEditButton     = null;
     
@@ -94,9 +94,8 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         SubjectsDescription.setText(mSelectedSubjectLabel);
         
         // Récupère un curseur sur les données (les messages) en filtrant sur l'id du sujet sélectionné
-        // TODO SRO : utiliser l'argument "projection" pour filtrer les résultats et ainsi optimiser l'utilisation mémoire
         mCursor = managedQuery( SJLB.Msg.CONTENT_URI,
-                                null,
+                                null, // Pas d'argument "projection" pour filtrer les colonnes de résultats car elles sont toutes utiles
                                 SJLB.Msg.SUBJECT_ID + "=" + mSelectedSubjectId,
                                 null, null);
 
@@ -109,7 +108,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         mMsgListView.setAdapter (mAdapter);
         
         // Scroll en bas de la liste des messages, sur le message précédant le premier message non lu
-        Cursor subCursor = managedQuery(
+        Cursor countCursor = managedQuery(
                 SJLB.Msg.CONTENT_URI,
                 new String[] {SJLB.Msg.SUBJECT_ID}, // ne récupère que le minimum pour compter le nombre de Msg non lus 
                 "(" +       SJLB.Msg.SUBJECT_ID + "=" + mSelectedSubjectId
@@ -117,10 +116,10 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                 null,
                 null);
         // Calcul de l'offset d'affichage correspondant au nombre de messages non lus moins un, mais plafonné à zéro !
-        int offsetNewMessages = Math.max(subCursor.getCount() - 1, 0);
-        // Calcul de l'index du premier message à afficher dans la liste, qui doit être du coup le premier non lu le cas échéant, là aussi plaffoné par 0
+        int offsetNewMessages = Math.max(countCursor.getCount() - 1, 0);
+        // Calcul de l'index du premier message à afficher dans la liste, qui doit être du coup le premier non lu le cas échéant, là aussi plafonné par 0
         int idxOfFirstUnreadMsg = Math.max(mMsgListView.getCount()-1 - offsetNewMessages, 0);
-        Log.d(LOG_TAG, "idxOfFirstUnreadMsg = " + idxOfFirstUnreadMsg);
+        Log.d(LOG_TAG, "idxOfFirstUnreadMsg = " + idxOfFirstUnreadMsg + " (nbUnreadMsg=" + countCursor.getCount() + ")");
         mMsgListView.setSelection(idxOfFirstUnreadMsg);    
 
         // Binding de la zone de saisie du message (masquée par la liste tant qu'on ne clic pas)
@@ -154,7 +153,8 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         ContentValues valuesSubj = new ContentValues();
         valuesSubj.put(SJLB.Subj.NB_UNREAD, 0);
         final String whereSubj = "(" + SJLB.Subj._ID + "=" + mSelectedSubjectId + ")";
-        getContentResolver ().update(SJLB.Subj.CONTENT_URI, valuesSubj, whereSubj, null);        
+        final int nbUpdatedRows = getContentResolver ().update(SJLB.Subj.CONTENT_URI, valuesSubj, whereSubj, null);
+        Log.w (LOG_TAG, "nbUpdatedRows=" + nbUpdatedRows);
     }
     
     
@@ -192,7 +192,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                 Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
                 // TODO voir si c'est la meilleurs manière de faire : donnerait plus de contrôle si l'on pouvait faire un accès direct à la AsynchTask...
                 IntentReceiverStartService.startService (this, LOG_TAG);
-                // TODO SRO : trouver un moyen de rafraîchir la liste à l'échéance de la tache de rafraîchissement
+                // TODO SRombauts : trouver un moyen de rafraîchir la liste à l'échéance de la tache de rafraîchissement
                 mCursor.requery();
                 mAdapter.notifyDataSetChanged();
                 break;            }
@@ -238,7 +238,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         if (-1 == mOriginalMsgListHeight) {
             mOriginalMsgListHeight = params.height;
         }
-        // TODO SRO : remplacer le nombre de pixel par des "sp" ou trouver une manière vraiment plus élégante de faire 
+        // TODO SRombauts : remplacer le nombre de pixel par des "sp" ou trouver une manière vraiment plus élégante de faire 
         params.height = getWindowManager().getDefaultDisplay().getHeight() - 380;
         mMsgListView.requestLayout();
         // On fait apparaître la zone d'édition
@@ -252,11 +252,11 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         mgr.showSoftInput(mEditText, InputMethodManager.SHOW_IMPLICIT);
 
-        // TODO SRO : Scroll tout en bas de la liste des messages ne marche pas :(
+        // TODO SRombauts : Scroll tout en bas de la liste des messages ne marche pas :(
         mMsgListView.setSelection(0);         
         mMsgListView.setSelection(mMsgListView.getCount()-1);        
 
-// TODO SRO : tests en cours
+// TODO SRombauts : tests en cours
         mMsgListView.getParent().requestLayout();
     }
     
@@ -310,7 +310,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         return true;
     }
 
-    // TODO SRO : onRightGesture ?
+    // TODO SRombauts : onRightGesture ?
     
     
     
@@ -322,8 +322,9 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         }
 
         // Met à jour avec un nouveau contenu un objet de cache du pool de view utilisées par la ListView 
-        // TODO SRO : tenter d'optimiser à mort cette méthode qui consomme beaucoup,
-        //            par exemple en remplaçant les getColumnIndexOrThrow par des constantes
+        // TODO SRombauts : tenter d'optimiser à mort cette méthode qui consomme beaucoup,
+        //                   par exemple en remplaçant les getColumnIndexOrThrow par des constantes
+        // => pour cela, commencer par ajouter qq traces pour voir ce qui se passe exactement !
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
             final MessageListItemCache  cache = (MessageListItemCache) view.getTag();
@@ -359,7 +360,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             int msgId = cursor.getInt(0); // SJLB.Msg._ID, à ne pas confondre avec SJLB.Msg
             
             // Récupère un curseur sur les données (les fichiers) en filtrant sur l'id du sujet sélectionné
-            // TODO SRO : utiliser l'argument "projection" pour filtrer les résultats et ainsi optimiser l'utilisation mémoire
+            // TODO SRombauts : utiliser l'argument "projection" pour filtrer les résultats et ainsi optimiser l'utilisation mémoire
             Cursor cursorFiles = managedQuery(  SJLB.File.CONTENT_URI, null,
                                                 SJLB.File.MSG_ID + "=" + msgId,
                                                 null, null);
@@ -431,7 +432,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
 
     
     
-    // TODO SRO : documentation !
+    // TODO SRombauts : documentation !
     private class FileListItemAdapter extends ArrayAdapter<FileListItem> {
 
         private FileListItem[] mListeItem;
@@ -450,14 +451,14 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                 LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = vi.inflate(R.layout.file, null);
 
-                // TODO SRO : tests en cours
+                // TODO SRombauts : tests en cours
                 FileListItem it = mListeItem[position];
                 if (it != null) {
                     Log.i (LOG_TAG, "getView(" + it.filename + ")" );
                     
                     it.imageViewFile = (ImageView) view.findViewById(R.id.fileImage);
                     
-                    // TODO SRO : il faut lancer ici le téléchargement du fichier en tache de fond (SSI il s'agit bien d'une image !)
+                    // TODO SRombauts : il faut lancer ici le téléchargement du fichier en tache de fond (SSI il s'agit bien d'une image !)
                     if (null == it.imageBitmap) {
                         AsynchTaskDownloadImage ImageDownloader = new AsynchTaskDownloadImage(it);
                         ImageDownloader.execute(getString(R.string.sjlb_fichiers_attaches) + it.filename);
@@ -490,7 +491,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                 imageViewFile.setAdjustViewBounds(true);
                 imageViewFile.setHorizontalScrollBarEnabled(true);
                 //imageViewFile.getSuggestedMinimumHeight(); 
-                // TODO SRO : tests en cours
+                // TODO SRombauts : tests en cours
                 imageViewFile.invalidate ();
                 imageViewFile.requestLayout();
                 imageViewFile.getParent().requestLayout();

@@ -8,7 +8,7 @@ import android.preference.PreferenceManager;
 
 /**
  * Récupération et encapsulation des préférences de notification
- * @author srombauts
+ * @author SRombauts
 */
 public class PrefsNotification {
     public Boolean  mbSound;

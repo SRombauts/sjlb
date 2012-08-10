@@ -10,7 +10,7 @@ import android.util.Log;
 /**
  * Gestionnaire de création/mise à jour de la base de données SQLite
  * 
- * @author 17/06/2010 srombauts
+ * @author 17/06/2010 SRombauts
  */
 public class DBOpenHelper extends SQLiteOpenHelper {
     private static final String  LOG_TAG = "DBAdapter";

@@ -3,7 +3,7 @@ package fr.srombauts.sjlb.model;
 
 /**
  * Encapsulation d'un message privé
- * @author 23/03/2011 srombauts
+ * @author 23/03/2011 SRombauts
  */
 public class AttachedFile {
     private int     mMessageId;

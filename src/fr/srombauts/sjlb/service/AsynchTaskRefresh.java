@@ -65,7 +65,7 @@ import fr.srombauts.sjlb.model.User;
  *
  * SSI de nouveaux ID y sont mentionnés, charge les fichiers XML complémentaires (PrivateMessages.php ou ForumMessages.php).
  *
- * @author 14/06/2010 srombauts
+ * @author 14/06/2010 SRombauts
  */
 public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     private static final String  LOG_TAG                    = "RefreshTask";
@@ -137,7 +137,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
      */
     protected void onPreExecute() {
         // Toast notification de début de rafraîchissement
-        // SRO COMMENTE : comme on tourne dans un service en tache de fond, on ne veut pas gêner l'utilisateur avec une notification
+        // SRombauts COMMENTE : comme on tourne dans un service en tache de fond, on ne veut pas gêner l'utilisateur avec une notification
         // Toast.makeText(mContext, mContext.getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
     }
     
@@ -214,7 +214,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
      */
     void refreshUsers () throws LoginPasswordBadException
     {
-        // TODO SRO : pour l'instant, fait une unique fois dans la vie de la BDD de l'application
+        // TODO SRombauts : pour l'instant, fait une unique fois dans la vie de la BDD de l'application
         if (0 == mUserDBAdapter.countUsers()) {
             try {
                 Log.d(LOG_TAG, "refreshUsers...");
@@ -268,7 +268,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                                     User newUser = new User(idUser, strPseudo, strName);
                                     
                                     // Renseigne la bdd si User inconnu
-                                    // TODO SRO : un peu moche, provoque une exception SQL si l'utilisateur est déjà en base (mais ne survient pas, cf TODO plus haut)
+                                    // TODO SRombauts : un peu moche, provoque une exception SQL si l'utilisateur est déjà en base (mais ne survient pas, cf TODO plus haut)
                                     mUserDBAdapter.insertUser(newUser);
                                 }
                                 
@@ -325,7 +325,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
 
             // Établi la liste des messages lus localement, à transmettre au site SJLB pour qu'il se mette à jour
-            // TODO SRO : déplacer ce qui suit dans une méthode dédiée
+            // TODO SRombauts : déplacer ce qui suit dans une méthode dédiée
             Cursor cursor = mMsgDBAdapter.getMsgUnread ();
             String strMsgLus = "";
             int    nbMsgLus = cursor.getCount ();
@@ -357,14 +357,14 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 nameValuePairs.add(new BasicNameValuePair("msg_lus", strMsgLus));
             }
             // y ajoute les 5 informations de version de l'équipement et de l'application
-            // TODO SRO : ne transmettre que lorsque différent !
+            // TODO SRombauts : ne transmettre que lorsque différent !
             Log.i(LOG_TAG, "device: " + Build.MODEL + " (" + Build.MANUFACTURER + "/" + Build.BRAND + ") " + Build.VERSION.RELEASE + " (api_level=" + Build.VERSION.SDK_INT + ")");
             nameValuePairs.add(new BasicNameValuePair("model",      Build.MODEL));
             nameValuePairs.add(new BasicNameValuePair("brand",      Build.BRAND));
             nameValuePairs.add(new BasicNameValuePair("android",    Build.VERSION.RELEASE));
             nameValuePairs.add(new BasicNameValuePair("api",        Integer.toString(Build.VERSION.SDK_INT)));
             nameValuePairs.add(new BasicNameValuePair("appli",      Integer.toString(mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), PackageManager.GET_ACTIVITIES).versionCode)));
-            // TODO SRO : ajouter l'état de l'application (ouverte/fermée) + le nombre de messages récupérés localement
+            // TODO SRombauts : ajouter l'état de l'application (ouverte/fermée) + le nombre de messages récupérés localement
             // puis place tous ces paramètres dans la requête HTTP POST
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
             
@@ -512,7 +512,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                     // Récupère le contenu de la réponse
                     InputStream             in          = response.getEntity().getContent();
                     
-                    // TODO SRO mutualiser ce qui suit pour l'utiliser aussi lors d'un effacement de pm
+                    // TODO SRombauts mutualiser ce qui suit pour l'utiliser aussi lors d'un effacement de pm
                     // Parse de la page XML
                     DocumentBuilderFactory  dbf         = DocumentBuilderFactory.newInstance();
                     dbf.setCoalescing(true);
@@ -589,7 +589,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     /**
      * Récupération du contenu des messages du forum
      * 
-     * Récupère la liste des messages flagués comme "non lus" sur le site SJLB, c'est à dire :
+     * Récupère la liste des messages flaggés comme "non lus" sur le site SJLB, c'est à dire :
      * - les nouveaux messages (bien qu'il puisent avoir déjà été récupérés par l'application mobile)
      * - les messages modifiés (qui ont déjà été récupéré, mais dont le contenu a changé entre temps)
      */
@@ -707,18 +707,18 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             boolean bUnread     = (0 != Integer.parseInt(strUnread));
                             
                             ForumMessage newMsg = new ForumMessage(idMsg, date, idAuthor, strAuthor, idSubject, bUnread, strText);
-                            Log.d(LOG_TAG, "Msg " + newMsg);
+                            //Log.d(LOG_TAG, "Msg " + newMsg);
                             
                             // Renseigne la bdd SSI le message n'est pas déjà inséré, sinon fait un update
                             if (mMsgDBAdapter.isExist(idMsg)) {
                                 if (mMsgDBAdapter.updateMsg(newMsg)) {
-                                    Log.d(LOG_TAG, "Msg " + idMsg + " updated");
+                                    //Log.d(LOG_TAG, "Msg " + idMsg + " updated");
                                 } else {
                                     Log.e(LOG_TAG, "Msg " + idMsg + " NOT updated !");
                                 }
                             } else {
                                 if (mMsgDBAdapter.insertMsg(newMsg)) {
-                                    Log.d(LOG_TAG, "Msg " + idMsg + " inserted");                                
+                                    //Log.d(LOG_TAG, "Msg " + idMsg + " inserted");                                
                                 } else {
                                     Log.e(LOG_TAG, "Msg " + idMsg + " NOT inserted !");
                                 }                                
@@ -729,9 +729,9 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                                 final int NbUnread = mMsgDBAdapter.getNbUnread(idSubject);
                                 if (mSubjDBAdapter.updateNbUnread(idSubject, NbUnread))
                                 {
-                                    Log.d(LOG_TAG, "strUnread=" + strUnread + " NbUnread(" + idSubject + ")=" + NbUnread);                                
+                                    Log.d(LOG_TAG, "NbUnread(" + idSubject + ")=" + NbUnread);                                
                                 } else {
-                                    Log.e(LOG_TAG, "strUnread=" + strUnread + " NbUnread(" + idSubject + ")=" + NbUnread);
+                                    Log.e(LOG_TAG, "NbUnread(" + idSubject + ")=" + NbUnread);
                                 }                                
                             }
                             

@@ -119,7 +119,7 @@ public class AsynchTaskDeletePM extends AsyncTask<String, Void, Void> {
             
                 Log.d(LOG_TAG, "fetchPM... en cours");                        
                 
-                // TODO SRO mutualiser ce qui suit pour l'utiliser aussi lors d'un effacement de pm
+                // TODO SRombauts mutualiser ce qui suit pour l'utiliser aussi lors d'un effacement de pm
                 // Parse de la page XML
                 DocumentBuilderFactory  dbf         = DocumentBuilderFactory.newInstance();
                 dbf.setCoalescing(true);

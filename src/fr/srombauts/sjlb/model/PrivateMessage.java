@@ -5,7 +5,7 @@ import java.util.Date;
 
 /**
  * Encapsulation d'un message privé
- * @author 14/06/2010 srombauts
+ * @author 14/06/2010 SRombauts
  */
 public class PrivateMessage {
     private int     mId;

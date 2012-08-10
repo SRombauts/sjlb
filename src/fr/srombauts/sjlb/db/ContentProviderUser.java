@@ -57,7 +57,7 @@ public class ContentProviderUser extends ContentProvider {
 
     @Override
     public String getType(Uri arg0) {
-        // TODO SRO Auto-generated method stub
+        // TODO SRombauts Auto-generated method stub
         return null;
     }
     
@@ -137,7 +137,7 @@ public class ContentProviderUser extends ContentProvider {
 
     // compte les utilisateurs
     public long countUsers () {
-        // TODO SRO : comment fermer le curseur !?
+        // TODO SRombauts : comment fermer le curseur !?
         long nbUsers = DatabaseUtils.queryNumEntries(mDBHelper.getReadableDatabase(), SJLB.User.TABLE_NAME);
         mDBHelper.getReadableDatabase().close();
         return nbUsers;

@@ -117,7 +117,7 @@ public class AsynchTaskNewMsg extends AsyncTask<String, Void, Boolean> {
             if (HttpStatus.SC_OK == response.getStatusLine ().getStatusCode())
             {
                 // Récupère le contenu de la réponse
-                // TODO SRO : parser la réponse comme dans RefreshTask (ou au moins partiellement)
+                // TODO SRombauts : parser la réponse comme dans RefreshTask (ou au moins partiellement)
                 //InputStream             in          = response.getEntity().getContent();
                 
                 Log.d(LOG_TAG, "sendMsg ok ");

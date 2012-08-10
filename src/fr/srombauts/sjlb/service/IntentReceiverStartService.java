@@ -14,7 +14,7 @@ import android.util.Log;
  * - sur réception de l'intent de fin de boot
  * - sur réception de l'intent d'alarme périodique
  * 
- * @author 10/06/2010 srombauts
+ * @author 10/06/2010 SRombauts
  */
 public class IntentReceiverStartService extends BroadcastReceiver {
     public  static final String ACTION_REFRESH_ALARM = "fr.srombauts.sjlb.ACTION_REFRESH_ALARM";

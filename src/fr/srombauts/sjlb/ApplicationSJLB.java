@@ -20,12 +20,12 @@ import android.util.Log;
  *  Classe gérant les objets et données dont le cycle de vie est celui de l'application,
  * c'est à dire au delas de celui d'une activité.
  * 
- * @author 01/09/2010 srombauts
+ * @author 01/09/2010 SRombauts
  */
 public class ApplicationSJLB extends Application {
     private static final String LOG_TAG     = "ApplicationSJLB";
 
-    // TODO SRO : implémenter comme ActivitySubjects un ResourceCursorAdapter, pour afficher une icone pour les messages non lus, et un Badge avec QuickView !
+    // TODO SRombauts : implémenter comme ActivitySubjects un ResourceCursorAdapter, pour afficher une icone pour les messages non lus, et un Badge avec QuickView !
     static final String[] CONTACTS_SUMMARY_PROJECTION = new String[] {
         Contacts._ID, // 0
         Contacts.DISPLAY_NAME, // 1
@@ -36,7 +36,7 @@ public class ApplicationSJLB extends Application {
         Contacts.LOOKUP_KEY, // 6
         Contacts.HAS_PHONE_NUMBER, // 7
     };
-    // TODO SRO : à supprimer !
+    // TODO SRombauts : à supprimer !
     static final int SUMMARY_ID_COLUMN_INDEX = 0;
     static final int SUMMARY_NAME_COLUMN_INDEX = 1;
     static final int SUMMARY_STARRED_COLUMN_INDEX = 2;

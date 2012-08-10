@@ -21,7 +21,7 @@ import fr.srombauts.sjlb.service.AsynchTaskNewPM;
 
 /**
  * Activité permettant d'envoyer un nouveau message privé
- * @author 14/08/2010 srombauts
+ * @author 14/08/2010 SRombauts
  */
 public class ActivityNewPrivateMessage extends Activity {
     private static final String LOG_TAG = "ActivityNewPM";

@@ -54,7 +54,7 @@ public class ContentProviderMsg extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        // TODO SRO Auto-generated method stub
+        // TODO SRombauts Auto-generated method stub
         return null;
     }
 
@@ -73,7 +73,7 @@ public class ContentProviderMsg extends ContentProvider {
 	/**
 	 * Requète générique sur les messages
 	 *
-	 * @todo SRO : ajouter un filtrage sur un "id" donné lorsque l'utilisateur fourni une URI de type "content:path/id"
+	 * @todo SRombauts : ajouter un filtrage sur un "id" donné lorsque l'utilisateur fourni une URI de type "content:path/id"
 	 */
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         if (null == selection) selection = ""; 
@@ -219,7 +219,7 @@ public class ContentProviderMsg extends ContentProvider {
     // compte les messages non lus d'un sujet donné
     public int getNbUnread (int aSubjectId) {
         Cursor cursor = mDBHelper.getReadableDatabase().query(SJLB.Msg.TABLE_NAME,
-                                                              null /*new String[]{SJLB.Msg._ID} TODO SRO : tests en cours */,
+                                                              null /*new String[]{SJLB.Msg._ID} TODO SRombauts : tests en cours */,
                                                               "(" + SJLB.Msg.SUBJECT_ID + "=" + aSubjectId
                                                                + " AND " + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")",
                                                               null, null, null, null);

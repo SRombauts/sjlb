@@ -57,7 +57,7 @@ public class ContentProviderFile extends ContentProvider {
 
     @Override
     public String getType(Uri arg0) {
-        // TODO SRO Auto-generated method stub
+        // TODO SRombauts Auto-generated method stub
         return null;
     }
 
@@ -76,7 +76,7 @@ public class ContentProviderFile extends ContentProvider {
     /**
      * Requète générique sur les sujets
      *
-     * @todo SRO : ajouter un filtrage sur un "id" donné lorsque l'utilisateur fourni une URI de type "content:path/id"
+     * @todo SRombauts : ajouter un filtrage sur un "id" donné lorsque l'utilisateur fourni une URI de type "content:path/id"
      */
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         return mDBHelper.getReadableDatabase().query(

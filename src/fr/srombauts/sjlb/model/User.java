@@ -3,7 +3,7 @@ package fr.srombauts.sjlb.model;
 
 /**
  * Encapsulation d'un utilisateur
- * @author 17/08/2010 srombauts
+ * @author 17/08/2010 SRombauts
  */
 public class User {
     private int     mId;
