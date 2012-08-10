@@ -45,7 +45,7 @@ public class ForumMessage {
 
     // Résumé du contenu de l'objet sous forme d'une chaîne de caractère
     public String toString () {
-		return mId + ": " + getDateString (mDate) + " " + mAuthorId + " subj=" + mSubjectId + " unread=" + mbUnread + " : " + mText;
+        return mId + ": " + getDateString (mDate) + " " + mAuthorId + " subj=" + mSubjectId + " unread=" + mbUnread + " : " + mText;
     }    
 
 

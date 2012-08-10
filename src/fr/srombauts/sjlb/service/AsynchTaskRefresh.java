@@ -332,7 +332,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             if (0 < nbMsgLus) {
                 if (cursor.moveToFirst ()) {
                     do {
-                        //Log.d(LOG_TAG, "refreshUsers id_msg_non_lu=" + cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg._ID)));
+                        Log.v(LOG_TAG, "refreshUsers id_msg_non_lu=" + cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg._ID)));
                         if (strMsgLus != "") {
                             strMsgLus += ",";
                         }
@@ -707,18 +707,18 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             boolean bUnread     = (0 != Integer.parseInt(strUnread));
                             
                             ForumMessage newMsg = new ForumMessage(idMsg, date, idAuthor, strAuthor, idSubject, bUnread, strText);
-                            //Log.d(LOG_TAG, "Msg " + newMsg);
+                            Log.v(LOG_TAG, "Msg " + newMsg);
                             
                             // Renseigne la bdd SSI le message n'est pas déjà inséré, sinon fait un update
                             if (mMsgDBAdapter.isExist(idMsg)) {
                                 if (mMsgDBAdapter.updateMsg(newMsg)) {
-                                    //Log.d(LOG_TAG, "Msg " + idMsg + " updated");
+                                    Log.v(LOG_TAG, "Msg " + idMsg + " updated");
                                 } else {
                                     Log.e(LOG_TAG, "Msg " + idMsg + " NOT updated !");
                                 }
                             } else {
                                 if (mMsgDBAdapter.insertMsg(newMsg)) {
-                                    //Log.d(LOG_TAG, "Msg " + idMsg + " inserted");                                
+                                    Log.v(LOG_TAG, "Msg " + idMsg + " inserted");                                
                                 } else {
                                     Log.e(LOG_TAG, "Msg " + idMsg + " NOT inserted !");
                                 }                                
@@ -740,7 +740,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                             NodeList    listFile = Msg.getElementsByTagName(NODE_NAME_FORUM_FILE);
                             if (null != listFile) {
                                 int nbFile = listFile.getLength();
-                                //Log.d(LOG_TAG, "listFile.getLength() = " + nbFile);
+                                Log.v(LOG_TAG, "listFile.getLength() = " + nbFile);
                                 for (int j = 0; j < nbFile; j++) {
                                     Element FileElement = (Element)listFile.item(j);
 //                                    String  FileNameX   = FileElement.getNodeValue();
@@ -831,7 +831,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             notification.defaults   |= Notification.DEFAULT_LIGHTS;
         }
         if (notificationPrefs.mbVibrate) {
-	        notification.vibrate    = new long[]{0, 200, 300, 200, 300, 200};
+            notification.vibrate    = new long[]{0, 200, 300, 200, 300, 200};
         }
 
         // Assemblage final de la notification

@@ -14,7 +14,7 @@ import android.net.Uri;
 /**
  * Encapsulation des données pour stockage en base de données
  * 
- * @author seb
+ * @author SRombauts
  */
 public class ContentProviderUser extends ContentProvider {
 
@@ -57,32 +57,34 @@ public class ContentProviderUser extends ContentProvider {
 
     @Override
     public String getType(Uri arg0) {
-        // TODO SRombauts Auto-generated method stub
+        // Auto-generated method stub
         return null;
     }
     
     @Override
     public int delete(Uri arg0, String arg1, String[] arg2) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         return 0;
     }
 
     @Override
     public Uri insert(Uri arg0, ContentValues arg1) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         return null;
     }
 
     @Override
     public Cursor query(Uri arg0, String[] arg1, String arg2, String[] arg3,
             String arg4) {
-        // TODO prendre en compte les paramètres pour faire la bonne requète !
-        return getAllUsers ();
+        // TODO prendre en compte les paramètres pour faire la bonne requête !
+        return mDBHelper.getReadableDatabase().query(   SJLB.User.TABLE_NAME,
+                null, null, null, // toutes les colonnes, pas de sélection
+                null, null, null);
     }
 
     @Override
     public int update(Uri arg0, ContentValues arg1, String arg2, String[] arg3) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         return 0;
     }
     
@@ -105,7 +107,7 @@ public class ContentProviderUser extends ContentProvider {
 
     // retire un User juste par son ID
     public boolean removeUser(long aId) {
-        return mDBHelper.getWritableDatabase().delete(SJLB.User.TABLE_NAME, SJLB.User._ID + "=" + aId, null) > 0;
+        return mDBHelper.getWritableDatabase().delete(SJLB.User.TABLE_NAME, SJLB.User._ID + "=?", null) > 0;
     }
 
     // vide la table des User
@@ -113,22 +115,14 @@ public class ContentProviderUser extends ContentProvider {
         return mDBHelper.getWritableDatabase().delete(SJLB.User.TABLE_NAME, null, null) > 0;
     }
     
-    // récupère un cursor avec la liste de tous les User
-    public Cursor getAllUsers () {
-        return mDBHelper.getReadableDatabase().query(   SJLB.User.TABLE_NAME,
-                                                       new String[] {   SJLB.User._ID,
-                                                                        SJLB.User.PSEUDO,
-                                                                        SJLB.User.NAME},
-                                                       null, null, null, null, null);
-    }
-    
     // récupère un cursor sur un User particulier
     public Cursor getUser (int aId) {
-        Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.User.TABLE_NAME,
-                                                                new String[]{   SJLB.User.PSEUDO,
-                                                                                SJLB.User.NAME},
-                                                                SJLB.User._ID + "=" + aId,
-                                                                null, null, null, null, null);
+        final String[] columns      = {SJLB.User.PSEUDO,SJLB.User.NAME};
+        final String   selection    = SJLB.User._ID + "=?";
+        final String[] selectionArgs= {Integer.toString(aId)};
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.User.TABLE_NAME,
+                                                                columns, selection, selectionArgs,
+                                                                null, null, null);
         if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
             throw new SQLException("Pas de User pour l'Id " + aId);
         }
@@ -137,7 +131,6 @@ public class ContentProviderUser extends ContentProvider {
 
     // compte les utilisateurs
     public long countUsers () {
-        // TODO SRombauts : comment fermer le curseur !?
         long nbUsers = DatabaseUtils.queryNumEntries(mDBHelper.getReadableDatabase(), SJLB.User.TABLE_NAME);
         mDBHelper.getReadableDatabase().close();
         return nbUsers;

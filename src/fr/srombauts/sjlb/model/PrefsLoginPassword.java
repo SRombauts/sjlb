@@ -54,8 +54,8 @@ public class PrefsLoginPassword {
             }
             else
             {
-				// Lève une exception dédiée lorsque login/mdp ne sont pas renseignés !
-				throw new LoginPasswordEmptyException ();
+                // Lève une exception dédiée lorsque login/mdp ne sont pas renseignés !
+                throw new LoginPasswordEmptyException ();
             }
         } catch (NoSuchAlgorithmException e) {  
             e.printStackTrace();  

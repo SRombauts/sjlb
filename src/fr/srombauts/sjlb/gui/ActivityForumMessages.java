@@ -108,13 +108,12 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         mMsgListView.setAdapter (mAdapter);
         
         // Scroll en bas de la liste des messages, sur le message précédant le premier message non lu
-        Cursor countCursor = managedQuery(
-                SJLB.Msg.CONTENT_URI,
-                new String[] {SJLB.Msg.SUBJECT_ID}, // ne récupère que le minimum pour compter le nombre de Msg non lus 
-                "(" +       SJLB.Msg.SUBJECT_ID + "=" + mSelectedSubjectId
-                + " AND " + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")",
-                null,
-                null);
+        final String[] columns = {SJLB.Msg.SUBJECT_ID}; // ne récupère que le minimum pour compter le nombre de Msg non lus
+        final String selection = "(" + SJLB.Msg.SUBJECT_ID + "=" + mSelectedSubjectId + " AND "
+                                     + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")";
+        Cursor countCursor = managedQuery(  SJLB.Msg.CONTENT_URI,
+                                            columns, selection, null,
+                                            null);
         // Calcul de l'offset d'affichage correspondant au nombre de messages non lus moins un, mais plafonné à zéro !
         int offsetNewMessages = Math.max(countCursor.getCount() - 1, 0);
         // Calcul de l'index du premier message à afficher dans la liste, qui doit être du coup le premier non lu le cas échéant, là aussi plafonné par 0
@@ -144,17 +143,20 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         notificationManager.cancel(AsynchTaskRefresh.NOTIFICATION_NEW_MSG_ID);
 
         // Efface les flags "UNREAD_TRUE" des messages lus dès qu'on entre !
-        ContentValues values = new ContentValues();
-        values.put(SJLB.Msg.UNREAD, SJLB.Msg.UNREAD_LOCALY); // on les passe à UNREAD_LOCALY ce qui indique qu'il faut encore signaler le site Web SJLB du fait qu'on les a lu !
-        final String where = "(" + SJLB.Msg.SUBJECT_ID + "=" + mSelectedSubjectId + " AND " + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")";
-        getContentResolver ().update(SJLB.Msg.CONTENT_URI, values, where, null);        
-
+        ContentValues valuesMsg = new ContentValues();
+        valuesMsg.put(SJLB.Msg.UNREAD, SJLB.Msg.UNREAD_LOCALY); // on les passe à UNREAD_LOCALY ce qui indique qu'il faut encore signaler le site Web SJLB du fait qu'on les a lu !
+        final String    whereMsg        = "(" + SJLB.Msg.SUBJECT_ID + "=? AND " + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")";
+        final String[]  selectionArgs   = {Long.toString(mSelectedSubjectId)};  // L'utilisation de "?" optimise la compilation SQL
+        final int nbUpdatedRows = getContentResolver ().update(SJLB.Msg.CONTENT_URI, valuesMsg, whereMsg, selectionArgs);
+        Log.w (LOG_TAG, "nbUpdatedRows=" + nbUpdatedRows);
+        
         // Met à zéro le nombre de messages non lus restant dans le sujet
         ContentValues valuesSubj = new ContentValues();
         valuesSubj.put(SJLB.Subj.NB_UNREAD, 0);
-        final String whereSubj = "(" + SJLB.Subj._ID + "=" + mSelectedSubjectId + ")";
-        final int nbUpdatedRows = getContentResolver ().update(SJLB.Subj.CONTENT_URI, valuesSubj, whereSubj, null);
-        Log.w (LOG_TAG, "nbUpdatedRows=" + nbUpdatedRows);
+        final String whereSubj = "(" + SJLB.Subj._ID + "=?)";
+        // NOTE : selectionArgs est identique
+        final int nbUpdatedRowsSubj = getContentResolver ().update(SJLB.Subj.CONTENT_URI, valuesSubj, whereSubj, selectionArgs);
+        Log.w (LOG_TAG, "nbUpdatedRowsSubj=" + nbUpdatedRowsSubj);
     }
     
     
@@ -177,10 +179,10 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         
         switch (item.getItemId()) {
             case (R.id.menu_show_online): {
-				// lien vers le Forum sur le Site Web :
-				Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + mSelectedSubjectId + getString(R.string.sjlb_forum_subj_dernier)));
+                // lien vers le Forum sur le Site Web :
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + mSelectedSubjectId + getString(R.string.sjlb_forum_subj_dernier)));
                 Log.d (LOG_TAG, "onOptionsItemSelected: menu_show_online: " + getString(R.string.sjlb_forum_subj_uri) + mSelectedCategoryId + getString(R.string.sjlb_forum_subj_param) + mSelectedSubjectId + getString(R.string.sjlb_forum_subj_dernier));                
-				startActivity(intent);
+                startActivity(intent);
                 break;
             }
             case (R.id.menu_new_msg): {

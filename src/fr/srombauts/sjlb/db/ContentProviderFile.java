@@ -14,7 +14,7 @@ import android.net.Uri;
 /**
  * Encapsulation des données pour stockage en base de données
  * 
- * @author seb
+ * @author SRombauts
  */
 public class ContentProviderFile extends ContentProvider {
 
@@ -57,33 +57,29 @@ public class ContentProviderFile extends ContentProvider {
 
     @Override
     public String getType(Uri arg0) {
-        // TODO SRombauts Auto-generated method stub
+        // Auto-generated method stub
         return null;
     }
 
     @Override
     public int delete(Uri arg0, String arg1, String[] arg2) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         return 0;
     }
 
     @Override
     public Uri insert(Uri arg0, ContentValues arg1) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         return null;
     }
 
     /**
-     * Requète générique sur les sujets
-     *
-     * @todo SRombauts : ajouter un filtrage sur un "id" donné lorsque l'utilisateur fourni une URI de type "content:path/id"
+     * Requête générique sur les sujets
      */
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         return mDBHelper.getReadableDatabase().query(
                     SJLB.File.TABLE_NAME,
-                    projection,
-                    selection,
-                    selectionArgs,
+                    projection, selection, selectionArgs,
                     null, // groupBy
                     null, // having
                     (null!=sortOrder)?sortOrder:SJLB.File.DEFAULT_SORT_ORDER
@@ -92,7 +88,7 @@ public class ContentProviderFile extends ContentProvider {
 
     @Override
     public int update(Uri arg0, ContentValues arg1, String arg2, String[] arg3) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         return 0;
     }
     
@@ -122,33 +118,28 @@ public class ContentProviderFile extends ContentProvider {
       return mDBHelper.getWritableDatabase().delete(SJLB.File.TABLE_NAME, null, null) > 0;
     }
     
-    // récupère un cursor avec la liste de tous les fichiers attachés
-    public Cursor getAllFiles () {
-        return mDBHelper.getReadableDatabase().query(   SJLB.File.TABLE_NAME,
-                                                       new String[] {   SJLB.File.MSG_ID,
-                                                                        SJLB.File.FILENAME},
-                                                       null, null, null, null, null);
-    }
-    
     // récupère un cursor sur les fichiers attachés d'un message en particulier
-    public Cursor getFiles (int aMessageId) {
-        Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.File.TABLE_NAME,
-                                                                new String[]{   SJLB.File.MSG_ID,
-                                                                                SJLB.File.FILENAME},
-                                                                SJLB.File.MSG_ID + "=" + aMessageId,
-                                                                null, null, null, null, null);
+    public Cursor getFiles (int aId) {
+        final String[] columns      = {SJLB.File.MSG_ID, SJLB.File.FILENAME};
+        final String   selection    = SJLB.File.MSG_ID + "=?";
+        final String[] selectionArgs= {Integer.toString(aId)};
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.File.TABLE_NAME,
+                                                                columns, selection, selectionArgs,
+                                                                null, null, null);
         if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
-            throw new SQLException("Pas de fichier attaché pour le message d'Id " + aMessageId);
+            throw new SQLException("Pas de fichier attaché pour le message d'Id " + aId);
         }
         return cursor;
     }
 
     // teste l'existence d'au moins un fichier pour un message particulier
-    public Boolean isExist (int aMessageId) {
-        Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.File.TABLE_NAME,
-                                                                new String[]{SJLB.File.FILENAME},
-                                                                SJLB.File.MSG_ID + "=" + aMessageId,
-                                                                null, null, null, null, null);
+    public Boolean isExist (int aId) {
+        final String[] columns      = {SJLB.File.FILENAME};
+        final String   selection    = SJLB.File.MSG_ID + "=?";
+        final String[] selectionArgs= {Integer.toString(aId)};
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.File.TABLE_NAME,
+                                                                columns, selection, selectionArgs,
+                                                                null, null, null);
         boolean bIsExist = (0 < cursor.getCount());
         cursor.close ();
         return bIsExist;

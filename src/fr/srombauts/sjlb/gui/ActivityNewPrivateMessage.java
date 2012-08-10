@@ -48,10 +48,9 @@ public class ActivityNewPrivateMessage extends Activity {
                                 null, null);
 
         // Les colonnes à mapper :
-        String[]    from = new String[] { SJLB.User.PSEUDO };
-        
+        final String[] from = { SJLB.User.PSEUDO };
         // Les ID des views sur lesquels les mapper :
-        int[]       to   = new int[]    { android.R.id.text1 };
+        final int[]    to   = { android.R.id.text1 };
 
         // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
         mAdapter = new SimpleCursorAdapter( this,

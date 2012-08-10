@@ -14,7 +14,7 @@ import android.net.Uri;
 /**
  * Encapsulation des données pour stockage en base de données
  * 
- * @author seb
+ * @author SRombauts
  */
 public class ContentProviderSubj extends ContentProvider {
 
@@ -57,27 +57,27 @@ public class ContentProviderSubj extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        // TODO SRombauts Auto-generated method stub
+        // SRombauts Auto-generated method stub
         return null;
     }
 
     @Override
     public int delete(Uri uri, String arg1, String[] arg2) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         return 0;
     }
 
     @Override
     public Uri insert(Uri uri, ContentValues arg1) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         return null;
     }
 
-	/**
-	 * Requète générique sur les sujets
-	 *
-	 * @todo SRombauts : ajouter un filtrage sur un "id" donné lorsque l'utilisateur fourni une URI de type "content:path/id"
-	 */
+    /**
+     * Requête générique sur les sujets
+     *
+     * @todo SRombauts : ajouter un filtrage sur un "id" donné lorsque l'utilisateur fourni une URI de type "content:path/id"
+     */
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         return mDBHelper.getReadableDatabase().query(
                     SJLB.Subj.TABLE_NAME,
@@ -122,13 +122,15 @@ public class ContentProviderSubj extends ContentProvider {
         newSubjValues.put(SJLB.Subj.GROUP_ID,  aSubj.getGroupId());
         newSubjValues.put(SJLB.Subj.LAST_DATE, aSubj.getLastDate().getTime());
         newSubjValues.put(SJLB.Subj.TEXT,      aSubj.getText());
-        return mDBHelper.getWritableDatabase().update(SJLB.Subj.TABLE_NAME, newSubjValues, SJLB.Subj._ID + "=" + aSubj.getId(), null) > 0;
+        final String[] selectionArgs = {Long.toString (aSubj.getId())};
+        return mDBHelper.getWritableDatabase().update(SJLB.Subj.TABLE_NAME, newSubjValues, SJLB.Subj._ID + "=?", selectionArgs) > 0;
     }
         
     public boolean updateNbUnread(int aId, int aNbUnread) {
         ContentValues newSubjValues = new ContentValues();
         newSubjValues.put(SJLB.Subj.NB_UNREAD, aNbUnread);
-        return mDBHelper.getWritableDatabase().update(SJLB.Subj.TABLE_NAME, newSubjValues, SJLB.Subj._ID + "=" + aId, null) > 0;
+        final String[] selectionArgs = {Long.toString (aId)};
+        return mDBHelper.getWritableDatabase().update(SJLB.Subj.TABLE_NAME, newSubjValues, SJLB.Subj._ID + "=?", selectionArgs) > 0;
     }
         
     // vide la table des Subj
@@ -136,27 +138,14 @@ public class ContentProviderSubj extends ContentProvider {
       return mDBHelper.getWritableDatabase().delete(SJLB.Subj.TABLE_NAME, null, null) > 0;
     }
     
-    // récupère un cursor avec la liste de tous les Subj
-    public Cursor getAllSubj () {
-        return mDBHelper.getReadableDatabase().query(   SJLB.Subj.TABLE_NAME,
-                                                       new String[] {  SJLB.Subj._ID,
-                                                                       SJLB.Subj.CAT_ID,
-                                                                       SJLB.Subj.GROUP_ID,
-                                                                       SJLB.Subj.LAST_DATE,
-                                                                       SJLB.Subj.TEXT},
-                                                       null, null, null, null,
-                                                       SJLB.Subj.DEFAULT_SORT_ORDER);
-    }
-    
     // récupère un cursor sur un Subj particulier
     public Cursor getSubj (int aId) {
-        Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.Subj.TABLE_NAME,
-                                                                new String[]{   SJLB.Subj.CAT_ID,
-                                                                                SJLB.Subj.GROUP_ID,
-                                                                                SJLB.Subj.LAST_DATE,
-                                                                                SJLB.Subj.TEXT},
-                                                                SJLB.Subj._ID + "=" + aId,
-                                                                null, null, null, null, null);
+        final String[] columns      = {SJLB.Subj.CAT_ID, SJLB.Subj.GROUP_ID, SJLB.Subj.LAST_DATE, SJLB.Subj.TEXT};
+        final String   selection    = SJLB.Subj._ID + "=?";
+        final String[] selectionArgs= {Integer.toString(aId)};
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Subj.TABLE_NAME,
+                                                                columns, selection, selectionArgs,
+                                                                null, null, null);
         if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
             throw new SQLException("Pas de Subj pour l'Id " + aId);
         }
@@ -165,10 +154,12 @@ public class ContentProviderSubj extends ContentProvider {
 
     // teste l'existence d'un Sujet particulier
     public Boolean isExist (int aId) {
-        Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.Subj.TABLE_NAME,
-                                                                new String[]{SJLB.Subj._ID},
-                                                                SJLB.Subj._ID + "=" + aId,
-                                                                null, null, null, null, null);
+        final String[] columns      = {SJLB.Subj._ID};
+        final String   selection    = SJLB.Subj._ID + "=?";
+        final String[] selectionArgs= {Integer.toString(aId)};
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Subj.TABLE_NAME,
+                                                                columns, selection, selectionArgs,
+                                                                null, null, null);
         boolean bIsExist = (0 < cursor.getCount());
         cursor.close ();
         return bIsExist;

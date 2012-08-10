@@ -26,7 +26,7 @@ public class ApplicationSJLB extends Application {
     private static final String LOG_TAG     = "ApplicationSJLB";
 
     // TODO SRombauts : implémenter comme ActivitySubjects un ResourceCursorAdapter, pour afficher une icone pour les messages non lus, et un Badge avec QuickView !
-    static final String[] CONTACTS_SUMMARY_PROJECTION = new String[] {
+    static final String[] CONTACTS_SUMMARY_PROJECTION = {
         Contacts._ID, // 0
         Contacts.DISPLAY_NAME, // 1
         Contacts.STARRED, // 2
@@ -51,20 +51,20 @@ public class ApplicationSJLB extends Application {
     // Liste des contacts Google correspondant aux utilisateurs du site
     public Vector<UserContactDescr> mUserContactList    = null;
     
-	/**
-	 * Appelée lorsque l'application démarre, avant toute autre activité
-	 */
-	@Override
-	public void onCreate () {
-		super.onCreate();
-		
-		Log.d(LOG_TAG, "onCreate");
-		
-	    initUserContactList ();
-	}
-	
-	
-	// Renseigne la liste des contacts Google correspondant aux utilisateurs du site
+    /**
+     * Appelée lorsque l'application démarre, avant toute autre activité
+     */
+    @Override
+    public void onCreate () {
+        super.onCreate();
+        
+        Log.d(LOG_TAG, "onCreate");
+        
+        initUserContactList ();
+    }
+    
+    
+    // Renseigne la liste des contacts Google correspondant aux utilisateurs du site
     public void initUserContactList () {
 
         // Liste les utilisateurs du site
@@ -111,5 +111,5 @@ public class ApplicationSJLB extends Application {
         }
         
         cursor.close();
-	}
+    }
 }

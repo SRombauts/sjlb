@@ -13,7 +13,7 @@ import android.net.Uri;
 /**
  * Encapsulation des données pour stockage en base de données
  * 
- * @author seb
+ * @author SRombauts
  */
 public class ContentProviderMsg extends ContentProvider {
     private static final int MSG_ALL         = 1;
@@ -54,36 +54,34 @@ public class ContentProviderMsg extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        // TODO SRombauts Auto-generated method stub
+        // Auto-generated method stub
         return null;
     }
 
     @Override
     public int delete(Uri uri, String arg1, String[] arg2) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         return 0;
     }
 
     @Override
     public Uri insert(Uri uri, ContentValues arg1) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         return null;
     }
 
-	/**
-	 * Requète générique sur les messages
-	 *
-	 * @todo SRombauts : ajouter un filtrage sur un "id" donné lorsque l'utilisateur fourni une URI de type "content:path/id"
-	 */
+    /**
+     * Requête générique sur les messages
+     *
+     * @todo SRombauts : ajouter un filtrage sur un "id" donné lorsque l'utilisateur fourni une URI de type "content:path/id"
+     */
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         if (null == selection) selection = ""; 
         String selectionCplx = "(" + selection + ") AND (" + SJLB.Msg.TABLE_NAME+"."+SJLB.Msg.AUTHOR_ID+"=" + SJLB.User.TABLE_NAME+"."+SJLB.User._ID + ")"; 
         //Log.e ("ContentProvider", selectionCplx);
         return mDBHelper.getReadableDatabase().query(
                     SJLB.Msg.TABLE_NAME + ", " + SJLB.User.TABLE_NAME,
-                    projection,
-                    selectionCplx,
-                    selectionArgs,
+                    projection, selectionCplx, selectionArgs,
                     null, // groupBy
                     null, // having
                     (null!=sortOrder)?sortOrder:SJLB.Msg.DEFAULT_SORT_ORDER
@@ -124,16 +122,19 @@ public class ContentProviderMsg extends ContentProvider {
       newMsgValues.put(SJLB.Msg.SUBJECT_ID,aMsg.getSubjectId());
       newMsgValues.put(SJLB.Msg.UNREAD,    aMsg.isUnread());
       newMsgValues.put(SJLB.Msg.TEXT,      aMsg.getText());
-      return mDBHelper.getWritableDatabase().update(SJLB.Msg.TABLE_NAME, newMsgValues, SJLB.Msg._ID + "=" + aMsg.getId(), null) > 0;
+      final String   selection      = SJLB.Msg._ID + "=?";
+      final String[] selectionArgs  = {Long.toString (aMsg.getId())};
+      return mDBHelper.getWritableDatabase().update(SJLB.Msg.TABLE_NAME, newMsgValues, selection, selectionArgs) > 0;
     }
     
     // Récupère la date du premier (plus vieux) message
     public long getFirstMsgDate () {
         long nbSeconds = 0;
+        final String[] columns  = {SJLB.Msg.DATE};
         Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Msg.TABLE_NAME,
-                                                                new String[] { SJLB.Msg.DATE },
-                                                                null,
-                                                                null, null, null, SJLB.Msg.DEFAULT_SORT_ORDER, "1");
+                                                                columns,
+                                                                null, null, // selection, selectionArgs
+                                                                null, null, SJLB.Msg.DEFAULT_SORT_ORDER, "1");
         if (1 == cursor.getCount())
         {
             cursor.moveToFirst();
@@ -146,10 +147,11 @@ public class ContentProviderMsg extends ContentProvider {
     // Récupère la date du dernier (plus récent) message
     public long getLastMsgDate () {
         long nbSeconds = 0;
+        final String[] columns  = {SJLB.Msg.DATE};
         Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Msg.TABLE_NAME,
-                                                                new String[] { SJLB.Msg.DATE },
-                                                                null,
-                                                                null, null, null, SJLB.Msg.REVERSE_SORT_ORDER, "1");
+                                                                columns,
+                                                                null, null, // selection, selectionArgs
+                                                                null, null, SJLB.Msg.REVERSE_SORT_ORDER, "1");
         if (1 == cursor.getCount())
         {
             cursor.moveToFirst();
@@ -161,10 +163,12 @@ public class ContentProviderMsg extends ContentProvider {
     
     // récupère un cursor avec la liste des Msg marqués UNREAD_LOCALY non lus mais localement lus 
     public Cursor getMsgUnread () {
+        final String[] columns  = {SJLB.Msg._ID};
+        final String   selection= SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_LOCALY;
         return mDBHelper.getReadableDatabase().query(   SJLB.Msg.TABLE_NAME,
-                                                       new String[] { SJLB.Msg._ID },
-                                                       SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_LOCALY,
-                                                       null, null, null, null);
+                                                        columns,
+                                                        selection, null,
+                                                        null, null, null);
     }
     
     // Efface les flags UNREAD_LOCALY des messages lus localement
@@ -175,30 +179,14 @@ public class ContentProviderMsg extends ContentProvider {
         return mDBHelper.getWritableDatabase ().update(SJLB.Msg.TABLE_NAME, values, where, null);
     }
 
-/*    
-    // récupère un cursor sur un Msg particulier
-    public Cursor getMsg (int aId) {
-        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Msg.TABLE_NAME,
-                                                                new String[]{   SJLB.Msg.DATE,
-                                                                                SJLB.Msg.AUTHOR_ID,
-                                                                                SJLB.Msg.SUBJECT_ID,
-                                                                                SJLB.Msg.UNREAD,
-                                                                                SJLB.Msg.TEXT},
-                                                                SJLB.Msg._ID + "=" + aId,
-                                                                null, null, null, null);
-        if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
-            throw new SQLException("Pas de Msg pour l'Id " + aId);
-        }
-        return cursor;
-    }
-*/
-
     // teste l'existence d'un Msg particulier
     public Boolean isExist (int aId) {
+        final String[] columns      = {SJLB.Msg._ID};
+        final String   selection    = SJLB.Msg._ID + "=?";
+        final String[] selectionArgs= {Long.toString (aId)};
         Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Msg.TABLE_NAME,
-                                                                new String[]{SJLB.Msg._ID},
-                                                                SJLB.Msg._ID + "=" + aId,
-                                                                null, null, null, null);
+                                                                columns, selection, selectionArgs,
+                                                                null, null, null);
         boolean bIsExist = (0 < cursor.getCount());
         cursor.close ();
         return bIsExist;
@@ -218,11 +206,15 @@ public class ContentProviderMsg extends ContentProvider {
 
     // compte les messages non lus d'un sujet donné
     public int getNbUnread (int aSubjectId) {
-        Cursor cursor = mDBHelper.getReadableDatabase().query(SJLB.Msg.TABLE_NAME,
-                                                              null /*new String[]{SJLB.Msg._ID} TODO SRombauts : tests en cours */,
-                                                              "(" + SJLB.Msg.SUBJECT_ID + "=" + aSubjectId
-                                                               + " AND " + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")",
-                                                              null, null, null, null);
+        final String[] columns      = {SJLB.Msg._ID};
+        final String   selection    = "(" + SJLB.Msg.SUBJECT_ID + "=?" + " AND "
+                                          + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")";
+        final String[] selectionArgs= {Integer.toString(aSubjectId)};
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Msg.TABLE_NAME,
+                                                                columns,
+                                                                selection,
+                                                                selectionArgs,
+                                                                null, null, null);
         int nbMsgs = cursor.getCount();
         cursor.close ();
         return nbMsgs;

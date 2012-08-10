@@ -55,17 +55,17 @@ public final class SJLB {
         /**
          * La clef spécifiant la notification sonore
          */
-        public static final String NOTIFICATION_SOUND	= "PREF_NOTIFICATION_SOUND";
+        public static final String NOTIFICATION_SOUND    = "PREF_NOTIFICATION_SOUND";
         
         /**
          * La clef spécifiant la notification par vibreur
          */
-        public static final String NOTIFICATION_VIBRATE	= "PREF_NOTIFICATION_VIBRATE";
+        public static final String NOTIFICATION_VIBRATE    = "PREF_NOTIFICATION_VIBRATE";
         
         /**
          * La clef spécifiant la notification lumineuse
          */
-        public static final String NOTIFICATION_LIGHT	= "PREF_NOTIFICATION_LIGHT";
+        public static final String NOTIFICATION_LIGHT    = "PREF_NOTIFICATION_LIGHT";
         
     }
     
@@ -302,7 +302,7 @@ public final class SJLB {
                                                     + DATE      + " integer, "
                                                     + AUTHOR_ID + " integer, "
                                                     + SUBJECT_ID+ " integer, "
-                                                    + UNREAD	+ " integer, "
+                                                    + UNREAD    + " integer, "
                                                     + TEXT      + " text);";
 
         public static final String TABLE_DROP   = "DROP TABLE IF EXISTS " + SJLB.Msg.TABLE_NAME;        
@@ -432,7 +432,7 @@ public final class SJLB {
          * Le nom complet de l'utilisateur
          * <P>Type: TEXT</P>
          */
-        public static final String  NAME              	= "name";
+        public static final String  NAME                  = "name";
         
         /**
          * The default sort order for this table
@@ -445,7 +445,7 @@ public final class SJLB {
         public static final String  TABLE_CREATE = "create table " + TABLE_NAME + " ("
                                                     + _ID     + " integer primary key, "
                                                     + PSEUDO  + " text, "
-        											+ NAME    + " text);";
+                                                    + NAME    + " text);";
 
         public static final String  TABLE_DROP   = "DROP TABLE IF EXISTS " + TABLE_NAME;
 

@@ -225,9 +225,9 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
             case (R.id.menu_show_online): {
                 // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
                 if (PrefsLoginPassword.AreFilled (this)) {
-    				// lien vers le Forum sur le Site Web :
-    				Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_uri)));
-    				startActivity(intent);
+                    // lien vers le Forum sur le Site Web :
+                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_uri)));
+                    startActivity(intent);
                 } else {
                     // Toast notification signalant l'absence de login/password
                     Toast.makeText(this, getString(R.string.toast_auth_needed), Toast.LENGTH_SHORT).show();

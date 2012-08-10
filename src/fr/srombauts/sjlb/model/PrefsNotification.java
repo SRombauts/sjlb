@@ -24,8 +24,8 @@ public class PrefsNotification {
     public PrefsNotification (Context aContext) {
         // Récupère les options de notification dans les préférences :
         SharedPreferences   Prefs       = PreferenceManager.getDefaultSharedPreferences(aContext);
-                            mbSound		= Prefs.getBoolean(SJLB.PREFS.NOTIFICATION_SOUND,   true);
-							mbVibrate	= Prefs.getBoolean(SJLB.PREFS.NOTIFICATION_VIBRATE, true);
-							mbLight		= Prefs.getBoolean(SJLB.PREFS.NOTIFICATION_LIGHT,   true);
+                            mbSound        = Prefs.getBoolean(SJLB.PREFS.NOTIFICATION_SOUND,   true);
+                            mbVibrate    = Prefs.getBoolean(SJLB.PREFS.NOTIFICATION_VIBRATE, true);
+                            mbLight        = Prefs.getBoolean(SJLB.PREFS.NOTIFICATION_LIGHT,   true);
     }
 }

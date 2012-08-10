@@ -201,7 +201,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
                        })
                        .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
                            public void onClick(DialogInterface dialog, int id) {
-							   dialog.cancel();
+                               dialog.cancel();
                            }
                        });
                 AlertDialog alert = builder.create();

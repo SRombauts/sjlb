@@ -149,8 +149,8 @@ public class AsynchTaskNewMsg extends AsyncTask<String, Void, Boolean> {
         super.onPostExecute(abResult);
 
         if (abResult) {
-    	    // Toast notification de fin d'envoi
-    	    Toast.makeText(mContext, mContext.getString(R.string.toast_sent), Toast.LENGTH_SHORT).show();
+            // Toast notification de fin d'envoi
+            Toast.makeText(mContext, mContext.getString(R.string.toast_sent), Toast.LENGTH_SHORT).show();
         }
         else {
             // Toast notification d'erreur d'envoi !

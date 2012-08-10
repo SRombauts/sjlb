@@ -14,7 +14,7 @@ import android.net.Uri;
 /**
  * Encapsulation des données pour stockage en base de données
  * 
- * @author seb
+ * @author SRombauts
  */
 public class ContentProviderPM extends ContentProvider {
 
@@ -57,32 +57,32 @@ public class ContentProviderPM extends ContentProvider {
 
     @Override
     public String getType(Uri arg0) {
-        // TODO SRombauts Auto-generated method stub
+        // SRombauts Auto-generated method stub
         return null;
     }
 
     @Override
     public int delete(Uri arg0, String arg1, String[] arg2) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         return 0;
     }
 
     @Override
     public Uri insert(Uri arg0, ContentValues arg1) {
-        // TODO Auto-generated method stub
+        // Auto-generated method stub
         return null;
     }
 
     @Override
     public Cursor query(Uri arg0, String[] arg1, String arg2, String[] arg3,
             String arg4) {
-        // TODO prendre en compte les paramètres pour faire la bonne requète !
-        return getAllPM ();
+        // TODO prendre en compte les paramètres pour faire la bonne requête !
+        return mDBHelper.getReadableDatabase().query(   SJLB.PM.TABLE_NAME,
+                null, null, null, null, null, null);
     }
 
     @Override
     public int update(Uri arg0, ContentValues arg1, String arg2, String[] arg3) {
-        // TODO Auto-generated method stub
         return 0;
     }
     
@@ -102,39 +102,28 @@ public class ContentProviderPM extends ContentProvider {
         newPMValues.put(SJLB.PM.AUTHOR_ID, aPM.getAuthorId());
         newPMValues.put(SJLB.PM.AUTHOR,    aPM.getAuthor());
         newPMValues.put(SJLB.PM.TEXT,      aPM.getText());
-        return mDBHelper.getWritableDatabase().insert(SJLB.PM.TABLE_NAME, null, newPMValues) > 0;
+        return (0 < mDBHelper.getWritableDatabase().insert(SJLB.PM.TABLE_NAME, null, newPMValues));
     }
 
     // retire un PM juste par son ID
     public boolean removePM(long aId) {
-        return mDBHelper.getWritableDatabase().delete(SJLB.PM.TABLE_NAME, SJLB.PM._ID + "=" + aId, null) > 0;
+        final String[] selectionArgs= {Long.toString(aId)};
+        return (0 < mDBHelper.getWritableDatabase().delete(SJLB.PM.TABLE_NAME, SJLB.PM._ID + "=?", selectionArgs));
     }
 
     // vide la table des PM
     public boolean clearPM() {
-        return mDBHelper.getWritableDatabase().delete(SJLB.PM.TABLE_NAME, null, null) > 0;
-    }
-    
-    // récupère un cursor avec la liste de tous les PM
-    public Cursor getAllPM () {
-        return mDBHelper.getReadableDatabase().query(   SJLB.PM.TABLE_NAME,
-                                                       new String[] {  SJLB.PM._ID,
-                                                                        SJLB.PM.DATE,
-                                                                        SJLB.PM.AUTHOR_ID,
-                                                                        SJLB.PM.AUTHOR,
-                                                                        SJLB.PM.TEXT},
-                                                       null, null, null, null, null);
+        return (0 < mDBHelper.getWritableDatabase().delete(SJLB.PM.TABLE_NAME, null, null));
     }
     
     // récupère un cursor sur un PM particulier
     public Cursor getPM (int aId) {
-        Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.PM.TABLE_NAME,
-                                                                new String[]{   SJLB.PM.DATE,
-                                                                                SJLB.PM.AUTHOR_ID,
-                                                                                SJLB.PM.AUTHOR,
-                                                                                SJLB.PM.TEXT},
-                                                                SJLB.PM._ID + "=" + aId,
-                                                                null, null, null, null, null);
+        final String[] columns      = {SJLB.PM.DATE, SJLB.PM.AUTHOR_ID, SJLB.PM.AUTHOR, SJLB.PM.TEXT};
+        final String   selection    = SJLB.PM._ID + "=?";
+        final String[] selectionArgs= {Integer.toString(aId)};
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.PM.TABLE_NAME,
+                                                                columns, selection, selectionArgs,
+                                                                null, null, null);
         if ((cursor.getCount() == 0) || !cursor.moveToFirst()) {
             throw new SQLException("Pas de PM pour l'Id " + aId);
         }
@@ -143,10 +132,12 @@ public class ContentProviderPM extends ContentProvider {
 
     // teste l'existence d'un PM particulier
     public Boolean isExist (int aId) {
-        Cursor cursor = mDBHelper.getReadableDatabase().query(  true, SJLB.PM.TABLE_NAME,
-                                                                new String[]{SJLB.PM._ID},
-                                                                SJLB.PM._ID + "=" + aId,
-                                                                null, null, null, null, null);
+        final String[] columns      = {SJLB.PM.DATE, SJLB.PM.AUTHOR_ID, SJLB.PM.AUTHOR, SJLB.PM.TEXT};
+        final String   selection    = SJLB.PM._ID + "=?";
+        final String[] selectionArgs= {Integer.toString(aId)};
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.PM.TABLE_NAME,
+                                                                columns, selection, selectionArgs,
+                                                                null, null, null);
         boolean bIsExist = (0 < cursor.getCount());
         cursor.close ();
         return bIsExist;

@@ -73,7 +73,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         
         // Récupère un curseur sur les données (les sujets) en filtrant sur l'id de la catégorie sélectionnée
         mCursor = managedQuery( SJLB.Subj.CONTENT_URI,
-        						null, // Pas d'argument "projection" pour filtrer les colonnes de résultats car elles sont toutes utiles
+                                null, // Pas d'argument "projection" pour filtrer les colonnes de résultats car elles sont toutes utiles
                                 SJLB.Subj.CAT_ID + "=" + mSelectedCategoryId,
                                 null, null);
 
@@ -145,10 +145,10 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         
         switch (item.getItemId()) {
             case (R.id.menu_show_online): {
-				// lien vers le Forum sur le Site Web :
-				Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_cat_uri) + mSelectedCategoryId));
+                // lien vers le Forum sur le Site Web :
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_forum_cat_uri) + mSelectedCategoryId));
                 Log.d (LOG_TAG, "onOptionsItemSelected: menu_show_online: " + getString(R.string.sjlb_forum_cat_uri) + mSelectedCategoryId);                
-				startActivity(intent);
+                startActivity(intent);
                 break;
             }
             case (R.id.menu_new_subj): {

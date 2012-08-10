@@ -189,8 +189,8 @@ public class AsynchTaskDeletePM extends AsyncTask<String, Void, Void> {
     protected void onPostExecute(Void result) {
         super.onPostExecute(result);
 
-	    // Toast notification de fin d'envoi
-	    Toast.makeText(mContext, mContext.getString(R.string.toast_deleted), Toast.LENGTH_SHORT).show();                
+        // Toast notification de fin d'envoi
+        Toast.makeText(mContext, mContext.getString(R.string.toast_deleted), Toast.LENGTH_SHORT).show();                
     }
 }
 
