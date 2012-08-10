@@ -26,7 +26,7 @@ import fr.srombauts.sjlb.service.IntentReceiverStartService;
 
 /**
  * Activité présentant la liste des sujets de la catégorie sélectionnée
- * @author 22/08/2010 srombauts
+ * @author 22/08/2010 SRombauts
  */
 public class ActivityForumSubjects extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener {
     private static final String LOG_TAG         = "ActivitySubj";
@@ -109,28 +109,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     @Override
     protected void onResume () {
         super.onResume();
-        Log.d (LOG_TAG, "onResume...");
-
-        // TODO SRO : tentative de refresh des données affichées (nb de new msg)
-        //Log.w (LOG_TAG, "requery & notifyDataSetChanged");
-        //mCursor.requery();              // => inutile car on utilise managedQuery !?
-        // Récupère un nouveau curseur sur les données (les sujets) en filtrant sur l'id de la catégorie sélectionnée
-        mCursor = managedQuery( SJLB.Subj.CONTENT_URI,
-                                null, // Pas d'argument "projection" pour filtrer les colonnes de résultats car elles sont toutes utiles
-                                SJLB.Subj.CAT_ID + "=" + mSelectedCategoryId,
-                                null, null);
-        //mAdapter.changeCursor(mCursor);
-        //mAdapter.notifyDataSetChanged();// Ne marche pas !?
-
-        // Re-créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
-        Log.w (LOG_TAG, "new adapter !");
-        mAdapter = new SubjectListItemAdapter(  this,
-                                                R.layout.subj,
-                                                mCursor);
-        
-        mSubjectsListView = (ListView)findViewById(R.id.subj_listview);
-        mSubjectsListView.setAdapter (mAdapter);
-        mSubjectsListView.requestLayout();
+        Log.d (LOG_TAG, "onResume");
     }
 
     
@@ -173,7 +152,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
                 break;
             }
             case (R.id.menu_new_subj): {
-                // TODO SRO : lancer l'activité chargée de créer un nouveau sujet dans la catégorie
+                // TODO SRombauts : lancer l'activité chargée de créer un nouveau sujet dans la catégorie
                 break;
             }
             case (R.id.menu_update): {
@@ -181,7 +160,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
                 Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
                 // TODO voir si c'est la meilleurs manière de faire...
                 IntentReceiverStartService.startService (this, LOG_TAG);
-                // TODO SRO : trouver un moyen de rafraîchir la liste à l'échéance de la tache de rafraîchissement
+                // TODO SRombauts : trouver un moyen de rafraîchir la liste à l'échéance de la tache de rafraîchissement
                 mCursor.requery();
                 mAdapter.notifyDataSetChanged();
                 break;
@@ -259,6 +238,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     
     // Adaptateur mappant les données du curseur dans des objets du cache du pool d'objets View utilisés par la ListView :
     // ceci remplace un SimpleCursorAdaptor pour permettre de customiser l'affichage du nombre de messages non lus (SSI != 0)
+    // TODO SRO : revoir complètement sont fonctionnement, on dirait que le cache n'est pas utilisé et qu'en plus les sujets sont chacun appelés/construits 3 fois ! 
     private final class SubjectListItemAdapter extends ResourceCursorAdapter {
         public SubjectListItemAdapter(Context context, int layout, Cursor c) {
             super(context, layout, c);
@@ -277,6 +257,8 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
                 // et ajoute au titre le nb de messages non lus si non nul
                 title += " (" + NbUnread + ")";
             }
+            // TODO SRO : tests en cours concernant le (non) rafraîchissement !
+            Log.d (LOG_TAG, title);
             cache.nameView.setText(title);
         }
 
@@ -291,6 +273,8 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
             cache.nameView  = (TextView)view.findViewById(R.id.subjText);
             // enregistre cet objet de cache
             view.setTag(cache);
+            // TODO SRO : tests en cours concernant le (non) rafraîchissement !
+            Log.d (LOG_TAG, "newView(" + cache.nameView + ")");
 
             return view;
         }
