@@ -4,8 +4,9 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Redesign (first part)
+        - Redesign (first part)\n
         - Added a screen with the list of users\n
+        - Bugfix on up-down touch movement\n
     </string>
     <string name="loginscreen_title">   Login/password                                          </string>
     <string name="loginscreen_message"> Enter your login and password in the preferences menu   </string>

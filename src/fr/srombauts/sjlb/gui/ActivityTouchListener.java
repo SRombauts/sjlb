@@ -1,6 +1,7 @@
 package fr.srombauts.sjlb.gui;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,7 +18,7 @@ import fr.srombauts.sjlb.model.PrefsInterface;
  * @author 27/08/2010 SRombauts
  */
 public class ActivityTouchListener extends Activity implements OnTouchListener {
-//  private static final String LOG_TAG = "ActivityTouchListener";
+    private static final String LOG_TAG = "ActivityTouchListener";
     
     protected float         mTouchStartPositionX    = 0;
     protected float         mTouchStartPositionY    = 0;
@@ -51,14 +52,16 @@ public class ActivityTouchListener extends Activity implements OnTouchListener {
                 //Log.d (LOG_TAG, "onTouch: deltas proportionnels : (" + proportionalDeltaX + ", " + proportionalDeltaY + ")");
                 
                 // Teste si le mouvement correspond à un mouvement horizontal (X) ou vertical (Y)
-                if (Math.abs(proportionalDeltaX)/Math.abs(proportionalDeltaY) > 1.0) {
+                if (Math.abs(proportionalDeltaX) > Math.abs(proportionalDeltaY)) {
                     // Teste si le mouvement correspond à un mouvement franc, d'ampleur suffisante en regard de la largeur de l'écran (> 40%)
                     if (Math.abs(proportionalDeltaX) > mSensibility) {
                         // Teste le sens du mouvement horizontal, et l'inverse éventuellement selon les préférences
                         if (   (proportionalDeltaX > 0) ==  (false == PrefsInterface.inverseSwitchScreenDirection(this)) )   {
+                            Log.v(LOG_TAG, "onRightGesture(): x=" + (touchX - mTouchStartPositionX) + " y=" + (touchY - mTouchStartPositionY));
                             bActionTraitee = onRightGesture ();
                         }
                         else {
+                            Log.v(LOG_TAG, "onLeftGesture(): x=" + (touchX - mTouchStartPositionX) + " y=" + (touchY - mTouchStartPositionY));
                             bActionTraitee = onLeftGesture ();
                         }
                     }
@@ -67,10 +70,12 @@ public class ActivityTouchListener extends Activity implements OnTouchListener {
                     if (Math.abs(proportionalDeltaY) > mSensibility) {
                         // Teste le sens du mouvement vertical (sans inversion possible)
                         if (proportionalDeltaY > 0)   {
+                            Log.v(LOG_TAG, "onUpGesture(): x=" + (touchX - mTouchStartPositionX) + " y=" + (touchY - mTouchStartPositionY));
                             bActionTraitee = onUpGesture ();
                         }
                         else {
-                            bActionTraitee = onLeftGesture ();
+                            Log.v(LOG_TAG, "onDownGesture(): x=" + (touchX - mTouchStartPositionX) + " y=" + (touchY - mTouchStartPositionY));
+                            bActionTraitee = onDownGesture ();
                         }
                     }
                 }
