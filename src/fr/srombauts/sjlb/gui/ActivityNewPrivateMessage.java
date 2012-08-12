@@ -39,8 +39,9 @@ public class ActivityNewPrivateMessage extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // Layout de l'activité
+        // Layout de l'activité, et titre
         setContentView(R.layout.pm_new);
+        setTitle(getString(R.string.pm_description));
 
         // Récupère un curseur sur les données (les utilisateurs) 
         mCursor = managedQuery( SJLB.User.CONTENT_URI, null,
