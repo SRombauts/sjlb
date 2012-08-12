@@ -35,7 +35,8 @@ public class ActivityUsers extends ActivityTouchListener {
         super.onCreate(savedInstanceState);
 
         // Layout de l'activité
-        setContentView(R.layout.user_list);
+        setContentView(R.layout.activity_list);
+        setTitle(getString(R.string.user_description));
         
         // Récupère un curseur sur les données (les membres) 
         mCursor = managedQuery( SJLB.User.CONTENT_URI, null,
@@ -44,13 +45,11 @@ public class ActivityUsers extends ActivityTouchListener {
 
         // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
         mAdapter = new UserListItemAdapter( this,
-                                          R.layout.user,
+                                          R.layout.user_item,
                                           mCursor);
         
-        mUsersListView = (ListView)findViewById(R.id.user_listview);
+        mUsersListView = (ListView)findViewById(R.id.activity_listview);
         mUsersListView.setAdapter (mAdapter);
-        // Scroll tout en bas de la liste des messages
-        mUsersListView.setSelection(mUsersListView.getCount()-1);
         
         // Enregistre le menu contextuel de la liste
         registerForContextMenu (mUsersListView);        

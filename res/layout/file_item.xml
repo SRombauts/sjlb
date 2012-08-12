@@ -3,6 +3,7 @@
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
+    android:background="#FFF"
    	>
     <ImageView
         android:id="@+id/fileImage"
@@ -11,13 +12,13 @@
         android:scaleType="centerInside"
         android:adjustViewBounds="true"
         android:src="@drawable/file_icon"
+        android:contentDescription="@string/file_description"
         />
     <TextView
         android:id="@+id/filename"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="10sp"
-        android:textColor="#FFF"
-        android:background="#000"
+        android:textColor="#000"
         />
 </LinearLayout>

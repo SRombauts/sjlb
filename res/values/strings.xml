@@ -4,6 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
+        - Redesign (first part)
         - Added a screen with the list of users\n
     </string>
     <string name="loginscreen_title">   Login/password                                          </string>
@@ -61,8 +62,10 @@
 
     <string name="delete_one_pm_confirmation">  "Are you sure you want to delete this PM ?" </string>
     <string name="delete_all_pm_confirmation">  "Are you sure you want to delete ALL PM ?!" </string>
-    <string name="yes">                 Yes </string>
-    <string name="no">                  No  </string>
+    <string name="yes">                 Yes     </string>
+    <string name="no">                  No      </string>
+    
+    <string name="file_description">    File    </string>
 
     <!-- Toast notifications -->
     <string name="toast_auth_needed">       Action not available : need login/password ! </string>

@@ -2,17 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:padding="6dp"
+    android:layout_height="fill_parent"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:background="#e4e4e4"
     >
-    <TextView  
-        android:id="@+id/category_label"
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content" 
-    />
     <ListView
-        android:id="@+id/subj_listview"
+        android:id="@+id/activity_listview"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:background="#FFF"
     />    
 </LinearLayout>

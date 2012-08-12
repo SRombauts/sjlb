@@ -89,9 +89,8 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             Log.i(LOG_TAG, "SelectedSubject (" + mSelectedSubjectId +", " + mSelectedGroupId + " [" + mSelectedCategoryId + "]) : " + mSelectedSubjectLabel);
         }
         
-        // Map la description du sujet pour la renseigner
-        TextView SubjectsDescription = (TextView)findViewById(R.id.subject_label);
-        SubjectsDescription.setText(mSelectedSubjectLabel);
+        // Map la description du sujet pour la renseigner dans le titre
+        setTitle(mSelectedSubjectLabel);
         
         // Récupère un curseur sur les données (les messages) en filtrant sur l'id du sujet sélectionné
         mCursor = managedQuery( SJLB.Msg.CONTENT_URI,
@@ -101,7 +100,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
 
         // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
         mAdapter = new MessageListItemAdapter(  this,
-                                                R.layout.msg,
+                                                R.layout.msg_item,
                                                 mCursor);
         
         mMsgListView = (ListView)findViewById(R.id.msg_listview);
@@ -384,7 +383,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
 
             // Créer l'adapteur entre la liste de fichiers et le layout et les informations sur le mapping des colonnes
             FileListItemAdapter adapterFiles = new FileListItemAdapter( context,
-                                                                        R.layout.file,
+                                                                        R.layout.file_item,
                                                                         arrayFileListItem);
 
             cache.fileListView.setAdapter (adapterFiles);
@@ -451,7 +450,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             View view = convertView;
             if (view == null) {
                 LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = vi.inflate(R.layout.file, null);
+                view = vi.inflate(R.layout.file_item, null);
 
                 // TODO SRombauts : tests en cours
                 FileListItem it = mListeItem[position];

@@ -4,6 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
+        - Redesign (première partie)
         - Ajout d\'un écran présentant la liste des utilisateurs de SJLB\n
     </string>
     <string name="loginscreen_title">   Login et mot de passe                                                           </string>

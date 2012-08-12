@@ -55,8 +55,9 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Layout de l'activité
-        setContentView(R.layout.pm_list);
+        // Layout de l'activité, et titre
+        setContentView(R.layout.activity_list);
+        setTitle(getString(R.string.pm_description));
         
         // Récupère un curseur sur les données (les messages Privés) 
         mCursor = managedQuery( SJLB.PM.CONTENT_URI, null,
@@ -65,10 +66,10 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
 
         // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
         mAdapter = new PmListItemAdapter( this,
-                                          R.layout.pm,
+                                          R.layout.pm_item,
                                           mCursor);
         
-        mPrivateMessagesListView = (ListView)findViewById(R.id.pm_listview);
+        mPrivateMessagesListView = (ListView)findViewById(R.id.activity_listview);
         mPrivateMessagesListView.setAdapter (mAdapter);
         // Scroll tout en bas de la liste des messages
         mPrivateMessagesListView.setSelection(mPrivateMessagesListView.getCount()-1);

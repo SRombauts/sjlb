@@ -60,7 +60,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         Log.d (LOG_TAG, "onCreate...");
         
         // Layout de l'activité
-        setContentView(R.layout.main);
+        setContentView(R.layout.main_list);
 
         // Affiche si nécessaire les modifications de la nouvelle version
         new WhatsNewScreen(this).show();
@@ -72,7 +72,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         mCategoriesListView     = (ListView)findViewById(R.id.categoriesListView);
         // Create the array adapter to bind the array to the listview
         mAA = new ArrayAdapter<String>( this,
-                                        android.R.layout.simple_list_item_1,
+                                        R.layout.main_item,
                                         mCategories);
         mCategoriesListView.setAdapter(mAA);
 

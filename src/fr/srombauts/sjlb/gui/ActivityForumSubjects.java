@@ -56,7 +56,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         Log.d (LOG_TAG, "onCreate...");
 
         // Layout de l'activité
-        setContentView(R.layout.subj_list);
+        setContentView(R.layout.activity_list);
         
         // Récupère l'éventuel paramètre de lancement (id de la catégorie du forum sélectionnée)
         Intent startIntent = getIntent();
@@ -67,9 +67,8 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
             Log.i(LOG_TAG, "SelectedCategory (" + mSelectedCategoryId + ") : " + mSelectedCategoryLabel);
         }
         
-        // Map la description de la catégorie pour la renseigner
-        TextView CategoryDescription = (TextView)findViewById(R.id.category_label);
-        CategoryDescription.setText(mSelectedCategoryLabel);        
+        // Map la description de la catégorie pour la renseigner dans le titre
+        setTitle(mSelectedCategoryLabel);
         
         // Récupère un curseur sur les données (les sujets) en filtrant sur l'id de la catégorie sélectionnée
         mCursor = managedQuery( SJLB.Subj.CONTENT_URI,
@@ -79,10 +78,10 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
 
         // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
         mAdapter = new SubjectListItemAdapter(  this,
-                                                R.layout.subj,
+                                                R.layout.subj_item,
                                                 mCursor);
         
-        mSubjectsListView = (ListView)findViewById(R.id.subj_listview);
+        mSubjectsListView = (ListView)findViewById(R.id.activity_listview);
         mSubjectsListView.setAdapter (mAdapter);
 
         // Enregistrer les listener d'IHM que la classe implémente        
