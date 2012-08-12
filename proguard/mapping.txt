@@ -175,6 +175,7 @@ fr.srombauts.sjlb.gui.ActivityMain -> fr.srombauts.sjlb.gui.ActivityMain:
     boolean onCreateOptionsMenu(android.view.Menu) -> onCreateOptionsMenu
     boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
     void onShowPM(android.view.View) -> onShowPM
+    void onShowUserList(android.view.View) -> onShowUserList
     void startActivityPM() -> c
     boolean onLeftGesture() -> a
     boolean onRightGesture() -> a_
@@ -236,14 +237,30 @@ fr.srombauts.sjlb.gui.ActivityTouchListener -> fr.srombauts.sjlb.gui.m:
     boolean onTouch(android.view.View,android.view.MotionEvent) -> onTouch
     boolean onLeftGesture() -> a
     boolean onRightGesture() -> a_
-fr.srombauts.sjlb.gui.LoginPasswordPopup -> fr.srombauts.sjlb.gui.n:
+fr.srombauts.sjlb.gui.ActivityUsers -> fr.srombauts.sjlb.gui.ActivityUsers:
+    android.database.Cursor mCursor -> a
+    fr.srombauts.sjlb.gui.ActivityUsers$UserListItemAdapter mAdapter -> b
+    android.widget.ListView mUsersListView -> e
+    void onCreate(android.os.Bundle) -> onCreate
+    void onResume() -> onResume
+    boolean onLeftGesture() -> a
+fr.srombauts.sjlb.gui.ActivityUsers$UserListItemAdapter -> fr.srombauts.sjlb.gui.n:
+    fr.srombauts.sjlb.gui.ActivityUsers this$0 -> a
+    void bindView(android.view.View,android.content.Context,android.database.Cursor) -> bindView
+    android.view.View newView(android.content.Context,android.database.Cursor,android.view.ViewGroup) -> newView
+fr.srombauts.sjlb.gui.ActivityUsers$UserListItemCache -> fr.srombauts.sjlb.gui.o:
+    android.widget.QuickContactBadge quickContactView -> a
+    android.widget.TextView pseudoView -> b
+    android.widget.TextView nameView -> c
+    android.widget.TextView addressView -> d
+fr.srombauts.sjlb.gui.LoginPasswordPopup -> fr.srombauts.sjlb.gui.p:
     android.app.Activity mActivity -> a
-fr.srombauts.sjlb.gui.LoginPasswordPopup$1 -> fr.srombauts.sjlb.gui.o:
+fr.srombauts.sjlb.gui.LoginPasswordPopup$1 -> fr.srombauts.sjlb.gui.q:
     fr.srombauts.sjlb.gui.LoginPasswordPopup this$0 -> a
     void onClick(android.content.DialogInterface,int) -> onClick
-fr.srombauts.sjlb.gui.WhatsNewScreen -> fr.srombauts.sjlb.gui.p:
+fr.srombauts.sjlb.gui.WhatsNewScreen -> fr.srombauts.sjlb.gui.r:
     android.app.Activity mActivity -> a
-fr.srombauts.sjlb.gui.WhatsNewScreen$1 -> fr.srombauts.sjlb.gui.q:
+fr.srombauts.sjlb.gui.WhatsNewScreen$1 -> fr.srombauts.sjlb.gui.s:
     fr.srombauts.sjlb.gui.WhatsNewScreen this$0 -> a
     android.content.SharedPreferences val$prefs -> b
     android.content.pm.PackageInfo val$packageInfo -> c
