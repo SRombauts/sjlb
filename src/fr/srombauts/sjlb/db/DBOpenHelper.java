@@ -24,7 +24,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     
     // Création des tables de la base si celle si est inexistante (ou n'était pas à jour)
     public void onCreate(SQLiteDatabase aDatabase) {
-        Log.w(LOG_TAG, "onCreate");
+        Log.d(LOG_TAG, "onCreate");
         aDatabase.execSQL(SJLB.PM.TABLE_CREATE);
         aDatabase.execSQL(SJLB.Subj.TABLE_CREATE);
         aDatabase.execSQL(SJLB.Msg.TABLE_CREATE);

@@ -439,7 +439,11 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                                     Log.d(LOG_TAG, "Msg " + idMsg + " recuperes precedemment");
                                 }
                             } else {
-                                Log.e(LOG_TAG, "Msg d'ID " + idMsg + " interdit");
+                                if (-1 == idMsg) {
+                                    Log.i(LOG_TAG, "Signal de l'agenda (ID -1)");
+                                } else {
+                                    Log.w(LOG_TAG, "Msg d'ID " + idMsg + " < 0");
+                                }
                             }
                         }
                     }
