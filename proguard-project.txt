@@ -3,7 +3,11 @@
 # de manière à permettre une customisation spécifique au projet
 # s'appuyant sur la configuration standard proposée par le SDK Android
 # 2012-08-09 SRombauts
+
+# Suppression en release de tous les logs d'information et de mise au point ;
+# ne doivent subsiter que les logs d'avertissement et d'erreur
 -assumenosideeffects class android.util.Log {
-    public static *** d(...);
     public static *** v(...);
+    public static *** d(...);
+    public static *** i(...);
 }
