@@ -290,10 +290,11 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
         public void bindView(View view, Context context, Cursor cursor) {
             final MessageListItemCache  cache = (MessageListItemCache) view.getTag();
             
-            // Fixe la barre de titre du message 
-            String  title = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.PM.AUTHOR)); // on utilise le champ "PSEUDO" issu du croisement avec la table 
+            // Fixe les infos du message 
+            String  pseudo = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.PM.AUTHOR)); // on utilise le champ "PSEUDO" issu du croisement avec la table 
+            cache.pseudoView.setText(pseudo);
             String  strDate = ForumMessage.getDateString (new Date(cursor.getLong(cursor.getColumnIndexOrThrow(SJLB.PM.DATE)))) ;
-            cache.titleView.setText(title + "\n" + strDate);
+            cache.dateView.setText(strDate);
             // Fixe le contenu du message 
             String  text = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.PM.TEXT));
             cache.textView.setText(text);
@@ -322,7 +323,8 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
             MessageListItemCache cache = new MessageListItemCache();
             // et binding sur les View décrites par le Layout
             cache.quickContactView  = (QuickContactBadge)   view.findViewById(R.id.pmBadge);
-            cache.titleView         = (TextView)            view.findViewById(R.id.pmTitre);
+            cache.pseudoView        = (TextView)            view.findViewById(R.id.pmPseudo);
+            cache.dateView          = (TextView)            view.findViewById(R.id.pmDate);
             cache.textView          = (TextView)            view.findViewById(R.id.pmText);
             // enregistre cet objet de cache
             view.setTag(cache);
@@ -334,7 +336,8 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
     // Objet utilisé comme cache des données d'une View, dans un pool d'objets utilisés par la ListView
     final static class MessageListItemCache {
         public QuickContactBadge    quickContactView;
-        public TextView             titleView;
+        public TextView             pseudoView;
+        public TextView             dateView;
         public TextView             textView;
     }    
 }

@@ -3,7 +3,7 @@
     android:id="@+id/subjText"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:padding="6dp"
+    android:padding="8dp"
     android:textSize="18sp"
     android:background="#FFF"
     android:textColor="#000"

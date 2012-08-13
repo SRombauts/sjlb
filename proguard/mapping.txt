@@ -14,7 +14,6 @@ fr.srombauts.sjlb.db.ContentProviderFile -> fr.srombauts.sjlb.db.ContentProvider
     int update(android.net.Uri,android.content.ContentValues,java.lang.String,java.lang.String[]) -> update
     void close() -> a
     boolean insertFile(fr.srombauts.sjlb.model.AttachedFile) -> a
-    boolean clearFiles() -> b
 fr.srombauts.sjlb.db.ContentProviderMsg -> fr.srombauts.sjlb.db.ContentProviderMsg:
     fr.srombauts.sjlb.db.DBOpenHelper mDBHelper -> a
     android.content.UriMatcher sUriMatcher -> b
@@ -32,8 +31,7 @@ fr.srombauts.sjlb.db.ContentProviderMsg -> fr.srombauts.sjlb.db.ContentProviderM
     android.database.Cursor getMsgUnread() -> d
     int clearMsgUnread() -> e
     java.lang.Boolean isExist(int) -> a
-    boolean clearMsg() -> f
-    long getCount() -> g
+    long getCount() -> f
     int getNbUnread(int) -> b
 fr.srombauts.sjlb.db.ContentProviderPM -> fr.srombauts.sjlb.db.ContentProviderPM:
     fr.srombauts.sjlb.db.DBOpenHelper mDBHelper -> a
@@ -62,7 +60,6 @@ fr.srombauts.sjlb.db.ContentProviderSubj -> fr.srombauts.sjlb.db.ContentProvider
     boolean insertSubj(fr.srombauts.sjlb.model.ForumSubject) -> a
     boolean updateSubj(fr.srombauts.sjlb.model.ForumSubject) -> b
     boolean updateNbUnread(int,int) -> a
-    boolean clearSubj() -> b
     java.lang.Boolean isExist(int) -> a
 fr.srombauts.sjlb.db.ContentProviderUser -> fr.srombauts.sjlb.db.ContentProviderUser:
     fr.srombauts.sjlb.db.DBOpenHelper mDBHelper -> a
@@ -75,8 +72,7 @@ fr.srombauts.sjlb.db.ContentProviderUser -> fr.srombauts.sjlb.db.ContentProvider
     int update(android.net.Uri,android.content.ContentValues,java.lang.String,java.lang.String[]) -> update
     void close() -> a
     boolean insertUser(fr.srombauts.sjlb.model.User) -> a
-    boolean clearUser() -> b
-    long countUsers() -> c
+    long countUsers() -> b
 fr.srombauts.sjlb.db.DBOpenHelper -> fr.srombauts.sjlb.db.a:
     void onCreate(android.database.sqlite.SQLiteDatabase) -> onCreate
     void onUpgrade(android.database.sqlite.SQLiteDatabase,int,int) -> onUpgrade
@@ -130,10 +126,11 @@ fr.srombauts.sjlb.gui.ActivityForumMessages$MessageListItemAdapter -> fr.srombau
     void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick
 fr.srombauts.sjlb.gui.ActivityForumMessages$MessageListItemCache -> fr.srombauts.sjlb.gui.d:
     android.widget.QuickContactBadge quickContactView -> a
-    android.widget.TextView titleView -> b
-    android.widget.TextView textView -> c
-    android.widget.ImageView imageViewNew -> d
-    android.widget.ListView fileListView -> e
+    android.widget.TextView pseudoView -> b
+    android.widget.TextView dateView -> c
+    android.widget.TextView textView -> d
+    android.widget.ImageView imageViewNew -> e
+    android.widget.ListView fileListView -> f
 fr.srombauts.sjlb.gui.ActivityForumSubjects -> fr.srombauts.sjlb.gui.ActivityForumSubjects:
     android.database.Cursor mCursor -> a
     fr.srombauts.sjlb.gui.ActivityForumSubjects$SubjectListItemAdapter mAdapter -> b
@@ -224,8 +221,9 @@ fr.srombauts.sjlb.gui.ActivityPrivateMessages$4 -> fr.srombauts.sjlb.gui.j:
     void onClick(android.content.DialogInterface,int) -> onClick
 fr.srombauts.sjlb.gui.ActivityPrivateMessages$MessageListItemCache -> fr.srombauts.sjlb.gui.k:
     android.widget.QuickContactBadge quickContactView -> a
-    android.widget.TextView titleView -> b
-    android.widget.TextView textView -> c
+    android.widget.TextView pseudoView -> b
+    android.widget.TextView dateView -> c
+    android.widget.TextView textView -> d
 fr.srombauts.sjlb.gui.ActivityPrivateMessages$PmListItemAdapter -> fr.srombauts.sjlb.gui.l:
     fr.srombauts.sjlb.gui.ActivityPrivateMessages this$0 -> a
     void bindView(android.view.View,android.content.Context,android.database.Cursor) -> bindView

@@ -3,18 +3,18 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:padding="8dp"
     android:background="#FFF"
     >
-    <QuickContactBadge xmlns:android="http://schemas.android.com/apk/res/android"
+    <QuickContactBadge
         android:id="@+id/userBadge"
-        android:layout_margin="4dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginRight="8dp"
         android:layout_width="48dp"
         android:layout_height="56dp"
         android:src="@drawable/ic_contact_picture"
         style="?android:attr/quickContactBadgeStyleWindowSmall" />
     
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -23,9 +23,8 @@
             android:id="@+id/userPseudo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textColor="#000"
-            android:background="#FFF"
             />
         <TextView
             android:id="@+id/userName"
@@ -33,15 +32,13 @@
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:textColor="#000"
-            android:background="#FFF"
             />
         <TextView
             android:id="@+id/userAddress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
+            android:textSize="0sp"
             android:textColor="#000"
-            android:background="#FFF"
             />
     </LinearLayout>
 </LinearLayout>

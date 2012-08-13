@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:padding="6dp"
+    android:padding="8dp"
     android:background="#FFF"
     >
     <LinearLayout
@@ -13,21 +13,33 @@
         >
         <QuickContactBadge
             android:id="@+id/pmBadge"
-            android:layout_margin="4dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginRight="8dp"
             android:layout_width="48dp"
             android:layout_height="52dp"
             android:src="@drawable/ic_contact_picture"
             style="?android:attr/quickContactBadgeStyleWindowSmall" />
-        <TextView
-            android:id="@+id/pmTitre"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="#000"
-            />
+            >
+            <TextView
+                android:id="@+id/pmPseudo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="#000"
+                />
+            <TextView
+                android:id="@+id/pmDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="#000"
+                />
+            </LinearLayout>
     </LinearLayout>
-    <TextView
+        <TextView
         android:id="@+id/pmText"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

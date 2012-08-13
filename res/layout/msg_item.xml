@@ -3,30 +3,42 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:padding="6dp"
+    android:padding="8dp"
     android:background="#FFF"
     >
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         >
-        <QuickContactBadge xmlns:android="http://schemas.android.com/apk/res/android"
+        <QuickContactBadge
             android:id="@+id/msgBadge"
-            android:layout_margin="4dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginRight="8dp"
             android:layout_width="48dp"
             android:layout_height="52dp"
             android:src="@drawable/ic_contact_picture"
             style="?android:attr/quickContactBadgeStyleWindowSmall" />
-        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/msgTitre"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:paddingRight="4dp"
-            android:textColor="#000"
-            />
+            >
+            <TextView
+                android:id="@+id/msgPseudo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:paddingRight="4dp"
+                android:textColor="#000"
+                />
+            <TextView
+                android:id="@+id/msgDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="#000"
+                />
+        </LinearLayout>
         <ImageView
             android:id="@+id/msgNew"
             android:layout_width="wrap_content"
@@ -42,7 +54,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:paddingTop="0dp"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textColor="#000"
         android:autoLink="all"
         />

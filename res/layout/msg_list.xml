@@ -3,8 +3,8 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
     android:background="#e4e4e4"
 >
     <ListView
@@ -16,20 +16,22 @@
     <EditText
         android:id="@+id/textEditText"
         android:layout_width="fill_parent"
-        android:layout_height="160dp"
+        android:layout_height="152dp"
         android:layout_marginTop="4dp"
         android:gravity="top"
         android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
+        android:textSize="14sp"
         android:visibility="invisible"
     />
     <Button
         android:id="@+id/textSendButton"
         android:layout_width="fill_parent" 
-        android:layout_height="32dp" 
+        android:layout_height="40dp" 
         android:layout_marginBottom="4dp"
         android:background="#09C"
         android:text="@string/button_send_msg"
         android:onClick="onSendMsg"
+        android:textSize="18sp"
         android:visibility="invisible"
     />
 </LinearLayout>

@@ -1,0 +1,17 @@
+Guidelines principales d'Android 
+SRombauts 2012/08/13
+
+Typographic Scale :
+12sp=Text Size Micro
+14sp=Text Size Small
+18sp=Text Size Medium
+22sp=Text Size Large
+
+
+Metrics :
+48dp=Icon(border included),Action Bar...
+40dp=Button
+32dp=Icon(center part, border excluded)
+16dp=Lateral spacing
+8dp=Icon border, spacing
+4dp=Margin arround button

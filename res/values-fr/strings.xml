@@ -4,9 +4,8 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Redesign (première partie)\n
-        - Ajout d\'un écran présentant la liste des utilisateurs de SJLB\n
-        - Correction bug mouvement vers le bas\n
+        - Uniformisation des tailles selon les préconisations Android\n
+        - Suppression de traces d\'informations\n
     </string>
     <string name="loginscreen_title">   Login et mot de passe                                                           </string>
     <string name="loginscreen_message"> Veuillez saisir votre login et votre mot de passe dans le menu des préférences  </string>
