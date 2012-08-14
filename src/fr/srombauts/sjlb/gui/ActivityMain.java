@@ -86,9 +86,6 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         mSavedIntent.putExtra(ActivityForumSubjects.START_INTENT_EXTRA_CAT_ID,    mSelectedCategoryId);
         mSavedIntent.putExtra(ActivityForumSubjects.START_INTENT_EXTRA_CAT_LABEL, mSelectedCategoryLabel);
         Log.i (LOG_TAG, "onCreate: restaure l'intent sauvegarde (" + mSelectedCategoryId +", " + mSelectedCategoryLabel + ")" );
-
-        // Lance le service, si pas déjà lancé, et provoque un rafraîchissement
-        IntentReceiverStartService.startService (this, LOG_TAG);
     }
 
     // Appelée lorsque l'activité était déjà lancée (par exemple clic sur une notification de nouveau Msg)

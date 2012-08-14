@@ -99,7 +99,7 @@ public class AsynchTaskDeletePM extends AsyncTask<String, Void, Void> {
             // Utilise les préférences pour récupérer le login/mot de passe :
             PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
             
-            // Instancie un client http et un header de requète "POST"  
+            // Instancie un client http et un header de requête "POST"  
             HttpClient  httpClient  = new DefaultHttpClient();  
             HttpPost    httpPost    = new HttpPost(mContext.getString(R.string.sjlb_pm_uri));  
                

@@ -103,7 +103,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     static final private String ATTR_NAME_USER_PSEUDO           = "pseudo";
     static final private String ATTR_NAME_USER_NAME             = "nom";
 
-    private ServiceRefresh  mContext        = null;
+    private ServiceSJLB  mContext        = null;
     private int             mNbPM           = 0;    // Nombre de PM de l'utilisateur (issu directement dans la liste XML)
     private int             mNbNewPM        = 0;    // Nombre d'ID de PM inconnus (issu de la comparaison de la liste XML avec la BDD)
     private int             mNbUnreadMsg    = 0;    // Nombre de messages non lus par l'utilisateur (issu directement de la liste XML)
@@ -119,7 +119,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
      * Constructeur utilisé pour mémorisée la référence sur le service appelant
      * @param context
      */
-    public AsynchTaskRefresh(ServiceRefresh context) {
+    public AsynchTaskRefresh(ServiceSJLB context) {
         mContext      = context;
                                 
         mPMDBAdapter    = new ContentProviderPM(context);
@@ -142,13 +142,8 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
     }
     
     
-    /**
-     * Lance la récupération et le parse de la liste XML des messages non lus
-     * 
-     * Ce travail s'exécute en tâche de fond, et n'a donc pas le droit d'effectuer d'actions sur la GUI
-     */
-    protected Void doInBackground(Void... args) {
-        
+    // TODO SRombauts : en cours
+    public void doInBackground() {
         try {
             // Récupération de la liste des utilisateurs (seulement si nécessaire, c'est à dire si la BDD est vide)
             refreshUsers ();
@@ -170,7 +165,16 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
             mUserDBAdapter.close();
             mMsgDBAdapter.close();
             mPMDBAdapter.close();
-        }        
+        }                
+    }
+    
+    /**
+     * Lance la récupération et le parse de la liste XML des messages non lus
+     * 
+     * Ce travail s'exécute en tâche de fond, et n'a donc pas le droit d'effectuer d'actions sur la GUI
+     */
+    protected Void doInBackground(Void... args) {
+        doInBackground();
         return null;
     }
     
@@ -222,7 +226,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 // Utilise les préférences pour récupérer le login/mot de passe :
                 PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
                 
-                // Instancie un client http et un header de requète "POST"
+                // Instancie un client HTTP et un header de requête "POST"
                 HttpClient  httpClient  = new DefaultHttpClient();
                 HttpPost    httpPost    = new HttpPost(mContext.getString(R.string.sjlb_users_uri));
                    
@@ -623,8 +627,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 && (0 < lastMsgDate) )
             {
                 // et si disponibles (ie après la première fois) les 2 dates du plus vieux et du plus récent message
-                // TODO SRombauts : tests en cours
-                //nameValuePairs.add(new BasicNameValuePair("date_premier", Long.toString(firstMsgDate)));
+                nameValuePairs.add(new BasicNameValuePair("date_premier", Long.toString(firstMsgDate)));
                 nameValuePairs.add(new BasicNameValuePair("date_dernier", Long.toString(lastMsgDate)));
                 Log.d(LOG_TAG, "fetchMsg (" + firstMsgDate +"," + lastMsgDate + ")");
             }

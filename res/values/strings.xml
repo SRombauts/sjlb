@@ -4,8 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Following size guidelines\n
-        - Less loging\n
+        - Improved service usage\n
     </string>
     <string name="loginscreen_title">   Login/password                                          </string>
     <string name="loginscreen_message"> Enter your login and password in the preferences menu   </string>

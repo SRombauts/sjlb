@@ -4,8 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Uniformisation des tailles selon les préconisations Android\n
-        - Suppression de traces d\'informations\n
+        - Amélioration de l\'utilisation du service\n
     </string>
     <string name="loginscreen_title">   Login et mot de passe                                                           </string>
     <string name="loginscreen_message"> Veuillez saisir votre login et votre mot de passe dans le menu des préférences  </string>

@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.UserContactDescr;
+import fr.srombauts.sjlb.service.IntentReceiverStartService;
 
 import android.app.Application;
 import android.content.ContentUris;
@@ -18,7 +19,7 @@ import android.util.Log;
 
 /**
  *  Classe gérant les objets et données dont le cycle de vie est celui de l'application,
- * c'est à dire au delas de celui d'une activité.
+ * c'est à dire au delà de celui d'une activité.
  * 
  * @author 01/09/2010 SRombauts
  */
@@ -46,8 +47,6 @@ public class ApplicationSJLB extends Application {
     static final int SUMMARY_LOOKUP_KEY = 6;
     static final int SUMMARY_HAS_PHONE_COLUMN_INDEX = 7;
     
-    
-    
     // Liste des contacts Google correspondant aux utilisateurs du site
     public Vector<UserContactDescr> mUserContactList    = null;
     
@@ -57,12 +56,29 @@ public class ApplicationSJLB extends Application {
     @Override
     public void onCreate () {
         super.onCreate();
-        
         Log.d(LOG_TAG, "onCreate");
         
+        // Lance l'alarme périodique, et le service, si pas déjà lancé, et provoque un rafraîchissement
+        IntentReceiverStartService.startAlarm(this, LOG_TAG);
+
+        // Renseigne la liste des contacts Google correspondant aux utilisateurs du site
         initUserContactList ();
     }
-    
+
+    /**
+     * Appelée lorsque l'application s'arrête, après la fin de toute autre activité
+     *
+     * NOTE SRombauts : la doc indique qu'il ne faut pas compter sur cette méthode, et effectivement...
+     *                  => fait dans l'ActivityMain.onDestroy()
+    */
+    public void onTerminate () {
+        super.onTerminate();
+        Log.d(LOG_TAG, "onTerminate");
+        
+        // Provoque un rafraîchissement des infos anticipé,
+        // qui permet de signaler au site web SJLB les messages qui ont été lus   
+        IntentReceiverStartService.startService (this, LOG_TAG);
+    }
     
     // Renseigne la liste des contacts Google correspondant aux utilisateurs du site
     public void initUserContactList () {
