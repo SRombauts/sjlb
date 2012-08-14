@@ -623,7 +623,8 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
                 && (0 < lastMsgDate) )
             {
                 // et si disponibles (ie après la première fois) les 2 dates du plus vieux et du plus récent message
-                nameValuePairs.add(new BasicNameValuePair("date_premier", Long.toString(firstMsgDate)));
+                // TODO SRombauts : tests en cours
+                //nameValuePairs.add(new BasicNameValuePair("date_premier", Long.toString(firstMsgDate)));
                 nameValuePairs.add(new BasicNameValuePair("date_dernier", Long.toString(lastMsgDate)));
                 Log.d(LOG_TAG, "fetchMsg (" + firstMsgDate +"," + lastMsgDate + ")");
             }

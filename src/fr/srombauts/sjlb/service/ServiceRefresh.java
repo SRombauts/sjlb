@@ -23,32 +23,31 @@ public class ServiceRefresh extends Service {
 
     private AsynchTaskRefresh   mRefreshTask    = null;
 
-    private AlarmManager        mAlarmManager   = null;
-    private PendingIntent       mAlarmIntent    = null;    
-
     /**
-     * Lancement de l'alarme périodique
+     * Lancement de l'alarme périodique : fait ici une fois pour toute (et non pas à chaque onStartCommand)
      */
     public void onCreate() {
+        Log.d(LOG_TAG, "onCreate");
+        
         // Récupère dans les préférences les valeurs de rafraîchissement  :
         SharedPreferences   prefs           = PreferenceManager.getDefaultSharedPreferences(this);
-        Boolean             bAutoUpdate     = prefs.getBoolean(SJLB.PREFS.AUTO_UPDATE,      true);
-        String              freqUpdate      = prefs.getString(SJLB.PREFS.UPDATE_FREQ,       "900");   // 15 min
-        long                freqUpdateMs    = Long.parseLong(freqUpdate) * 1000;
-        
-        String ALARM_ACTION = IntentReceiverStartService.ACTION_REFRESH_ALARM;
-        Intent intentToFire = new Intent(ALARM_ACTION);
-        mAlarmIntent    = PendingIntent.getBroadcast(this, 0, intentToFire, 0);
-        mAlarmManager   = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-        // Lancement de l'alarme périodique  :
-        // - imprécise car plus économique, /*AlarmManager.INTERVAL_FIFTEEN_MINUTES == 900000*/
-        // - et pas ELAPSED_REALTIME_WAKEUP car ainsi n'utilise que les réveils  demandés par d'autres applis (gmail...)
-        if (false == bAutoUpdate)
+        final Boolean       bAutoUpdate     = prefs.getBoolean(SJLB.PREFS.AUTO_UPDATE,      true);
+        if (bAutoUpdate)
         {
-            // Si pas d'update automatique, l'alarme n'est pas répétée
-            freqUpdateMs = 0;
+            final String    freqUpdate      = prefs.getString(SJLB.PREFS.UPDATE_FREQ,       "900");   // 15 min
+            final long      freqUpdateMs    = Long.parseLong(freqUpdate) * 1000;
+            
+            final String ALARM_ACTION = IntentReceiverStartService.ACTION_REFRESH_ALARM;
+            final Intent intentToFire = new Intent(ALARM_ACTION);
+
+            final PendingIntent   mAlarmIntent    = PendingIntent.getBroadcast(this, 0, intentToFire, 0);
+            final AlarmManager    mAlarmManager   = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+
+            // Lancement de l'alarme périodique  :
+            // - imprécise car plus économique, /*AlarmManager.INTERVAL_FIFTEEN_MINUTES == 900000*/
+            // - et pas ELAPSED_REALTIME_WAKEUP car ainsi n'utilise que les réveils demandés par d'autres applis (gmail...)
+            mAlarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, freqUpdateMs, freqUpdateMs, mAlarmIntent);
         }
-        mAlarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 0, freqUpdateMs, mAlarmIntent);
     }    
 
     /**
@@ -56,7 +55,7 @@ public class ServiceRefresh extends Service {
      */
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        Log.d(LOG_TAG, "onStartCommand");
+        Log.d(LOG_TAG, "onStartCommand(" + intent + "," + flags + "," + startId + ")");
         
         // Refresh : création et lancement d'une nouvelle tâche de fond ssi jamais créée ou précédente terminée 
         if (   (mRefreshTask == null)
@@ -75,10 +74,20 @@ public class ServiceRefresh extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.d(LOG_TAG, "onDestroy");
+
+        // Refresh : création et lancement d'une nouvelle tâche de fond ssi jamais créée ou précédente terminée 
+        if (mRefreshTask != null)
+        {
+            if (mRefreshTask.getStatus() == AsyncTask.Status.RUNNING) {
+                mRefreshTask.cancel(true);
+            }
+            mRefreshTask = null;
+        }
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-         return null;
+        Log.d(LOG_TAG, "onBind");
+        return null;
     }
 }
