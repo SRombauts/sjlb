@@ -37,10 +37,11 @@ import fr.srombauts.sjlb.model.ForumMessage;
 import fr.srombauts.sjlb.model.UserContactDescr;
 import fr.srombauts.sjlb.service.AsynchTaskDownloadImage;
 import fr.srombauts.sjlb.service.AsynchTaskNewMsg;
-import fr.srombauts.sjlb.service.AsynchTaskRefresh;
+import fr.srombauts.sjlb.service.TaskRefresh;
 import fr.srombauts.sjlb.service.CallbackImageDownload;
 import fr.srombauts.sjlb.service.CallbackTransfer;
 import fr.srombauts.sjlb.service.IntentReceiverStartService;
+import fr.srombauts.sjlb.service.ServiceSJLB;
 
 
 /**
@@ -139,7 +140,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         // Supprime l'éventuelle notification de Msg non lus
         String              ns                      = Context.NOTIFICATION_SERVICE;
         NotificationManager notificationManager     = (NotificationManager) getSystemService(ns);
-        notificationManager.cancel(AsynchTaskRefresh.NOTIFICATION_NEW_MSG_ID);
+        notificationManager.cancel(TaskRefresh.NOTIFICATION_NEW_MSG_ID);
 
         // Efface les flags "UNREAD_TRUE" des messages lus dès qu'on entre !
         ContentValues valuesMsg = new ContentValues();
@@ -199,6 +200,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                 break;            }
             case (R.id.menu_prefs): {
                 Intent intent = new Intent(this, ActivityPreferences.class);
+                intent.setAction(ServiceSJLB.ACTION_REFRESH);
                 startActivity(intent);
                 break;
             }

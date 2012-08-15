@@ -30,7 +30,7 @@ import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.ForumMessage;
 import fr.srombauts.sjlb.model.UserContactDescr;
 import fr.srombauts.sjlb.service.AsynchTaskDeletePM;
-import fr.srombauts.sjlb.service.AsynchTaskRefresh;
+import fr.srombauts.sjlb.service.TaskRefresh;
 import fr.srombauts.sjlb.service.IntentReceiverStartService;
 
 
@@ -98,7 +98,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
         // Annule l'éventuelle notification de PM non lus
         String              ns                      = Context.NOTIFICATION_SERVICE;
         NotificationManager notificationManager     = (NotificationManager) getSystemService(ns);
-        notificationManager.cancel(AsynchTaskRefresh.NOTIFICATION_NEW_PM_ID);
+        notificationManager.cancel(TaskRefresh.NOTIFICATION_NEW_PM_ID);
     }
 
     @Override

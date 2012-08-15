@@ -33,7 +33,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.net.ParseException;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 import fr.srombauts.sjlb.ApplicationSJLB;
@@ -67,7 +66,7 @@ import fr.srombauts.sjlb.model.User;
  *
  * @author 14/06/2010 SRombauts
  */
-public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
+public class TaskRefresh {
     private static final String  LOG_TAG                    = "RefreshTask";
 
     public static final int     NOTIFICATION_NEW_PM_ID      = 1;
@@ -119,7 +118,7 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
      * Constructeur utilisé pour mémorisée la référence sur le service appelant
      * @param context
      */
-    public AsynchTaskRefresh(ServiceSJLB context) {
+    public TaskRefresh(ServiceSJLB context) {
         mContext      = context;
                                 
         mPMDBAdapter    = new ContentProviderPM(context);
@@ -129,20 +128,11 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         mUserDBAdapter  = new ContentProviderUser(context);
     }
 
-
     /**
-     * Avant début de refresh
-     *
-     * Cette méthode est synchronisée avec le thread main, donc on peut y demander des modifs de GUI (notifications...)
+     * Lance la récupération et le parse de la liste XML des messages non lus
+     * 
+     * Ce travail s'exécute en tâche de fond, et n'a donc pas le droit d'effectuer d'actions sur la GUI
      */
-    protected void onPreExecute() {
-        // Toast notification de début de rafraîchissement
-        // SRombauts COMMENTE : comme on tourne dans un service en tache de fond, on ne veut pas gêner l'utilisateur avec une notification
-        // Toast.makeText(mContext, mContext.getString(R.string.refreshing), Toast.LENGTH_SHORT).show();
-    }
-    
-    
-    // TODO SRombauts : en cours
     public void doInBackground() {
         try {
             // Récupération de la liste des utilisateurs (seulement si nécessaire, c'est à dire si la BDD est vide)
@@ -168,50 +158,22 @@ public class AsynchTaskRefresh extends AsyncTask<Void, Void, Void> {
         }                
     }
     
-    /**
-     * Lance la récupération et le parse de la liste XML des messages non lus
-     * 
-     * Ce travail s'exécute en tâche de fond, et n'a donc pas le droit d'effectuer d'actions sur la GUI
-     */
-    protected Void doInBackground(Void... args) {
-        doInBackground();
-        return null;
-    }
-    
     
     /**
-     * Fin de refresh
-     *
-     * Cette méthode est synchronisée avec le thread main, donc on peut y demander des modifs de GUI (notifications...)
+     * Fin de refresh : affiche les éventuelles notifications !
      */
-    protected void onPostExecute(Void result) {
-      super.onPostExecute(result);
-
-      // s'il y a de nouveaux PM :
-      if (0 < mNbNewPM) {
-          // Notification dans la barre de status
-          notifyUserPM ();
-      }
-      // s'il y a de nouveaux messages non lus (ou au contraire, s'il ne reste plus de messages non lus) :
-      if ( (0 < mNbNewMsg) || (0 == mNbUnreadMsg) ) {
-          // Notification dans la barre de status (ou suppression de la notification)
-          notifyUserMsg ();
-      }
-      
-      // Le service peut dès lors être interrompu une fois qu'il a effectué le rafraîchissement
-      mContext.stopSelf ();
+    public void notifyUser() {
+        // s'il y a de nouveaux PM :
+        if (0 < mNbNewPM) {
+            // Notification dans la barre de status
+            notifyUserPM ();
+        }
+        // s'il y a de nouveaux messages non lus (ou au contraire, s'il ne reste plus de messages non lus) :
+        if ( (0 < mNbNewMsg) || (0 == mNbUnreadMsg) ) {
+            // Notification dans la barre de status (ou suppression de la notification)
+            notifyUserMsg ();
+        }
     }
-
-    
-    /**
-     * Publication en cours de travail, sur appel à publishProgress ()
-     *
-     * Cette méthode est synchronisée donc une action sur la GUI est autorisée 
-     */
-    protected void onProgressUpdate(Void... values) {
-        super.onProgressUpdate(values);      
-    }
-    
 
     /**
      * Récupération des listes des utilisateurs du site
