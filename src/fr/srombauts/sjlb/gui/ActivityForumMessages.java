@@ -31,6 +31,7 @@ import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import fr.srombauts.sjlb.ApplicationSJLB;
+import fr.srombauts.sjlb.BuildConfig;
 import fr.srombauts.sjlb.R;
 import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.ForumMessage;
@@ -39,6 +40,8 @@ import fr.srombauts.sjlb.service.AsynchTaskDownloadImage;
 import fr.srombauts.sjlb.service.AsynchTaskNewMsg;
 import fr.srombauts.sjlb.service.CallbackImageDownload;
 import fr.srombauts.sjlb.service.CallbackTransfer;
+import fr.srombauts.sjlb.service.OnResponseListener;
+import fr.srombauts.sjlb.service.ResponseReceiver;
 import fr.srombauts.sjlb.service.ServiceSJLB;
 import fr.srombauts.sjlb.service.StartService;
 import fr.srombauts.sjlb.service.TaskRefresh;
@@ -48,7 +51,7 @@ import fr.srombauts.sjlb.service.TaskRefresh;
  * Activité présentant la liste des sujets de la catégorie sélectionnée
  * @author 22/08/2010 SRombauts
  */
-public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, CallbackTransfer {
+public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, CallbackTransfer, OnResponseListener {
     private static final String LOG_TAG = "ActivityMsg";
     
     public static final String  START_INTENT_EXTRA_CAT_ID       = "CategoryId";
@@ -69,6 +72,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     
     private int                     mOriginalMsgListHeight  = -1; 
     
+    private ResponseReceiver        mResponseReceiver       = null;
     
     /** Called when the activity is first created. */
     @Override
@@ -157,8 +161,38 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         // NOTE : selectionArgs est identique
         final int nbUpdatedRowsSubj = getContentResolver ().update(SJLB.Subj.CONTENT_URI, valuesSubj, whereSubj, selectionArgs);
         Log.w (LOG_TAG, "nbUpdatedRowsSubj=" + nbUpdatedRowsSubj);
+        
+        // Demande à être notifié des résultats des demandes faites au service
+        mResponseReceiver = new ResponseReceiver(this);
     }
     
+    // Appelée lorsque l'activité passe de "au premier plan" à "en pause/cachée" 
+    protected void onPause() {
+        super.onPause();
+        
+        // Plus de notification de résultat du service, vu qu'on se met en pause !
+        mResponseReceiver.unregister(this);
+        mResponseReceiver = null;
+    }
+
+    /**
+     * Sur réception d'une réponse du service SJLB
+     * 
+     * @param aIntent Informations sur le type d'action traitée et le résultat obtenu
+     */
+    @Override
+    public void onServiceResponse(Intent intent) {
+      //String  responseType    = intent.getStringExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_TYPE);
+        boolean reponseResult   = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
+        if (reponseResult) {
+            if (false != BuildConfig.DEBUG) {
+                // En mise au point uniquement : Toast notification signalant la réponse
+                Toast.makeText(this, "refresh", Toast.LENGTH_SHORT).show();
+            }
+            // Rafraîchit la liste des messages (il y a peut être de nouveaux messages non lus)
+            mCursor.requery();
+        }
+    }
     
     /**
      * Création du menu général

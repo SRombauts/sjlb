@@ -19,8 +19,12 @@ import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+import fr.srombauts.sjlb.BuildConfig;
 import fr.srombauts.sjlb.R;
 import fr.srombauts.sjlb.db.SJLB;
+import fr.srombauts.sjlb.service.OnResponseListener;
+import fr.srombauts.sjlb.service.ResponseReceiver;
+import fr.srombauts.sjlb.service.ServiceSJLB;
 import fr.srombauts.sjlb.service.StartService;
 
 
@@ -28,7 +32,7 @@ import fr.srombauts.sjlb.service.StartService;
  * Activité présentant la liste des sujets de la catégorie sélectionnée
  * @author 22/08/2010 SRombauts
  */
-public class ActivityForumSubjects extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener {
+public class ActivityForumSubjects extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, OnResponseListener {
     private static final String LOG_TAG         = "ActivitySubj";
     
     private static final String SAVE_FILENAME   = "SavedIntent";
@@ -47,7 +51,8 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     private String              mSelectedSubjLabel      = "";
     
     private Intent              mSavedIntent            = null;
-    
+        
+    private ResponseReceiver    mResponseReceiver       = null;
     
     /** Called when the activity is first created. */
     @Override
@@ -109,8 +114,19 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     protected void onResume () {
         super.onResume();
         Log.d (LOG_TAG, "onResume");
+        
+        // Demande à être notifié des résultats des demandes faites au service
+        mResponseReceiver = new ResponseReceiver(this);
     }
-
+    
+    // Appelée lorsque l'activité passe de "au premier plan" à "en pause/cachée" 
+    protected void onPause() {
+        super.onPause();
+        
+        // Plus de notification de résultat du service, vu qu'on se met en pause !
+        mResponseReceiver.unregister(this);
+        mResponseReceiver = null;
+    }
     
     @Override
     public void onStop () {
@@ -125,6 +141,25 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         editor.commit();
     }
 
+    /**
+     * Sur réception d'une réponse du service SJLB
+     * 
+     * @param aIntent Informations sur le type d'action traitée et le résultat obtenu
+     */
+    @Override
+    public void onServiceResponse(Intent intent) {
+      //String  responseType    = intent.getStringExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_TYPE);
+        boolean reponseResult   = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
+        if (reponseResult) {
+            if (false != BuildConfig.DEBUG) {
+                // En mise au point uniquement : Toast notification signalant la réponse
+                Toast.makeText(this, "refresh", Toast.LENGTH_SHORT).show();
+            }
+            // Rafraîchit la liste des sujets (il y a peut être de nouveaux messages non lus)
+            mCursor.requery();
+        }
+    }
+        
     /**
      * Création du menu général
      */

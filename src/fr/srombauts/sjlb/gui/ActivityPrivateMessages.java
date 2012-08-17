@@ -25,11 +25,15 @@ import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import fr.srombauts.sjlb.ApplicationSJLB;
+import fr.srombauts.sjlb.BuildConfig;
 import fr.srombauts.sjlb.R;
 import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.ForumMessage;
 import fr.srombauts.sjlb.model.UserContactDescr;
 import fr.srombauts.sjlb.service.AsynchTaskDeletePM;
+import fr.srombauts.sjlb.service.OnResponseListener;
+import fr.srombauts.sjlb.service.ResponseReceiver;
+import fr.srombauts.sjlb.service.ServiceSJLB;
 import fr.srombauts.sjlb.service.StartService;
 import fr.srombauts.sjlb.service.TaskRefresh;
 
@@ -38,7 +42,7 @@ import fr.srombauts.sjlb.service.TaskRefresh;
  * Activité présentant la liste des messages privés
  * @author 14/06/2010 SRombauts
  */
-public class ActivityPrivateMessages extends ActivityTouchListener {
+public class ActivityPrivateMessages extends ActivityTouchListener implements OnResponseListener {
     private static final String LOG_TAG = "ActivityPM";
     
     static final private int    DIALOG_ID_PM_DELETE_ONE     = 1;
@@ -49,6 +53,8 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
     private ListView            mPrivateMessagesListView    = null;
     
     private long                mSelectedPmId               = 0;
+    
+    private ResponseReceiver    mResponseReceiver           = null;
     
     /** Called when the activity is first created. */
     @Override
@@ -72,7 +78,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
         mPrivateMessagesListView = (ListView)findViewById(R.id.activity_listview);
         mPrivateMessagesListView.setAdapter (mAdapter);
         // Scroll tout en bas de la liste des messages
-        mPrivateMessagesListView.setSelection(mPrivateMessagesListView.getCount()-1);
+        mPrivateMessagesListView.setSelection(mCursor.getCount()-1);
         
         // Enregistre le menu contextuel de la liste
         registerForContextMenu (mPrivateMessagesListView);        
@@ -92,6 +98,18 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
         super.onResume();
         
         clearNotificationPM ();
+        
+        // Demande à être notifié des résultats des demandes faites au service
+        mResponseReceiver = new ResponseReceiver(this);
+    }
+    
+    // Appelée lorsque l'activité passe de "au premier plan" à "en pause/cachée" 
+    protected void onPause() {
+        super.onPause();
+        
+        // Plus de notification de résultat du service, vu qu'on se met en pause !
+        mResponseReceiver.unregister(this);
+        mResponseReceiver = null;
     }
 
     private void clearNotificationPM () {
@@ -101,6 +119,25 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
         notificationManager.cancel(TaskRefresh.NOTIFICATION_NEW_PM_ID);
     }
 
+    /**
+     * Sur réception d'une réponse du service SJLB
+     * 
+     * @param aIntent Informations sur le type d'action traitée et le résultat obtenu
+     */
+    @Override
+    public void onServiceResponse(Intent intent) {
+      //String  responseType    = intent.getStringExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_TYPE);
+        boolean reponseResult   = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
+        if (reponseResult) {
+            if (false != BuildConfig.DEBUG) {
+                // En mise au point uniquement : Toast notification signalant la réponse
+                Toast.makeText(this, "refresh", Toast.LENGTH_SHORT).show();
+            }
+            // Rafraîchit la liste des messages privés (il y a peut être de nouveaux messages privés)
+            mCursor.requery();
+        }
+    }
+    
     @Override
     protected boolean onLeftGesture () {
         Log.i (LOG_TAG, "onTouch: va a l'ecran de gauche... quitte l'activite pour retour à la liste des sujets");

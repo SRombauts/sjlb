@@ -10,5 +10,11 @@ import android.content.Intent;
  * @author SRombauts
  */
 public interface OnResponseListener {
-    public void onResponseListener(Intent intent);
+
+    /**
+     * Sur réception d'une réponse du service SJLB
+     * 
+     * @param aIntent Informations sur le type d'action traitée et le résultat obtenu
+     */
+    public void onServiceResponse(Intent aIntent);
 }

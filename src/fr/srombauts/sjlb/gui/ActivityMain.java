@@ -44,16 +44,16 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
     private static final String SAVE_FILENAME   = "SavedIntent";
 
     // Liste des catégories du forum
-    private ListView        mCategoriesListView     = null;
-    ArrayAdapter<String>    mAA;
-    ArrayList<String>       mCategories             = new ArrayList<String>();
+    private ListView            mCategoriesListView     = null;
+    ArrayAdapter<String>        mAA;
+    ArrayList<String>           mCategories             = new ArrayList<String>();
 
-    private long            mSelectedCategoryId     = 0;
-    private String          mSelectedCategoryLabel  = "";
+    private long                mSelectedCategoryId     = 0;
+    private String              mSelectedCategoryLabel  = "";
 
-    private Intent          mSavedIntent            = null;
+    private Intent              mSavedIntent            = null;
     
-    private ResponseReceiver mResponseReceiver   = null;
+    private ResponseReceiver    mResponseReceiver       = null;
 
     /** Called when the activity is first created. */
     @Override
@@ -107,7 +107,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         // Rafraîchi l'affichage
         refreshCategoryList ();
         
-        // Demande à être notifié du résultat des demandes faites au service
+        // Demande à être notifié des résultats des demandes faites au service
         mResponseReceiver = new ResponseReceiver(this);
     }
     
@@ -194,10 +194,13 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         VersionView.setText("version " + info.versionName + "       " + NbMsg + " messages");
     }    
     
-
-    // Sur réception d'une réponse du service SJLB
+    /**
+     * Sur réception d'une réponse du service SJLB
+     * 
+     * @param aIntent Informations sur le type d'action traitée et le résultat obtenu
+     */
     @Override
-    public void onResponseListener(Intent intent) {
+    public void onServiceResponse(Intent intent) {
       //String  responseType    = intent.getStringExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_TYPE);
         boolean reponseResult   = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
         if (reponseResult) {
@@ -205,7 +208,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
                 // En mise au point uniquement : Toast notification signalant la réponse
                 Toast.makeText(this, "refresh", Toast.LENGTH_SHORT).show();
             }
-            // Met à jour l'affichage de la liste des catégories (il y a peut être de nouveaux messages
+            // Met à jour l'affichage de la liste des catégories (il y a peut être de nouveaux messages)
             refreshCategoryList();
         }
     }
