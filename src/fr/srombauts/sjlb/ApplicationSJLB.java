@@ -3,10 +3,6 @@ package fr.srombauts.sjlb;
 import java.io.InputStream;
 import java.util.Vector;
 
-import fr.srombauts.sjlb.db.SJLB;
-import fr.srombauts.sjlb.model.UserContactDescr;
-import fr.srombauts.sjlb.service.IntentReceiverStartService;
-
 import android.app.Application;
 import android.content.ContentUris;
 import android.database.Cursor;
@@ -15,6 +11,10 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.util.Log;
+import fr.srombauts.sjlb.db.SJLB;
+import fr.srombauts.sjlb.model.UserContactDescr;
+import fr.srombauts.sjlb.service.IntentReceiverStartService;
+import fr.srombauts.sjlb.service.StartService;
 
 
 /**
@@ -77,7 +77,7 @@ public class ApplicationSJLB extends Application {
         
         // Provoque un rafraîchissement des infos anticipé,
         // qui permet de signaler au site web SJLB les messages qui ont été lus   
-        IntentReceiverStartService.startService (this, LOG_TAG);
+        StartService.refresh(this);
     }
     
     // Renseigne la liste des contacts Google correspondant aux utilisateurs du site

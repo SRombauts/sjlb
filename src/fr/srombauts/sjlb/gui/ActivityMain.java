@@ -27,7 +27,7 @@ import fr.srombauts.sjlb.db.ContentProviderMsg;
 import fr.srombauts.sjlb.db.DBOpenHelper;
 import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.PrefsLoginPassword;
-import fr.srombauts.sjlb.service.IntentReceiverStartService;
+import fr.srombauts.sjlb.service.StartService;
 
 
 /**
@@ -166,7 +166,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         
         // Provoque un rafraîchissement des infos anticipé,
         // qui permet de signaler au site web SJLB les messages qui ont été lus   
-        IntentReceiverStartService.startService (this, LOG_TAG);
+        StartService.refresh(this);
     }
 
     public void onItemClick(AdapterView<?> parent, View view, int index, long arg3) {
@@ -236,10 +236,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
                 // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
                 if (PrefsLoginPassword.AreFilled (this)) {
                     // Demande de rafraîchissement asynchrone des informations
-                    // TODO mettre en place une callback ou un Receiver d'Intent capable de rafraîchir l'Activity visible en haut de la stack
-                    //      à l'aide du notifyDatasetChanged() adéquat (correspondant à l'Activity visible au moment en question)
-                    IntentReceiverStartService.startService (this, LOG_TAG);
-                    // Toast notification de début de rafraîchissement
+                    StartService.refresh(this);
                     Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
                 } else {
                     // Toast notification signalant l'absence de login/password

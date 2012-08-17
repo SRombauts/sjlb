@@ -20,11 +20,20 @@ public class ServiceSJLB extends IntentService {
      * Actions que les activités peuvent demander au service
     */
     public static final String  ACTION_REFRESH      = "fr.srombauts.sjlb.ACTION_REFRESH";
-    public static final String  ACTION_SEND_MSG     = "fr.srombauts.sjlb.ACTION_SEND_MSG";
+    public static final String  ACTION_NEW_MSG      = "fr.srombauts.sjlb.ACTION_NEW_MSG";
     public static final String  ACTION_EDIT_MSG     = "fr.srombauts.sjlb.ACTION_EDIT_MSG";
     public static final String  ACTION_DEL_MSG      = "fr.srombauts.sjlb.ACTION_DEL_MSG";
-    public static final String  ACTION_SEND_PM      = "fr.srombauts.sjlb.ACTION_SEND_PM";
+    public static final String  ACTION_NEW_PM       = "fr.srombauts.sjlb.ACTION_NEW_PM";
     public static final String  ACTION_DEL_PM       = "fr.srombauts.sjlb.ACTION_DEL_PM";
+    
+    public static final String  START_INTENT_EXTRA_MSG_ID       = "MessageId";
+    public static final String  START_INTENT_EXTRA_CAT_ID       = "CategoryId";
+    public static final String  START_INTENT_EXTRA_SUBJ_ID      = "SubjectId";
+    public static final String  START_INTENT_EXTRA_GROUP_ID     = "GroupId";
+    public static final String  START_INTENT_EXTRA_TEXT         = "Text";
+    public static final String  START_INTENT_EXTRA_EDIT_TEXT    = "EditText";
+    public static final String  START_INTENT_EXTRA_DEST_ID      = "DestId";
+    public static final String  START_INTENT_EXTRA_PM_ID        = "PmId";
 
     /**
      * Constructeur : nomme le thread de travail
@@ -40,28 +49,25 @@ public class ServiceSJLB extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         Log.d(LOG_TAG, "onHandleIntent(" + intent + ")");
+
+        boolean bSuccess = false;
         
         // TODO SRombauts : implémenter en fonction de l'Intent :
         // - signaler la liste des messages lus localement,
         // - poster un éventuel nouveau message
         // - lancer une récupération de la liste des messages non lus
         final String action = intent.getAction();
-        Log.d(LOG_TAG, "action = " + intent.getAction());
-        if (   (action == ACTION_REFRESH)
-            || (action == null) ) {
-            // TODO SRombauts : mettre au propre
+        if (action.equals(ACTION_REFRESH)) {
+            // TODO SRombauts : mettre au propre (utiliser des membres pour ne pas recréer à chaque fois)
             TaskRefresh Refresh = new TaskRefresh(this);
-            Refresh.doInBackground();
-            
-            Log.e(LOG_TAG, "notification?");
-            Refresh.notifyUser();
+            bSuccess = Refresh.doInBackground();
+            if (bSuccess) {
+                Refresh.notifyUser();
+            }
         }
-        
-        // TODO SRombauts : test d'un moyen d'interragir avec l'IHM
-        // Toast notification INTERDIT car on tourne dans un thread en tache de fond
-        // Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
-        //Intent intentRefresh = new Intent();
-        //this.sendBroadcast(intentRefresh);
+        else {
+            Log.e(LOG_TAG, "action=" + action);
+        }
     }
 
     @Override

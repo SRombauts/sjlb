@@ -30,8 +30,8 @@ import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.ForumMessage;
 import fr.srombauts.sjlb.model.UserContactDescr;
 import fr.srombauts.sjlb.service.AsynchTaskDeletePM;
+import fr.srombauts.sjlb.service.StartService;
 import fr.srombauts.sjlb.service.TaskRefresh;
-import fr.srombauts.sjlb.service.IntentReceiverStartService;
 
 
 /**
@@ -130,13 +130,9 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
                 break;
             }
             case (R.id.menu_update): {
-                // Toast notification de début de rafraîchissement
+                // Demande de rafraîchissement asynchrone des informations
+                StartService.refresh(this);
                 Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
-                // TODO voir si c'est la meilleurs manière de faire : donnerait plus de contrôle si l'on pouvait faire un accès direct à la AsynchTask...
-                // TODO SRombauts : rafraîchir la liste à l'échéance de la tache de rafraîchissement
-                //            => "suffirait" que le service lance un Intent sur cette Activity, comme lorsqu'on clique sur une notification 
-                IntentReceiverStartService.startService (this, LOG_TAG);
-                mCursor.requery();
                 break;            }
             case (R.id.menu_delete_all_pm): {
                 showDialog(DIALOG_ID_PM_DELETE_ALL);
@@ -253,7 +249,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener {
     }
 
     /**
-     * Effacement d'un message privé
+     * Effacement de tous les messages privés
     */
     void deleteAllPM () {
         Log.d (LOG_TAG, "deletePM (all)" );

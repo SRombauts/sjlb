@@ -92,14 +92,11 @@ public class ActivityUsers extends ActivityTouchListener {
                 break;
             }
             case (R.id.menu_update): {
-                // Toast notification de début de rafraîchissement
+                // Demande de rafraîchissement asynchrone des informations
+                StartService.refresh(this);
                 Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
-                // TODO voir si c'est la meilleurs manière de faire : donnerait plus de contrôle si l'on pouvait faire un accès direct à la AsynchTask...
-                // TODO SRombauts : rafraîchir la liste à l'échéance de la tache de rafraîchissement
-                //            => "suffirait" que le service lance un Intent sur cette Activity, comme lorsqu'on clique sur une notification 
-                IntentReceiverStartService.startService (this, LOG_TAG);
-                mCursor.requery();
-                break;            }
+                break;
+            }
             case (R.id.menu_delete_all_user): {
                 showDialog(DIALOG_ID_PM_DELETE_ALL);
                 break;

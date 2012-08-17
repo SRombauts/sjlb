@@ -37,11 +37,11 @@ import fr.srombauts.sjlb.model.ForumMessage;
 import fr.srombauts.sjlb.model.UserContactDescr;
 import fr.srombauts.sjlb.service.AsynchTaskDownloadImage;
 import fr.srombauts.sjlb.service.AsynchTaskNewMsg;
-import fr.srombauts.sjlb.service.TaskRefresh;
 import fr.srombauts.sjlb.service.CallbackImageDownload;
 import fr.srombauts.sjlb.service.CallbackTransfer;
-import fr.srombauts.sjlb.service.IntentReceiverStartService;
 import fr.srombauts.sjlb.service.ServiceSJLB;
+import fr.srombauts.sjlb.service.StartService;
+import fr.srombauts.sjlb.service.TaskRefresh;
 
 
 /**
@@ -51,10 +51,10 @@ import fr.srombauts.sjlb.service.ServiceSJLB;
 public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, CallbackTransfer {
     private static final String LOG_TAG = "ActivityMsg";
     
-    public  static final String START_INTENT_EXTRA_CAT_ID       = "CategoryId";
-    public  static final String START_INTENT_EXTRA_SUBJ_ID      = "SubjectId";
-    public  static final String START_INTENT_EXTRA_SUBJ_LABEL   = "SubjectLabel";
-    public  static final String START_INTENT_EXTRA_GROUP_ID     = "GroupId";
+    public static final String  START_INTENT_EXTRA_CAT_ID       = "CategoryId";
+    public static final String  START_INTENT_EXTRA_SUBJ_ID      = "SubjectId";
+    public static final String  START_INTENT_EXTRA_SUBJ_LABEL   = "SubjectLabel";
+    public static final String  START_INTENT_EXTRA_GROUP_ID     = "GroupId";
     
     private Cursor                  mCursor         = null;
     private MessageListItemAdapter  mAdapter        = null;
@@ -190,14 +190,11 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                 break;
             }
             case (R.id.menu_update): {
-                // Toast notification de début de rafraîchissement
+                // Demande de rafraîchissement asynchrone des informations
+                StartService.refresh(this);
                 Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
-                // TODO voir si c'est la meilleurs manière de faire : donnerait plus de contrôle si l'on pouvait faire un accès direct à la AsynchTask...
-                IntentReceiverStartService.startService (this, LOG_TAG);
-                // TODO SRombauts : trouver un moyen de rafraîchir la liste à l'échéance de la tache de rafraîchissement
-                mCursor.requery();
-                mAdapter.notifyDataSetChanged();
-                break;            }
+                break;
+            }
             case (R.id.menu_prefs): {
                 Intent intent = new Intent(this, ActivityPreferences.class);
                 intent.setAction(ServiceSJLB.ACTION_REFRESH);

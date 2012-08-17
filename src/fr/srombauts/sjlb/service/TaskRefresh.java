@@ -133,7 +133,8 @@ public class TaskRefresh {
      * 
      * Ce travail s'exécute en tâche de fond, et n'a donc pas le droit d'effectuer d'actions sur la GUI
      */
-    public void doInBackground() {
+    public boolean doInBackground() {
+        boolean bSuccess = false;
         try {
             // Récupération de la liste des utilisateurs (seulement si nécessaire, c'est à dire si la BDD est vide)
             refreshUsers ();
@@ -145,6 +146,8 @@ public class TaskRefresh {
             fetchPM ();  // récupère la liste des PM seulement si nécessaire
             fetchMsg (); // récupère systématiquement la liste des nouveaux messages, éventuellement vide
             
+            bSuccess = true;
+            
         } catch (LoginPasswordBadException e) {
             //e.printStackTrace();
             Log.w(LOG_TAG, "doInBackground: Bad Login/Password set in preferences");
@@ -155,7 +158,9 @@ public class TaskRefresh {
             mUserDBAdapter.close();
             mMsgDBAdapter.close();
             mPMDBAdapter.close();
-        }                
+        }
+        
+        return bSuccess;
     }
     
     

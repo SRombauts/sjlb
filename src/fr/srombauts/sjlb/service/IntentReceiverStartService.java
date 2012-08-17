@@ -3,7 +3,6 @@ package fr.srombauts.sjlb.service;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -42,7 +41,7 @@ public class IntentReceiverStartService extends BroadcastReceiver {
         }
         else if (ACTION_REFRESH_ALARM.equals(action)) {
             // lance le service si l'action correspond à l'alarme périodique
-            startService(context, LOG_TAG);
+            StartService.refresh(context);
         }
     }
 
@@ -71,22 +70,6 @@ public class IntentReceiverStartService extends BroadcastReceiver {
             mAlarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, 0, freqUpdateMs, mAlarmIntent);
         } else {
             Log.d(aLogTag, "startAlarm(nop)");
-        }
-    }
-
-    /**
-     * Lance le service de rafraîchissement, si pas déjà lancé
-     */
-    // TODO SRombauts : rendre privée et encapsuler par des méthodes publiques précisant la demande (refresh, send...) 
-    public static void startService (Context context, String aLogTag) {
-        Log.d(aLogTag, "startService...");
-        Intent  intentService = new Intent();
-        intentService.setClassName( "fr.srombauts.sjlb", "fr.srombauts.sjlb.service.ServiceSJLB");
-        ComponentName cname = context.startService(intentService);
-        if (cname == null) {
-            Log.e(aLogTag, "SJLB Service was not started");
-        } else {
-            Log.d(aLogTag, "SJLB Service started");
         }
     }
 }

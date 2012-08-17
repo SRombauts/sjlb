@@ -21,7 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import fr.srombauts.sjlb.R;
 import fr.srombauts.sjlb.db.SJLB;
-import fr.srombauts.sjlb.service.IntentReceiverStartService;
+import fr.srombauts.sjlb.service.StartService;
 
 
 /**
@@ -155,13 +155,9 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
                 break;
             }
             case (R.id.menu_update): {
-                // Toast notification de début de rafraîchissement
+                // Demande de rafraîchissement asynchrone des informations
+                StartService.refresh(this);
                 Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
-                // TODO voir si c'est la meilleurs manière de faire...
-                IntentReceiverStartService.startService (this, LOG_TAG);
-                // TODO SRombauts : trouver un moyen de rafraîchir la liste à l'échéance de la tache de rafraîchissement
-                mCursor.requery();
-                mAdapter.notifyDataSetChanged();
                 break;
             }
             case (R.id.menu_prefs): {
