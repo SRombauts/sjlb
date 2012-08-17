@@ -209,6 +209,8 @@ public class AsynchTaskNewPM extends AsyncTask<String, Void, Boolean> {
         if (abResult) {
             // Toast notification de fin d'envoi
             Toast.makeText(mContext, mContext.getString(R.string.toast_sent), Toast.LENGTH_SHORT).show();
+            // TODO SRombauts : en attendant de passer l'envoi de message dans le service, fait un refresh après l'envoi 
+            StartService.refresh(mContext);
         }
         else {
             // Toast notification d'erreur d'envoi !

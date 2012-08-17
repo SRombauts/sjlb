@@ -327,12 +327,11 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     }    
 
     // Appelée lorsqu'un transfert s'est terminé (post d'un nouveau messages, effacement d'un PM...)
+    // TODO SRombauts : en attendant de passer l'envoi de message dans le service, fait un refresh après l'envoi 
     public void onTransferDone (boolean abResult) {
         // Si le message a été envoyé avec succès, on peur refermer la zone de saisie texte
         if (abResult) {
             closeEditText ();
-            // TODO SRombauts : en attendant de passer l'envoi de message dans le service, fait un refresh après l'envoi 
-            StartService.refresh(this);
         }
     }
     
