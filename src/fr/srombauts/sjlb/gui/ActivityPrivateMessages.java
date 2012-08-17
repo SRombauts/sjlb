@@ -221,7 +221,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
     /**
      * Création de la boîte de dialogue
      */
-    // TODO SRombauts : ne pas créer de liste directement dans le code comme ça !
+    // TODO SRombauts : ne pas créer de boîte de dialogue directement dans le code comme ça !
     public Dialog onCreateDialog (int id) {
         switch(id) {
             case(DIALOG_ID_PM_DELETE_ONE): {
@@ -268,7 +268,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
     public void onPrepareDialog (int id, Dialog dialog) {
         switch(id) {
             case(DIALOG_ID_PM_DELETE_ONE):
-                // TODO SRombauts : modifier le contenu de la boîte de dialogue pour montrer le texte du pm
+                // TODO SRombauts : compléter le contenu de la boîte de dialogue pour montrer le texte du pm
                 break;
             case(DIALOG_ID_PM_DELETE_ALL):
                 // Rien à faire

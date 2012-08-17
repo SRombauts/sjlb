@@ -26,7 +26,6 @@ import fr.srombauts.sjlb.service.StartService;
 public class ApplicationSJLB extends Application {
     private static final String LOG_TAG     = "ApplicationSJLB";
 
-    // TODO SRombauts : implémenter comme ActivitySubjects un ResourceCursorAdapter, pour afficher une icone pour les messages non lus, et un Badge avec QuickView !
     static final String[] CONTACTS_SUMMARY_PROJECTION = {
         Contacts._ID, // 0
         Contacts.DISPLAY_NAME, // 1
@@ -37,7 +36,7 @@ public class ApplicationSJLB extends Application {
         Contacts.LOOKUP_KEY, // 6
         Contacts.HAS_PHONE_NUMBER, // 7
     };
-    // TODO SRombauts : à supprimer !
+    /* NOTE SRO : pourrait servir à optimiser en remplaçant les getColumnIndexOrThrow()
     static final int SUMMARY_ID_COLUMN_INDEX = 0;
     static final int SUMMARY_NAME_COLUMN_INDEX = 1;
     static final int SUMMARY_STARRED_COLUMN_INDEX = 2;
@@ -46,6 +45,7 @@ public class ApplicationSJLB extends Application {
     static final int SUMMARY_PHOTO_ID_COLUMN_INDEX = 5;
     static final int SUMMARY_LOOKUP_KEY = 6;
     static final int SUMMARY_HAS_PHONE_COLUMN_INDEX = 7;
+    */
     
     // Liste des contacts Google correspondant aux utilisateurs du site
     public Vector<UserContactDescr> mUserContactList    = null;

@@ -287,8 +287,6 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
                 // et ajoute au titre le nb de messages non lus si non nul
                 title += " (" + NbUnread + ")";
             }
-            // TODO SRO : tests en cours concernant le (non) rafraîchissement !
-            Log.d (LOG_TAG, title);
             cache.nameView.setText(title);
         }
 
@@ -303,8 +301,6 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
             cache.nameView  = (TextView)view.findViewById(R.id.subjText);
             // enregistre cet objet de cache
             view.setTag(cache);
-            // TODO SRO : tests en cours concernant le (non) rafraîchissement !
-            Log.d (LOG_TAG, "newView(" + cache.nameView + ")");
 
             return view;
         }

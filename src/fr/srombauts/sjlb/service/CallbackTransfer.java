@@ -1,5 +1,6 @@
 package fr.srombauts.sjlb.service;
 
+// TODO SRombauts : obsolète, utiliser à la place l'Intent de réponse du service
 public interface CallbackTransfer
 {
     /**

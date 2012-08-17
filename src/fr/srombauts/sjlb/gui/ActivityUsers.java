@@ -161,7 +161,8 @@ public class ActivityUsers extends ActivityTouchListener {
             cache.pseudoView.setText(pseudo);
             String  name = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.User.NAME));
             cache.nameView.setText(name);
-            // TODO SRombauts :
+            // TODO SRombauts : ajouter l'adresse et le digicode de chaque utilisateur
+            //                  (souhaite t'on ajouter aussi la date de maj des données ?)
             String  addresse = "";//cursor.getString(cursor.getColumnIndexOrThrow(SJLB.User.TEXT));
             cache.addressView.setText(addresse);
 

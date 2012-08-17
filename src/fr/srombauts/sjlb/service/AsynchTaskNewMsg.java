@@ -158,6 +158,7 @@ public class AsynchTaskNewMsg extends AsyncTask<String, Void, Boolean> {
         }
         
         // Notifie l'activité appelante à l'aide d'une callback
+        // TODO SRombauts : obsolète, utiliser à la place l'Intent de réponse du service
         mCallbackTransfer.onTransferDone(abResult);
     }
 }

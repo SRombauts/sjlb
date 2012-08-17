@@ -289,8 +289,6 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         // TODO SRombauts : Scroll tout en bas de la liste des messages ne marche pas :(
         mMsgListView.setSelection(0);         
         mMsgListView.setSelection(mMsgListView.getCount()-1);        
-
-// TODO SRombauts : tests en cours
         mMsgListView.getParent().requestLayout();
     }
     
@@ -333,6 +331,8 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         // Si le message a été envoyé avec succès, on peur refermer la zone de saisie texte
         if (abResult) {
             closeEditText ();
+            // TODO SRombauts : en attendant de passer l'envoi de message dans le service, fait un refresh après l'envoi 
+            StartService.refresh(this);
         }
     }
     
@@ -344,10 +344,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         return true;
     }
 
-    // TODO SRombauts : onRightGesture ?
-    
-    
-    
+    // NOTE SRombauts : pas besoin de onRightGesture()
     
     // Adaptateur mappant les données du curseur dans des objets du cache du pool d'objets View utilisés par la ListView
     private final class MessageListItemAdapter extends ResourceCursorAdapter implements OnItemClickListener {
@@ -395,8 +392,9 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             int msgId = cursor.getInt(0); // SJLB.Msg._ID, à ne pas confondre avec SJLB.Msg
             
             // Récupère un curseur sur les données (les fichiers) en filtrant sur l'id du sujet sélectionné
-            // TODO SRombauts : utiliser l'argument "projection" pour filtrer les résultats et ainsi optimiser l'utilisation mémoire
-            Cursor cursorFiles = managedQuery(  SJLB.File.CONTENT_URI, null,
+            final String[] columns = {SJLB.File.FILENAME};
+            Cursor cursorFiles = managedQuery(  SJLB.File.CONTENT_URI,
+                                                columns, // ne récupère que le filename
                                                 SJLB.File.MSG_ID + "=" + msgId,
                                                 null, null);
 
@@ -495,7 +493,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                     
                     it.imageViewFile = (ImageView) view.findViewById(R.id.fileImage);
                     
-                    // TODO SRombauts : il faut lancer ici le téléchargement du fichier en tache de fond (SSI il s'agit bien d'une image !)
+                    // Lance ici le téléchargement du fichier en tache de fond (SSI il s'agit bien d'une image !)
                     if (null == it.imageBitmap) {
                         AsynchTaskDownloadImage ImageDownloader = new AsynchTaskDownloadImage(it);
                         ImageDownloader.execute(getString(R.string.sjlb_fichiers_attaches) + it.filename);
