@@ -32,8 +32,8 @@ public class StartService {
      * 
      * Lance le service s'il n'est pas déjà lancé, sinon ne fait qu'ajouter le message à sa fifo d'Intent
      * 
-     * @param[in] aSubjectId    ID du sujet dans lequel poster le message
-     * @param[in] aText         Contenu du message à poster
+     * @param aSubjectId    ID du sujet dans lequel poster le message
+     * @param aText         Contenu du message à poster
      */
     public static void newMsg (Context context, long aSubjectId, String aText) {
         Intent intentService = new Intent();
@@ -52,9 +52,9 @@ public class StartService {
      * 
      * Lance le service s'il n'est pas déjà lancé, sinon ne fait qu'ajouter le message à sa fifo d'Intent
      * 
-     * @param[in] aMsgId    ID du message à mettre à jour
-     * @param[in] aText     Nouveau contenu du message à modifier
-     * @param[in] aEditText Raison de l'édition du message
+     * @param aMsgId    ID du message à mettre à jour
+     * @param aText     Nouveau contenu du message à modifier
+     * @param aEditText Raison de l'édition du message
      */
     public static void editMsg (Context context, long aMsgId, String aText, String aEditText) {
         Intent intentService = new Intent();
@@ -74,7 +74,7 @@ public class StartService {
      * 
      * Lance le service s'il n'est pas déjà lancé, sinon ne fait qu'ajouter l'id du message à effacer à sa fifo d'Intent
      * 
-     * @param[in] aMsgId    ID du message à supprimer
+     * @param aMsgId    ID du message à supprimer
      */
     public static void delMsg (Context context, long aMsgId) {
         Intent intentService = new Intent();
@@ -86,15 +86,14 @@ public class StartService {
             Log.e(LOG_TAG, "sendMsg: SJLB Service was not started");
         }
     }
-    
 
     /**
      * Transmet au service une consigne (un Intent) de post d'un nouveau PM.
      * 
      * Lance le service s'il n'est pas déjà lancé, sinon ne fait qu'ajouter le PM à sa fifo d'Intent
      * 
-     * @param[in] aDestId   ID du membre destinataire du PM
-     * @param[in] aText     Contenu du PM à poster
+     * @param aDestId   ID du membre destinataire du PM
+     * @param aText     Contenu du PM à poster
      */
     public static void newPM (Context context, long aDestId, String aText) {
         Intent intentService = new Intent();
@@ -113,7 +112,7 @@ public class StartService {
      * 
      * Lance le service s'il n'est pas déjà lancé, sinon ne fait qu'ajouter l'id du PM à effacer à sa fifo d'Intent
      * 
-     * @param[in] aPmId ID du PM à supprimer
+     * @param aPmId ID du PM à supprimer
      */
     public static void delPM (Context context, long aPmId) {
         Intent intentService = new Intent();

@@ -22,11 +22,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import fr.srombauts.sjlb.BuildConfig;
 import fr.srombauts.sjlb.R;
 import fr.srombauts.sjlb.db.ContentProviderMsg;
 import fr.srombauts.sjlb.db.DBOpenHelper;
 import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.PrefsLoginPassword;
+import fr.srombauts.sjlb.service.OnResponseListener;
+import fr.srombauts.sjlb.service.ResponseReceiver;
+import fr.srombauts.sjlb.service.ServiceSJLB;
 import fr.srombauts.sjlb.service.StartService;
 
 
@@ -34,7 +38,7 @@ import fr.srombauts.sjlb.service.StartService;
  * Activité du menu principal, qui lance le service si besoin et permet de naviguer entre PM et Msg
  * @author 27/06/2010 SRombauts
  */
-public class ActivityMain extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener {
+public class ActivityMain extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, OnResponseListener {
     private static final String LOG_TAG         = "ActivityMain";
 
     private static final String SAVE_FILENAME   = "SavedIntent";
@@ -48,10 +52,12 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
     private String          mSelectedCategoryLabel  = "";
 
     private Intent          mSavedIntent            = null;
+    
+    private ResponseReceiver mResponseReceiver   = null;
 
     /** Called when the activity is first created. */
     @Override
-    protected void onCreate (Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d (LOG_TAG, "onCreate...");
         
@@ -77,7 +83,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         mCategoriesListView.setOnItemLongClickListener(this);
         mCategoriesListView.setOnTouchListener(this);
         mCategoriesListView.getRootView().setOnTouchListener(this);
-
+        
         // Restaure les valeurs du dernier intent
         SharedPreferences settings = getSharedPreferences(SAVE_FILENAME, 0);
         mSelectedCategoryId     = settings.getLong  ("mSelectedCategoryId",     0);
@@ -89,20 +95,56 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
     }
 
     // Appelée lorsque l'activité était déjà lancée (par exemple clic sur une notification de nouveau Msg)
-    protected void onNewIntent (Intent intent) {
+    protected void onNewIntent(Intent intent) {
         Log.d (LOG_TAG, "onNewIntent...");
     }
     
     // Appelée lorsque l'activité passe de "en pause/cachée" à "au premier plan"
-    protected void onResume () {
+    protected void onResume() {
         super.onResume();
         Log.d (LOG_TAG, "onResume...");
 
+        // Rafraîchi l'affichage
+        refreshCategoryList ();
+        
+        // Demande à être notifié du résultat des demandes faites au service
+        mResponseReceiver = new ResponseReceiver(this);
+    }
+    
+    // Appelée lorsque l'activité passe de "au premier plan" à "en pause/cachée" 
+    protected void onPause() {
+        super.onPause();
+        
+        // Plus de notification de résultat du service, vu qu'on se met en pause !
+        mResponseReceiver.unregister(this);
+        mResponseReceiver = null;
+    }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        
+        // Sauvegarde les valeurs du dernier intent
+        Log.d (LOG_TAG, "onDestroy: Sauvegarde les valeurs du dernier intent (" + mSelectedCategoryId +", " + mSelectedCategoryLabel + ")" );
+        SharedPreferences           settings    = getSharedPreferences(SAVE_FILENAME, 0);
+        SharedPreferences.Editor    editor      = settings.edit();
+        editor.putLong  ("mSelectedCategoryId",     mSelectedCategoryId);
+        editor.putString("mSelectedCategoryLabel",  mSelectedCategoryLabel);
+        editor.commit();
+        
+        // Provoque un rafraîchissement des infos anticipé,
+        // qui permet de signaler au site web SJLB les messages qui ont été lus   
+        StartService.refresh(this);
+    }
+
+    /**
+     *  Rafraîchit la liste des categories :
+     *  récupération de la liste des catégories, avec le nombre de msg non lus,
+     *  et la transforme en un tableau pour servir un ArrayAdapter standard.
+     */
+    private void refreshCategoryList() {
         DBOpenHelper DBHelper = new DBOpenHelper(this, SJLB.DATABASE_NAME, null, SJLB.DATABASE_VERSION);
         
-        // Rafraîchit la liste des categories :
-        // récupération de la liste des catégories, avec le nombre de msg non lus,
-        // et la transforme en un tableau pour servir un ArrayAdapter standard.
         mCategories.clear();
         String [] categories = getResources().getStringArray(R.array.category_labels);
         for (int catIdx = 0; catIdx < categories.length; catIdx++) {
@@ -149,26 +191,26 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         }
 
         // Puis affiches ces infos
-        VersionView.setText("version " + info.versionName + "       " + NbMsg + " messages");        
+        VersionView.setText("version " + info.versionName + "       " + NbMsg + " messages");
+    }    
+    
+
+    // Sur réception d'une réponse du service SJLB
+    @Override
+    public void onResponseListener(Intent intent) {
+      //String  responseType    = intent.getStringExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_TYPE);
+        boolean reponseResult   = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
+        if (reponseResult) {
+            if (false != BuildConfig.DEBUG) {
+                // En mise au point uniquement : Toast notification signalant la réponse
+                Toast.makeText(this, "refresh", Toast.LENGTH_SHORT).show();
+            }
+            // Met à jour l'affichage de la liste des catégories (il y a peut être de nouveaux messages
+            refreshCategoryList();
+        }
     }
     
-    @Override
-    public void onDestroy () {
-        super.onDestroy();
-        
-        // Sauvegarde les valeurs du dernier intent
-        Log.d (LOG_TAG, "onDestroy: Sauvegarde les valeurs du dernier intent (" + mSelectedCategoryId +", " + mSelectedCategoryLabel + ")" );
-        SharedPreferences           settings    = getSharedPreferences(SAVE_FILENAME, 0);
-        SharedPreferences.Editor    editor      = settings.edit();
-        editor.putLong  ("mSelectedCategoryId",     mSelectedCategoryId);
-        editor.putString("mSelectedCategoryLabel",  mSelectedCategoryLabel);
-        editor.commit();
-        
-        // Provoque un rafraîchissement des infos anticipé,
-        // qui permet de signaler au site web SJLB les messages qui ont été lus   
-        StartService.refresh(this);
-    }
-
+    // Sur clic sur l'une des catégories
     public void onItemClick(AdapterView<?> parent, View view, int index, long arg3) {
         // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
         if (PrefsLoginPassword.AreFilled (this)) {

@@ -25,15 +25,18 @@ public class ServiceSJLB extends IntentService {
     public static final String  ACTION_DEL_MSG      = "fr.srombauts.sjlb.ACTION_DEL_MSG";
     public static final String  ACTION_NEW_PM       = "fr.srombauts.sjlb.ACTION_NEW_PM";
     public static final String  ACTION_DEL_PM       = "fr.srombauts.sjlb.ACTION_DEL_PM";
+
+    public static final String  ACTION_RESPONSE     = "fr.srombauts.sjlb.ACTION_RESPONSE";
     
     public static final String  START_INTENT_EXTRA_MSG_ID       = "MessageId";
-    public static final String  START_INTENT_EXTRA_CAT_ID       = "CategoryId";
     public static final String  START_INTENT_EXTRA_SUBJ_ID      = "SubjectId";
-    public static final String  START_INTENT_EXTRA_GROUP_ID     = "GroupId";
     public static final String  START_INTENT_EXTRA_TEXT         = "Text";
     public static final String  START_INTENT_EXTRA_EDIT_TEXT    = "EditText";
     public static final String  START_INTENT_EXTRA_DEST_ID      = "DestId";
     public static final String  START_INTENT_EXTRA_PM_ID        = "PmId";
+    
+    public static final String  RESPONSE_INTENT_EXTRA_TYPE      = "Type";
+    public static final String  RESPONSE_INTENT_EXTRA_RESULT    = "Result";
 
     /**
      * Constructeur : nomme le thread de travail
@@ -68,6 +71,15 @@ public class ServiceSJLB extends IntentService {
         else {
             Log.e(LOG_TAG, "action=" + action);
         }
+
+        // Formulation d'un intent de réponse à destination de l'activité ayant la main
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(ACTION_RESPONSE);
+        //broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        broadcastIntent.putExtra(RESPONSE_INTENT_EXTRA_TYPE,    action);    // le type de réponse indique l'action à laquelle on répond 
+        broadcastIntent.putExtra(RESPONSE_INTENT_EXTRA_RESULT,  bSuccess);  // résultat de l'action
+        Log.d(LOG_TAG, "sendBroadcast(" + broadcastIntent + ", " + action + ", " + bSuccess + ")");
+        sendBroadcast(broadcastIntent);
     }
 
     @Override

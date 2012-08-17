@@ -21,7 +21,7 @@ public class PrefsInterface {
     /**
      * Constructeur récupérant les préférences de comportement de l'interface utilisateur
      *
-     * @param[in] aContext Contexte de l'activité/du service, nécessaire pour récupérer les préférences de l'application
+     * @param aContext Contexte de l'activité/du service, nécessaire pour récupérer les préférences de l'application
      */
     public PrefsInterface (Context aContext) {
         SharedPreferences   Prefs                   = PreferenceManager.getDefaultSharedPreferences(aContext);
@@ -31,7 +31,7 @@ public class PrefsInterface {
     /**
      * Accesseur simple à la configuration de la direction dans laquelle il faut bouger le doigt pour changer d'écran
      *
-     * @param[in] aContext Contexte de l'activité/du service, nécessaire pour récupérer les préférences de l'application
+     * @param aContext Contexte de l'activité/du service, nécessaire pour récupérer les préférences de l'application
      */
     public static boolean inverseSwitchScreenDirection (Context aContext) {
         SharedPreferences   Prefs = PreferenceManager.getDefaultSharedPreferences(aContext);

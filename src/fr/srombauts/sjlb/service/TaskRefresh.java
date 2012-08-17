@@ -134,6 +134,8 @@ public class TaskRefresh {
      * Ce travail s'exécute en tâche de fond, et n'a donc pas le droit d'effectuer d'actions sur la GUI
      */
     public boolean doInBackground() {
+        // TODO SRombauts : gérer et remonter proprement un code d'erreur
+        // TODO SRombauts : refactoriser tout ça (API.php unique)
         boolean bSuccess = false;
         try {
             // Récupération de la liste des utilisateurs (seulement si nécessaire, c'est à dire si la BDD est vide)

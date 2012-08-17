@@ -26,7 +26,7 @@ public class PrefsLoginPassword {
     /**
      * Constructeur utilisant les préférences pour récupérer login/password et hasher ce dernier
      *
-     * @param[in] aContext Contexte de l'activité/du service, nécessaire pour récupérer les préférences de l'application
+     * @param aContext Contexte de l'activité/du service, nécessaire pour récupérer les préférences de l'application
      */
     public PrefsLoginPassword (Context aContext) throws LoginPasswordEmptyException {
         try {
@@ -65,7 +65,7 @@ public class PrefsLoginPassword {
     /**
      * Regarde si les préférences contiennent login/mdp
      *
-     * @param[in] aContext Contexte de l'activité/du service, nécessaire pour récupérer les préférences de l'application
+     * @param aContext Contexte de l'activité/du service, nécessaire pour récupérer les préférences de l'application
      *
      * @return boolean true si login ET mdp sont renseignés
      */
@@ -82,7 +82,7 @@ public class PrefsLoginPassword {
     /**
      * Supprime le mot de passe des préférences (sur erreur de login remonté par le serveur)
      *
-     * @param[in] aContext Contexte de l'activité/du service, nécessaire pour récupérer les préférences de l'application
+     * @param aContext Contexte de l'activité/du service, nécessaire pour récupérer les préférences de l'application
      */
     static public void InvalidatePassword (Context aContext) {
         // Récupère l'interface d'édition des préférences
