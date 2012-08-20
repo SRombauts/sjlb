@@ -57,16 +57,75 @@ import fr.srombauts.sjlb.model.User;
 
 
 /**
- * Tâche de travail en tâche de fond, chargée de récupérer les fichier XML listant les messages non lus
+ * Appelée par le service en tâche de fond pour récupérer les données utiles depuis le fichier XML "API.php"
  *
- * Charge un fichier XML light (Polling.php) ne listant que les ID des messages privés/des messages du forum non lus,
+ * Ce un fichier XML est quasi-vide tant qu'il n'y a pas de nouveautés à récupérées,
  * de manière à ne pas charger le réseau inutilement.
  *
- * SSI de nouveaux ID y sont mentionnés, charge les fichiers XML complémentaires (PrivateMessages.php ou ForumMessages.php).
+ * Liste des arguments à fournir en entrée, selon le type de requête :
+Obligatoire pour toute requête :
+"login"          : login (pseudo) de l'utilisateur
+"password"       : password (encrypté en MD5) de l'utilisateur
+"date_first_msg" : date du plus vieux message déjà récupéré
+"date_last_msg"  : date du plus récent message récupéré
+"id_last_pm"     : id de pm le plus élevé déjà récupéré (dernier pm reçu)
+"date_last_user" : valeur du champ 'DateDerniereMaj' la plus récente (dernière maj du user reçue)
+
+Post d'un nouveau message :
+"id_subj_new" : id du sujet où poster le nouveau message
+"msg_new"     : texte du message (doit être non vide)
+
+Edition d'un message existant :
+"id_msg_edit" : id du message à éditer
+"msg_edit"    : nouveau texte du message (doit être non vide)
+"raison_edit" : texte optionnel expliquant la raison de l'édition
+
+Suppression d'un message existant :
+"id_msg_del" : id du message à supprimer
+
+Post d'un nouveau PM :
+"id_dest_pm" : id du destinataire du pm
+"pm_new"     : texte du pm
+
+Suppression d'un PM existant :
+"id_pm_del" : id du pm à supprimer
+ 
+Effacement des flags "nouveaux messages" :
+"msg_lus" : liste d'id de messages lus sur l'application mobile, séparés par des virgules 
+
+Transmission des informations sur le terminal mobile et la version de l'application utilisée :
+"model"
+"brand"
+"android"
+"api"
+"appli"
+
+ 
+ * Voici un exemple de fichier XML produit pour quatres messages provenant de deux sujets,
+ * et deux messages privés pour l'utilisateur donné :
+ 
+<?xml version="1.0" encoding="utf-8"?> 
+<sjlb> 
+<sujet id="253" id_categorie="2" id_groupe="2" derniere_date="130078545">Week-End</sujet> 
+<sujet id="127" id_categorie="1" id_groupe="2" derniere_date="1300787496">Infos boulot, taf, exams... berk :(</sujet> 
+<msg id="18175" id_auteur="1" auteur="Ced" date="1300780989" id_sujet="253" unread="0">Merci a tous pour ce week end original. c'était super sympa et très bien organisé.
+ "
+@+, Ced</msg> 
+<msg id="18176" id_auteur="2" auteur="Seb" date="130078545" id_sujet="253" unread="0">J'avoue ;) !
+ 
+Seb</msg>
+<pm id="5810" date="1294130078" id_auteur="2" auteur="Seb" id_destinataire="2" destinataire="Seb">Voici le contenu du message,
+éventuellement sur plusieurs lignes.
+Seb</pm>
+<pm id="6438" date="1345220064" id_auteur="2" auteur="Seb" id_destinataire="2" destinataire="Seb">Un second message</pm>
+<user id="2" pseudo="Seb" nom="Sébastien Rombauts" digicode="43A7" DateDerniereMaj="1294130395">4 rue Emile Duclaux
+2ème à gauche de l'escalier
+92150 Suresnes</user>
+</sjlb> 
  *
  * @author 14/06/2010 SRombauts
  */
-public class TaskRefresh {
+public class API {
     private static final String  LOG_TAG                    = "RefreshTask";
 
     public static final int     NOTIFICATION_NEW_PM_ID      = 1;
@@ -118,7 +177,7 @@ public class TaskRefresh {
      * Constructeur utilisé pour mémorisée la référence sur le service appelant
      * @param context
      */
-    public TaskRefresh(ServiceSJLB context) {
+    public API(ServiceSJLB context) {
         mContext      = context;
                                 
         mPMDBAdapter    = new ContentProviderPM(context);

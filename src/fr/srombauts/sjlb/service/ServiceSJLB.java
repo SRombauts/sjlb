@@ -38,6 +38,9 @@ public class ServiceSJLB extends IntentService {
     public static final String  RESPONSE_INTENT_EXTRA_TYPE      = "Type";
     public static final String  RESPONSE_INTENT_EXTRA_RESULT    = "Result";
 
+
+    private API mAPI = new API(this);
+    
     /**
      * Constructeur : nomme le thread de travail
      */
@@ -61,11 +64,9 @@ public class ServiceSJLB extends IntentService {
         // - lancer une récupération de la liste des messages non lus
         final String action = intent.getAction();
         if (action.equals(ACTION_REFRESH)) {
-            // TODO SRombauts : mettre au propre (utiliser des membres pour ne pas recréer à chaque fois)
-            TaskRefresh Refresh = new TaskRefresh(this);
-            bSuccess = Refresh.doInBackground();
+            bSuccess = mAPI.doInBackground();
             if (bSuccess) {
-                Refresh.notifyUser();
+                mAPI.notifyUser();
             }
         }
         else {

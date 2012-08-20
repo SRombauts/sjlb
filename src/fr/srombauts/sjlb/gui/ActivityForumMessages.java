@@ -44,7 +44,7 @@ import fr.srombauts.sjlb.service.OnResponseListener;
 import fr.srombauts.sjlb.service.ResponseReceiver;
 import fr.srombauts.sjlb.service.ServiceSJLB;
 import fr.srombauts.sjlb.service.StartService;
-import fr.srombauts.sjlb.service.TaskRefresh;
+import fr.srombauts.sjlb.service.API;
 
 
 /**
@@ -144,7 +144,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         // Supprime l'éventuelle notification de Msg non lus
         String              ns                      = Context.NOTIFICATION_SERVICE;
         NotificationManager notificationManager     = (NotificationManager) getSystemService(ns);
-        notificationManager.cancel(TaskRefresh.NOTIFICATION_NEW_MSG_ID);
+        notificationManager.cancel(API.NOTIFICATION_NEW_MSG_ID);
 
         // Efface les flags "UNREAD_TRUE" des messages lus dès qu'on entre !
         ContentValues valuesMsg = new ContentValues();
@@ -488,9 +488,11 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                 // TODO SRombauts : tests en cours
                 FileListItem it = mListeItem[position];
                 if (it != null) {
-                    Log.i (LOG_TAG, "getView(" + it.filename + ")" );
+                    Log.d (LOG_TAG, "getView(" + it.filename + ")" );
                     
                     it.imageViewFile = (ImageView) view.findViewById(R.id.fileImage);
+                    // TODO SRombauts : tente de réserver un espace carré pour l'image
+                    //it.imageViewFile.getLayoutParams().width = it.imageViewFile.getHeight();
                     
                     // Lance ici le téléchargement du fichier en tache de fond (SSI il s'agit bien d'une image !)
                     if (null == it.imageBitmap) {
@@ -519,19 +521,20 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         
         public void onImageDownloaded(Bitmap aBitmap) {
             if (null != aBitmap) {
-                Log.i (LOG_TAG, "onImageDownloaded(" + aBitmap + ")" );
+                Log.d (LOG_TAG, "onImageDownloaded(" + aBitmap + ")" );
                 textViewFile.setVisibility(TextView.GONE);
                 imageViewFile.setImageBitmap(aBitmap);
                 imageViewFile.setAdjustViewBounds(true);
                 imageViewFile.setHorizontalScrollBarEnabled(true);
                 //imageViewFile.getSuggestedMinimumHeight(); 
-                // TODO SRombauts : tests en cours
+                /* TODO SRombauts : tests en cours
                 imageViewFile.invalidate ();
                 imageViewFile.requestLayout();
                 imageViewFile.getParent().requestLayout();
                 imageViewFile.getParent().recomputeViewAttributes (imageViewFile);
                 mMsgListView.invalidate();
                 mMsgListView.requestLayout();
+                */
             } else {
                 Log.e (LOG_TAG, "onImageDownloaded(" + aBitmap + ")" );
             }

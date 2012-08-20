@@ -35,7 +35,7 @@ import fr.srombauts.sjlb.service.OnResponseListener;
 import fr.srombauts.sjlb.service.ResponseReceiver;
 import fr.srombauts.sjlb.service.ServiceSJLB;
 import fr.srombauts.sjlb.service.StartService;
-import fr.srombauts.sjlb.service.TaskRefresh;
+import fr.srombauts.sjlb.service.API;
 
 
 /**
@@ -116,7 +116,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
         // Annule l'éventuelle notification de PM non lus
         String              ns                      = Context.NOTIFICATION_SERVICE;
         NotificationManager notificationManager     = (NotificationManager) getSystemService(ns);
-        notificationManager.cancel(TaskRefresh.NOTIFICATION_NEW_PM_ID);
+        notificationManager.cancel(API.NOTIFICATION_NEW_PM_ID);
     }
 
     /**
