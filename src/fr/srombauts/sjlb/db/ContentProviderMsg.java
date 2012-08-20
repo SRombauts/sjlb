@@ -147,7 +147,7 @@ public class ContentProviderMsg extends ContentProvider {
     // Récupère la date du dernier (plus récent) message
     // TODO SRombauts : attention, il faudrait récupérer à la place la date de Maj la plus récente le cas échéant
     public long getDateLastMsg () {
-        long nbSeconds = 0;
+        long dateLastMsgSecondes = 0;
         final String[] columns  = {"max(" + SJLB.Msg.DATE + ")"};
         Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Msg.TABLE_NAME,
                                                                 columns,
@@ -156,10 +156,10 @@ public class ContentProviderMsg extends ContentProvider {
         if (1 == cursor.getCount())
         {
             cursor.moveToFirst();
-            nbSeconds = cursor.getLong(0)/1000;
+            dateLastMsgSecondes = cursor.getLong(0)/1000;
         }
         cursor.close();
-        return nbSeconds;
+        return dateLastMsgSecondes;
     }
     
     // récupère un cursor avec la liste des Msg marqués UNREAD_LOCALY non lus mais localement lus 

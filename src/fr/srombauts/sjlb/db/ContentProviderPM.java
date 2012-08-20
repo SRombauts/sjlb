@@ -147,5 +147,21 @@ public class ContentProviderPM extends ContentProvider {
     public long countPM () {
         return DatabaseUtils.queryNumEntries(mDBHelper.getReadableDatabase(), SJLB.PM.TABLE_NAME);
     }
-    
+
+    // Récupère l'ID du dernier (plus récent) PM (plus grand id)
+    public long getIdLastPM () {
+        long idLastPM = 0;
+        final String[] columns  = {"max(" + SJLB.PM._ID + ")"};
+        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.PM.TABLE_NAME,
+                                                                columns,
+                                                                null, null, // selection, selectionArgs
+                                                                null, null, null);
+        if (1 == cursor.getCount())
+        {
+            cursor.moveToFirst();
+            idLastPM = cursor.getLong(0);
+        }
+        cursor.close();
+        return idLastPM;
+    }
 }

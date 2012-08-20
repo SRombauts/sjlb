@@ -632,7 +632,7 @@ public class API {
      * - les nouveaux messages (bien qu'il puisent avoir déjà été récupérés par l'application mobile)
      * - les messages modifiés (qui ont déjà été récupéré, mais dont le contenu a changé entre temps)
      */
-    // TODO SRombauts : 
+    // TODO SRombauts : transformation ; ajouter un paramètre pour les paramètres optionnels ? 
     boolean fetchMsg () {
         boolean bSuccess = false;
 
@@ -645,6 +645,10 @@ public class API {
             // Récupère la date du message le plus vieux (le premier) et du plus récent (le dernier) connus
             long dateFirstMsg   = mMsgDBAdapter.getDateFirstMsg();
             long dateLastMsg    = mMsgDBAdapter.getDateLastMsg();
+            
+            // idem id du PM le plus récent et date de modif d'un utilisateur la plus récente
+            long idLastPM           = mPMDBAdapter.getIdLastPM();
+            long dateLastUpdateUser = 1444444444; // TODO SRombauts : bouchonnage
             
             // Instancie un client HTTP et un header de requête "POST"  
             HttpClient  httpClient  = new DefaultHttpClient();  
@@ -664,16 +668,13 @@ public class API {
             nameValuePairs.add(new BasicNameValuePair(PARAM_PASSWORD,   loginPassword.mPasswordMD5));
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
             // et si disponibles (ie après la première fois) les 2 dates du plus vieux et du plus récent message
-            // TODO SRombauts : en mise au point, commenter ce qui suit !
             nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_FIRST_MSG, Long.toString(dateFirstMsg)));
             nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_LAST_MSG,  Long.toString(dateLastMsg)));
-            // TODO SRombauts idem PM et User
-            long idLastPm       = 10000; // bouchonnage...
-            long dateLastUser   = 1444444444; // bouchonnage...
-            nameValuePairs.add(new BasicNameValuePair(PARAM_ID_LAST_PM,     Long.toString(idLastPm)));
-            nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_LAST_USER, Long.toString(dateLastUser)));
+            // idem id du PM le plus récent et date de modif d'un utilisateur la plus récente
+            nameValuePairs.add(new BasicNameValuePair(PARAM_ID_LAST_PM,     Long.toString(idLastPM)));
+            nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_LAST_USER, Long.toString(dateLastUpdateUser)));
             
-            Log.e(LOG_TAG, "fetchMsg (" + dateFirstMsg + "," + dateLastMsg + "," + idLastPm + "," + dateLastUser + ")");
+            Log.e(LOG_TAG, "fetchMsg (" + dateFirstMsg + "," + dateLastMsg + "," + idLastPM + "," + dateLastUpdateUser + ")");
             // puis place tous ces paramètres dans la requête HTTP POST
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
             
@@ -842,6 +843,7 @@ public class API {
             e.printStackTrace();
         }
         mMsgDBAdapter.close();
+        mPMDBAdapter.close();
         mSubjDBAdapter.close();
         mFileDBAdapter.close();
         
