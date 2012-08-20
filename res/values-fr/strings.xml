@@ -77,6 +77,5 @@
     <string name="notification_text_pm">    nouveau(x) message(s) privé(s)  </string>
     <string name="notification_title_msg">  Post(s) non lu(s)               </string>
     <string name="notification_text_msg">   post(s) non lu(s)               </string>
-    <string name="notification_new">        nouveau(x)                      </string>
     <!-- URI -->
 </resources>

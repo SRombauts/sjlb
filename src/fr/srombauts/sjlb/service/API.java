@@ -101,27 +101,23 @@ Transmission des informations sur le terminal mobile et la version de l'applicat
 "appli"
 
  
- * Voici un exemple de fichier XML produit pour quatres messages provenant de deux sujets,
- * et deux messages privés pour l'utilisateur donné :
+ * Voici un exemple de fichier XML produit pour 1 message provenant de 1 sujet,
+ * avec 1 message privé
+ * et 1 maj des info d'un utilisateur :
  
-<?xml version="1.0" encoding="utf-8"?> 
-<sjlb> 
-<sujet id="253" id_categorie="2" id_groupe="2" derniere_date="130078545">Week-End</sujet> 
-<sujet id="127" id_categorie="1" id_groupe="2" derniere_date="1300787496">Infos boulot, taf, exams... berk :(</sujet> 
-<msg id="18175" id_auteur="1" auteur="Ced" date="1300780989" id_sujet="253" unread="0">Merci a tous pour ce week end original. c'était super sympa et très bien organisé.
- "
-@+, Ced</msg> 
-<msg id="18176" id_auteur="2" auteur="Seb" date="130078545" id_sujet="253" unread="0">J'avoue ;) !
- 
-Seb</msg>
-<pm id="5810" date="1294130078" id_auteur="2" auteur="Seb" id_destinataire="2" destinataire="Seb">Voici le contenu du message,
-éventuellement sur plusieurs lignes.
-Seb</pm>
-<pm id="6438" date="1345220064" id_auteur="2" auteur="Seb" id_destinataire="2" destinataire="Seb">Un second message</pm>
-<user id="2" pseudo="Seb" nom="Sébastien Rombauts" digicode="43A7" DateDerniereMaj="1294130395">4 rue Emile Duclaux
-2ème à gauche de l'escalier
-92150 Suresnes</user>
-</sjlb> 
+<?xml version="1.0" encoding="utf-8"?>
+<sjlb>
+<sujet id="127" id_categorie="1" id_groupe="2" derniere_date="1345462107">Infos boulot, taf, exams... berk :(</sujet>
+<msg id="20501" id_auteur="10" auteur="Laura" date="1345462107" id_sujet="127" unread="0">Je confirme !!!
+
+Laura</msg>
+<pm id="6457" date="1345405384" id_auteur="2" auteur="Seb" id_destinataire="3" destinataire="Damien">As tu eu ma réponse ?</pm>
+<user id="8" pseudo="Amélie" nom="Amélie Rombauts" digicode="" DateDerniereMaj="1345132117">1 rue des roses
+92260 Fontenay-aux-Roses
+RER sortie 2 - rue robert marchand (il faut traverser les voies). 
+Se mettre vers l'avant de la rame, genre 3ème wagon, c'est l'idéal. </user>
+</sjlb>
+
  *
  * @author 14/06/2010 SRombauts
  */
@@ -161,7 +157,16 @@ public class API {
     static final private String ATTR_NAME_USER_PSEUDO           = "pseudo";
     static final private String ATTR_NAME_USER_NAME             = "nom";
 
-    private ServiceSJLB  mContext        = null;
+    // TODO SRombauts : nouvelle API, en cours
+    static final private String API_URI                         = "http://www.sjlb.fr/Android/API.php";
+    static final private String PARAM_LOGIN                     = "login";          // login (pseudo) de l'utilisateur
+    static final private String PARAM_PASSWORD                  = "password";       // password (encrypté en MD5) de l'utilisateur
+    static final private String PARAM_DATE_FIRST_MSG            = "date_first_msg"; // date du plus vieux message déjà récupéré
+    static final private String PARAM_DATE_LAST_MSG             = "date_last_msg";  // date du plus récent message récupéré
+    static final private String PARAM_ID_LAST_PM                = "id_last_pm";     // id de pm le plus élevé déjà récupéré (dernier pm reçu)
+    static final private String PARAM_DATE_LAST_USER            = "date_last_user"; // valeur du champ 'DateDerniereMaj' la plus récente (dernière maj du user reçue)
+    
+    private ServiceSJLB     mContext        = null;
     private int             mNbPM           = 0;    // Nombre de PM de l'utilisateur (issu directement dans la liste XML)
     private int             mNbNewPM        = 0;    // Nombre d'ID de PM inconnus (issu de la comparaison de la liste XML avec la BDD)
     private int             mNbUnreadMsg    = 0;    // Nombre de messages non lus par l'utilisateur (issu directement de la liste XML)
@@ -205,9 +210,7 @@ public class API {
             
             // et récupération de ces éventuels nouveaux contenus
             fetchPM ();  // récupère la liste des PM seulement si nécessaire
-            fetchMsg (); // récupère systématiquement la liste des nouveaux messages, éventuellement vide
-            
-            bSuccess = true;
+            bSuccess = fetchMsg (); // récupère systématiquement la liste des nouveaux messages, éventuellement vide
             
         } catch (LoginPasswordBadException e) {
             //e.printStackTrace();
@@ -629,7 +632,9 @@ public class API {
      * - les nouveaux messages (bien qu'il puisent avoir déjà été récupérés par l'application mobile)
      * - les messages modifiés (qui ont déjà été récupéré, mais dont le contenu a changé entre temps)
      */
-    void fetchMsg () {
+    // TODO SRombauts : 
+    boolean fetchMsg () {
+        boolean bSuccess = false;
 
         try {
             Log.d(LOG_TAG, "fetchMsg...");
@@ -638,27 +643,37 @@ public class API {
             PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
 
             // Récupère la date du message le plus vieux (le premier) et du plus récent (le dernier) connus
-            long firstMsgDate   = mMsgDBAdapter.getFirstMsgDate();
-            long lastMsgDate    = mMsgDBAdapter.getLastMsgDate();
+            long dateFirstMsg   = mMsgDBAdapter.getDateFirstMsg();
+            long dateLastMsg    = mMsgDBAdapter.getDateLastMsg();
             
             // Instancie un client HTTP et un header de requête "POST"  
             HttpClient  httpClient  = new DefaultHttpClient();  
-            HttpPost    httpPost    = new HttpPost(mContext.getString(R.string.sjlb_msg_uri));  
+            HttpPost    httpPost    = new HttpPost(API_URI);  
                
-            // Prépare les 4 paramètres POST
+            // Prépare les 6 paramètres systématiques 
+            // "login"          : login (pseudo) de l'utilisateur
+            // "password"       : password (encrypté en MD5) de l'utilisateur
+            // "date_first_msg" : date du plus vieux message déjà récupéré
+            // "date_last_msg"  : date du plus récent message récupéré
+            // "id_last_pm"     : id de pm le plus élevé déjà récupéré (dernier pm reçu)
+            // "date_last_user" : valeur du champ 'DateDerniereMaj' la plus récente (dernière maj du user reçue)
+
             // commence par les 2 infos de login et le password
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(4);
-            nameValuePairs.add(new BasicNameValuePair("login",      loginPassword.mLogin));  
-            nameValuePairs.add(new BasicNameValuePair("password",   loginPassword.mPasswordMD5));
+            nameValuePairs.add(new BasicNameValuePair(PARAM_LOGIN,      loginPassword.mLogin));  
+            nameValuePairs.add(new BasicNameValuePair(PARAM_PASSWORD,   loginPassword.mPasswordMD5));
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
-            if (   (0 < firstMsgDate)
-                && (0 < lastMsgDate) )
-            {
-                // et si disponibles (ie après la première fois) les 2 dates du plus vieux et du plus récent message
-                nameValuePairs.add(new BasicNameValuePair("date_premier", Long.toString(firstMsgDate)));
-                nameValuePairs.add(new BasicNameValuePair("date_dernier", Long.toString(lastMsgDate)));
-                Log.d(LOG_TAG, "fetchMsg (" + firstMsgDate +"," + lastMsgDate + ")");
-            }
+            // et si disponibles (ie après la première fois) les 2 dates du plus vieux et du plus récent message
+            // TODO SRombauts : en mise au point, commenter ce qui suit !
+            nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_FIRST_MSG, Long.toString(dateFirstMsg)));
+            nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_LAST_MSG,  Long.toString(dateLastMsg)));
+            // TODO SRombauts idem PM et User
+            long idLastPm       = 10000; // bouchonnage...
+            long dateLastUser   = 1444444444; // bouchonnage...
+            nameValuePairs.add(new BasicNameValuePair(PARAM_ID_LAST_PM,     Long.toString(idLastPm)));
+            nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_LAST_USER, Long.toString(dateLastUser)));
+            
+            Log.e(LOG_TAG, "fetchMsg (" + dateFirstMsg + "," + dateLastMsg + "," + idLastPm + "," + dateLastUser + ")");
             // puis place tous ces paramètres dans la requête HTTP POST
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
             
@@ -794,6 +809,10 @@ public class API {
                                 }
                             }
                         }
+                        
+                        // Arrivé ici, c'est qu'il n'y a manifestement pas eu d'erreur (pas d'exception)
+                        bSuccess = true;
+                        
                     } else {
                         Log.e(LOG_TAG, "fetchMsg: no XML document: server error");
                     }
@@ -825,6 +844,8 @@ public class API {
         mMsgDBAdapter.close();
         mSubjDBAdapter.close();
         mFileDBAdapter.close();
+        
+        return bSuccess;
     }
     
     
@@ -896,7 +917,7 @@ public class API {
             // Définition du message détaillé à afficher dans le volet de notification
             Context         context             = mContext.getApplicationContext();
             CharSequence    contentTitle        = mContext.getString(R.string.notification_title_msg);
-            CharSequence    contentText         = mNbUnreadMsg + " " + mContext.getString(R.string.notification_text_msg) + " (" + mNbNewMsg + mContext.getString(R.string.notification_new) + ")";
+            CharSequence    contentText         = mNbUnreadMsg + " " + mContext.getString(R.string.notification_text_msg) + ")";
             
             // Intent à envoyer lorsque l'utilisateur sélectionne la  notification
             // => lien activité principale :
@@ -905,7 +926,7 @@ public class API {
         
             // Préparation du résumé de notification
             int          icon        = R.drawable.status_icon;
-            CharSequence tickerText  = mContext.getString(R.string.app_name) + ": " + mNbUnreadMsg + " " + mContext.getString(R.string.notification_text_msg) + " (" + mNbNewMsg + mContext.getString(R.string.notification_new) + ")";
+            CharSequence tickerText  = mContext.getString(R.string.app_name) + ": " + mNbUnreadMsg + " " + mContext.getString(R.string.notification_text_msg) + ")";
             long         when        = System.currentTimeMillis();
         
             // et instanciation de la Notification :

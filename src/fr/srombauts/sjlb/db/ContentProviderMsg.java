@@ -128,34 +128,35 @@ public class ContentProviderMsg extends ContentProvider {
     }
     
     // Récupère la date du premier (plus vieux) message
-    public long getFirstMsgDate () {
-        long nbSeconds = 0;
-        final String[] columns  = {SJLB.Msg.DATE};
+    public long getDateFirstMsg () {
+        long dateFirstMsgSecondes = 0;
+        final String[] columns  = {"min(" + SJLB.Msg.DATE + ")"};
         Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Msg.TABLE_NAME,
                                                                 columns,
                                                                 null, null, // selection, selectionArgs
-                                                                null, null, SJLB.Msg.DEFAULT_SORT_ORDER, "1");
+                                                                null, null, null);
         if (1 == cursor.getCount())
         {
             cursor.moveToFirst();
-            nbSeconds = cursor.getLong(cursor.getColumnIndex(SJLB.Msg.DATE))/1000;
+            dateFirstMsgSecondes = cursor.getLong(0)/1000;
         }
         cursor.close();
-        return nbSeconds;
+        return dateFirstMsgSecondes;
     }
     
     // Récupère la date du dernier (plus récent) message
-    public long getLastMsgDate () {
+    // TODO SRombauts : attention, il faudrait récupérer à la place la date de Maj la plus récente le cas échéant
+    public long getDateLastMsg () {
         long nbSeconds = 0;
-        final String[] columns  = {SJLB.Msg.DATE};
+        final String[] columns  = {"max(" + SJLB.Msg.DATE + ")"};
         Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Msg.TABLE_NAME,
                                                                 columns,
                                                                 null, null, // selection, selectionArgs
-                                                                null, null, SJLB.Msg.REVERSE_SORT_ORDER, "1");
+                                                                null, null, null);
         if (1 == cursor.getCount())
         {
             cursor.moveToFirst();
-            nbSeconds = cursor.getLong(cursor.getColumnIndex(SJLB.Msg.DATE))/1000;
+            nbSeconds = cursor.getLong(0)/1000;
         }
         cursor.close();
         return nbSeconds;

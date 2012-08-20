@@ -92,7 +92,7 @@ public class AsynchTaskNewMsg extends AsyncTask<String, Void, Boolean> {
             PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
             
             // Récupère la date du message le plus récent déjà lu
-            long lastMsgDate = mMsgDBAdapter.getLastMsgDate();
+            long lastMsgDate = mMsgDBAdapter.getDateLastMsg();
             
             // Instancie un client http et un header de requête "POST"  
             HttpClient  httpClient  = new DefaultHttpClient();  
