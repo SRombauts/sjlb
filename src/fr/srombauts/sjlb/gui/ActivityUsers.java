@@ -161,21 +161,21 @@ public class ActivityUsers extends ActivityTouchListener {
             cache.pseudoView.setText(pseudo);
             String  name = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.User.NAME));
             cache.nameView.setText(name);
-            // TODO SRombauts : ajouter l'adresse et le digicode de chaque utilisateur
-            //                  (souhaite t'on ajouter aussi la date de maj des données ?)
-            String  addresse = "";//cursor.getString(cursor.getColumnIndexOrThrow(SJLB.User.TEXT));
+            String  addresse = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.User.ADDRESS));
             cache.addressView.setText(addresse);
+            String  notes = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.User.NOTES));
+            cache.notesView.setText(notes);
 
             // Récupère le contact éventuellement associé à l'utilisateur (Uri et photo)
             ApplicationSJLB appSJLB = (ApplicationSJLB)getApplication ();
             int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.User._ID));
             UserContactDescr user = appSJLB.mUserContactList.get(userId);
             // Fixe la barre de QuickContact
-            cache.quickContactView.assignContactUri(user.lookupUri);
+            cache.quickContactView.assignContactUri(user.mLookupUri);
             
             // Affiche la photo du contact si elle existe (sinon petite icône de robot par défaut)
-            if (null != user.photo) {
-                cache.quickContactView.setImageBitmap(user.photo);
+            if (null != user.mPhoto) {
+                cache.quickContactView.setImageBitmap(user.mPhoto);
             } else {
                 cache.quickContactView.setImageResource(R.drawable.ic_contact_picture);
             }
@@ -193,6 +193,7 @@ public class ActivityUsers extends ActivityTouchListener {
             cache.pseudoView        = (TextView)            view.findViewById(R.id.userPseudo);
             cache.nameView          = (TextView)            view.findViewById(R.id.userName);
             cache.addressView       = (TextView)            view.findViewById(R.id.userAddress);
+            cache.notesView         = (TextView)            view.findViewById(R.id.userNotes);
             // enregistre cet objet de cache
             view.setTag(cache);
 
@@ -206,5 +207,6 @@ public class ActivityUsers extends ActivityTouchListener {
         public TextView             pseudoView;
         public TextView             nameView;
         public TextView             addressView;
+        public TextView             notesView;
     }    
 }

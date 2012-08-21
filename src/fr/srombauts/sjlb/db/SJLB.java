@@ -11,7 +11,7 @@ public final class SJLB {
     private SJLB() {}
 
     public static final String DATABASE_NAME        = "SJLB.db";
-    public static final int    DATABASE_VERSION     = 8;
+    public static final int    DATABASE_VERSION     = 9;
     
     
     /**
@@ -90,14 +90,14 @@ public final class SJLB {
         public static final String  AUTHOR_ID           = "author_id";
 
         /**
-         * L'auteur/expéditeur du PM
-         * <P>Type: TEXT</P>
+         * L'id du destinataire du PM
+         * <P>Type: INTEGER</P>
          */
-        public static final String  AUTHOR              = "author";
-
+        public static final String  DEST_ID             = "dest_id";
+        
         /**
          * Le texte du PM
-         * <P>Type: INTEGER</P>
+         * <P>Type: TEXT</P>
          */
         public static final String  TEXT                = "text";
 
@@ -114,7 +114,7 @@ public final class SJLB {
                                                     + _ID       + " integer primary key, "
                                                     + DATE      + " integer, "
                                                     + AUTHOR_ID + " integer, "
-                                                    + AUTHOR    + " text, "
+                                                    + DEST_ID   + " integer, "
                                                     + TEXT      + " text);";
 
         public static final String  TABLE_DROP   = "DROP TABLE IF EXISTS " + TABLE_NAME;
@@ -262,6 +262,12 @@ public final class SJLB {
         public static final String  DATE                = "date";
         
         /**
+         * Date d'édition du msg, en secondes depuis le 1er janvier 1970
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  DATE_EDIT           = "date_edit";
+        
+        /**
          * L'id de l'auteur/expéditeur du Msg
          * <P>Type: INTEGER</P>
          */
@@ -300,6 +306,7 @@ public final class SJLB {
         public static final String TABLE_CREATE = "create table " + SJLB.Msg.TABLE_NAME + " ("
                                                     + _ID       + " integer primary key, "
                                                     + DATE      + " integer, "
+                                                    + DATE_EDIT + " integer, "
                                                     + AUTHOR_ID + " integer, "
                                                     + SUBJECT_ID+ " integer, "
                                                     + UNREAD    + " integer, "
@@ -435,6 +442,24 @@ public final class SJLB {
         public static final String  NAME                  = "name";
         
         /**
+         * L'adresse de l'utilisateur
+         * <P>Type: TEXT</P>
+         */
+        public static final String  ADDRESS               = "address";
+        
+        /**
+         * Notes complémentaires de l'adresse de l'utilisateur (étage, métro, digicode...)
+         * <P>Type: TEXT</P>
+         */
+        public static final String  NOTES                 = "notes";
+        
+        /**
+         * Date de maj des infos, en secondes depuis le 1er janvier 1970
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  DATE_MAJ              = "date_maj";
+
+        /**
          * The default sort order for this table
          */
         public static final String  DEFAULT_SORT_ORDER  = _ID + " ASC";
@@ -443,9 +468,12 @@ public final class SJLB {
         public static final String  TABLE_NAME   = "users";
 
         public static final String  TABLE_CREATE = "create table " + TABLE_NAME + " ("
-                                                    + _ID     + " integer primary key, "
-                                                    + PSEUDO  + " text, "
-                                                    + NAME    + " text);";
+                                                    + _ID       + " integer primary key, "
+                                                    + PSEUDO    + " text, "
+                                                    + NAME      + " text, "
+                                                    + ADDRESS   + " text, "
+                                                    + NOTES     + " text, "
+                                                    + DATE_MAJ  + " integer);";
 
         public static final String  TABLE_DROP   = "DROP TABLE IF EXISTS " + TABLE_NAME;
 

@@ -67,7 +67,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
         
         // Récupère un curseur sur les données (les messages Privés) 
         mCursor = managedQuery( SJLB.PM.CONTENT_URI, null,
-                                null,
+                                null,// TODO SRombauts filtrer : SJLB.PM.DEST_ID + "=" + mUserId,
                                 null, null);
 
         // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
@@ -323,8 +323,12 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
         public void bindView(View view, Context context, Cursor cursor) {
             final MessageListItemCache  cache = (MessageListItemCache) view.getTag();
             
+            // Récupère le pseudo et le contact (Uri et photo) éventuellement associé à l'utilisateur
+            int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.AUTHOR_ID));
+            UserContactDescr user = ((ApplicationSJLB)getApplication ()).mUserContactList.get(userId);
+            
             // Fixe les infos du message 
-            String  pseudo = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.PM.AUTHOR)); // on utilise le champ "PSEUDO" issu du croisement avec la table 
+            String  pseudo = user.mPseudo; // on utilise le pseudo fourni par la liste d'utilisateur, plus simple qu'un croisement en bdd
             cache.pseudoView.setText(pseudo);
             String  strDate = ForumMessage.getDateString (new Date(cursor.getLong(cursor.getColumnIndexOrThrow(SJLB.PM.DATE)))) ;
             cache.dateView.setText(strDate);
@@ -332,16 +336,12 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
             String  text = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.PM.TEXT));
             cache.textView.setText(text);
 
-            // Récupère le contact éventuellement associé à l'utilisateur (Uri et photo)
-            ApplicationSJLB appSJLB = (ApplicationSJLB)getApplication ();
-            int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.PM.AUTHOR_ID));
-            UserContactDescr user = appSJLB.mUserContactList.get(userId);
             // Fixe la barre de QuickContact
-            cache.quickContactView.assignContactUri(user.lookupUri);
+            cache.quickContactView.assignContactUri(user.mLookupUri);
             
-            // Affiche la photo du contact si elle existe (sinon petite icone de robot par défaut)
-            if (null != user.photo) {
-                cache.quickContactView.setImageBitmap(user.photo);
+            // Affiche la photo du contact si elle existe (sinon petite icône de robot par défaut)
+            if (null != user.mPhoto) {
+                cache.quickContactView.setImageBitmap(user.mPhoto);
             } else {
                 cache.quickContactView.setImageResource(R.drawable.ic_contact_picture);
             }

@@ -360,8 +360,12 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         public void bindView(View view, Context context, Cursor cursor) {
             final MessageListItemCache  cache = (MessageListItemCache) view.getTag();
             
+            // Récupère le pseudo et le contact (Uri et photo) éventuellement associé à l'utilisateur
+            int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.AUTHOR_ID));
+            UserContactDescr user = ((ApplicationSJLB)getApplication ()).mUserContactList.get(userId);
+            
             // Fixe la barre d'informations du message 
-            String  pseudo = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.User.PSEUDO)); // on utilise le champ "PSEUDO" issu du croisement avec la table 
+            String  pseudo = user.mPseudo; // on utilise le pseudo fourni par la liste d'utilisateur, plus simple qu'un croisement en bdd
             cache.pseudoView.setText(pseudo);
             String  strDate = ForumMessage.getDateString (new Date(cursor.getLong(cursor.getColumnIndexOrThrow(SJLB.Msg.DATE)))) ;
             cache.dateView.setText(strDate);
@@ -372,16 +376,12 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             boolean bIsNew = (SJLB.Msg.UNREAD_TRUE == cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.UNREAD)));
             cache.imageViewNew.setVisibility(bIsNew?ImageView.VISIBLE:ImageView.INVISIBLE); 
 
-            // Récupère le contact éventuellement associé à l'utilisateur (Uri et photo)
-            ApplicationSJLB appSJLB = (ApplicationSJLB)getApplication ();
-            int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.AUTHOR_ID));
-            UserContactDescr user = appSJLB.mUserContactList.get(userId);
             // Fixe la barre de QuickContact
-            cache.quickContactView.assignContactUri(user.lookupUri);
+            cache.quickContactView.assignContactUri(user.mLookupUri);
             
-            // Affiche la photo du contact si elle existe (sinon petite icone de robot par défaut)
-            if (null != user.photo) {
-                cache.quickContactView.setImageBitmap(user.photo);
+            // Affiche la photo du contact si elle existe (sinon petite icône de robot par défaut)
+            if (null != user.mPhoto) {
+                cache.quickContactView.setImageBitmap(user.mPhoto);
             } else {
                 cache.quickContactView.setImageResource(R.drawable.ic_contact_picture);
             }

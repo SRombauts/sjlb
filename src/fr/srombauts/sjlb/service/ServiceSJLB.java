@@ -64,10 +64,7 @@ public class ServiceSJLB extends IntentService {
         // - lancer une récupération de la liste des messages non lus
         final String action = intent.getAction();
         if (action.equals(ACTION_REFRESH)) {
-            bSuccess = mAPI.doInBackground();
-            if (bSuccess) {
-                mAPI.notifyUser();
-            }
+            bSuccess = mAPI.fetchNewContent();
         }
         else {
             Log.e(LOG_TAG, "action=" + action);

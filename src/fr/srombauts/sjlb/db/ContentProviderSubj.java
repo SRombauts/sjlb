@@ -154,12 +154,9 @@ public class ContentProviderSubj extends ContentProvider {
 
     // teste l'existence d'un Sujet particulier
     public Boolean isExist (int aId) {
-        final String[] columns      = {SJLB.Subj._ID};
-        final String   selection    = SJLB.Subj._ID + "=?";
+        final String   sql          = "SELECT 1 FROM " + SJLB.Subj.TABLE_NAME + " WHERE " + SJLB.Subj._ID + "=?";
         final String[] selectionArgs= {Integer.toString(aId)};
-        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.Subj.TABLE_NAME,
-                                                                columns, selection, selectionArgs,
-                                                                null, null, null);
+        Cursor cursor = mDBHelper.getReadableDatabase().rawQuery(sql, selectionArgs);
         boolean bIsExist = (0 < cursor.getCount());
         cursor.close ();
         return bIsExist;

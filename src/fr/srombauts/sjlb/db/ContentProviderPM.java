@@ -74,11 +74,14 @@ public class ContentProviderPM extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri arg0, String[] arg1, String arg2, String[] arg3,
-            String arg4) {
-        // TODO prendre en compte les paramètres pour faire la bonne requête !
-        return mDBHelper.getReadableDatabase().query(   SJLB.PM.TABLE_NAME,
-                null, null, null, null, null, null);
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        return mDBHelper.getReadableDatabase().query(
+                SJLB.PM.TABLE_NAME,
+                projection, selection, selectionArgs,
+                null, // groupBy
+                null, // having
+                (null!=sortOrder)?sortOrder:SJLB.PM.DEFAULT_SORT_ORDER
+                );
     }
 
     @Override
@@ -100,7 +103,7 @@ public class ContentProviderPM extends ContentProvider {
         newPMValues.put(SJLB.PM._ID,       aPM.getId());
         newPMValues.put(SJLB.PM.DATE,      aPM.getDate().getTime());
         newPMValues.put(SJLB.PM.AUTHOR_ID, aPM.getAuthorId());
-        newPMValues.put(SJLB.PM.AUTHOR,    aPM.getAuthor());
+        newPMValues.put(SJLB.PM.DEST_ID,   aPM.getDestId());
         newPMValues.put(SJLB.PM.TEXT,      aPM.getText());
         return (0 < mDBHelper.getWritableDatabase().insert(SJLB.PM.TABLE_NAME, null, newPMValues));
     }
@@ -118,7 +121,7 @@ public class ContentProviderPM extends ContentProvider {
     
     // récupère un cursor sur un PM particulier
     public Cursor getPM (int aId) {
-        final String[] columns      = {SJLB.PM.DATE, SJLB.PM.AUTHOR_ID, SJLB.PM.AUTHOR, SJLB.PM.TEXT};
+        final String[] columns      = {SJLB.PM.DATE, SJLB.PM.AUTHOR_ID, SJLB.PM.DEST_ID, SJLB.PM.TEXT};
         final String   selection    = SJLB.PM._ID + "=?";
         final String[] selectionArgs= {Integer.toString(aId)};
         Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.PM.TABLE_NAME,
@@ -132,12 +135,9 @@ public class ContentProviderPM extends ContentProvider {
 
     // teste l'existence d'un PM particulier
     public Boolean isExist (int aId) {
-        final String[] columns      = {SJLB.PM.DATE, SJLB.PM.AUTHOR_ID, SJLB.PM.AUTHOR, SJLB.PM.TEXT};
-        final String   selection    = SJLB.PM._ID + "=?";
+        final String   sql          = "SELECT 1 FROM " + SJLB.PM.TABLE_NAME + " WHERE " + SJLB.PM._ID + "=?";
         final String[] selectionArgs= {Integer.toString(aId)};
-        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.PM.TABLE_NAME,
-                                                                columns, selection, selectionArgs,
-                                                                null, null, null);
+        Cursor cursor = mDBHelper.getReadableDatabase().rawQuery(sql, selectionArgs);
         boolean bIsExist = (0 < cursor.getCount());
         cursor.close ();
         return bIsExist;

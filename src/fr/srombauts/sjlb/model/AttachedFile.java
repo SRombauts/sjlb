@@ -9,11 +9,13 @@ public class AttachedFile {
     private int     mMessageId;
     private String  mFilename;
 
+    // Constructeur
     public AttachedFile(int aMessageId, String aFilename) {
         mMessageId  = aMessageId;
         mFilename   = aFilename;
     }
     
+    // Getters basics (optimisés en release par ProGuard)
     public int getMessageId () {
         return mMessageId;
     }

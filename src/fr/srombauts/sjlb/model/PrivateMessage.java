@@ -11,46 +11,47 @@ public class PrivateMessage {
     private int     mId;
     private Date    mDate;
     private int     mAuthorId;
-    private String  mAuthor;
+    private int     mDestId;
     private String  mText;
 
-    public PrivateMessage(int aId, Date aDate, int aAuthorId, String aAuthor, String aText) {
+    // Constructeur
+    public PrivateMessage(int aId, Date aDate, int aAuthorId, int aDestId, String aText) {
         mId         = aId;
         mDate       = aDate;
         mAuthorId   = aAuthorId;
-        mAuthor     = aAuthor;
+        mAuthorId   = aDestId;
         mText       = aText;
     }
     
-    public int getId () {
+    // Getters basics (optimisés en release par ProGuard)
+    public int getId() {
         return mId;
     }
-    public Date getDate () {
+    public Date getDate() {
         return mDate;
     }
-    public int getAuthorId () {
+    public int getAuthorId() {
         return mAuthorId;
     }
-    public String getAuthor () {
-        return mAuthor;
+    public int getDestId() {
+        return mDestId;
     }
-    public String getText () {
+    public String getText() {
         return mText;
     }
     
     /**
-     * Retourne une description résumée en une unique chaine
+     * Retourne une description résumée en une unique chaîne
      */
-    public String toString () {
-        return mAuthor + " (" + getDateString (mDate) + ") : " + mText;
+    public String toString() {
+        return mAuthorId + " (" + getDateString (mDate) + ") -> " + mDestId + " : " + mText;
     }
 
-    // Formatte une date en chaîne de caractère
+    // Formate une date en chaîne de caractère
     static public String getDateString (Date aDate) {
         SimpleDateFormat    sdf         = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         String              dateString  = sdf.format(aDate);
 
         return dateString;
     }
-
 }

@@ -30,10 +30,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 import fr.srombauts.sjlb.R;
-import fr.srombauts.sjlb.db.ContentProviderPM;
 import fr.srombauts.sjlb.model.LoginPasswordEmptyException;
 import fr.srombauts.sjlb.model.PrefsLoginPassword;
-import fr.srombauts.sjlb.model.PrivateMessage;
 
 
 /**
@@ -50,13 +48,12 @@ public class AsynchTaskDeletePM extends AsyncTask<String, Void, Void> {
     static final private String ATTR_NAME_PRIVATE_MSG_ID        = "id";
     static final private String ATTR_NAME_PRIVATE_MSG_DATE      = "date";
     static final private String ATTR_NAME_PRIVATE_MSG_ID_AUTHOR = "id_auteur";
-    static final private String ATTR_NAME_PRIVATE_MSG_PSEUDO    = "pseudo";
     
 
     private Context         mContext        = null;
     private int             mNbPM           = 0;
     
-    private ContentProviderPM   mPMDBAdapter  = null;
+    //private ContentProviderPM   mPMDBAdapter  = null;
       
     /**
      * Constructeur utilisé pour mémorisée la référence sur le service appelant
@@ -65,7 +62,7 @@ public class AsynchTaskDeletePM extends AsyncTask<String, Void, Void> {
     public AsynchTaskDeletePM(Context context) {
         mContext      = context;
                                 
-        mPMDBAdapter  = new ContentProviderPM(context);
+        //mPMDBAdapter  = new ContentProviderPM(context);
     }
 
     protected void onPreExecute() {
@@ -132,7 +129,7 @@ public class AsynchTaskDeletePM extends AsyncTask<String, Void, Void> {
                 if (null != listPM)
                 {
                     // Vide la table des messages privés
-                    mPMDBAdapter.clearPM ();
+                    //mPMDBAdapter.clearPM ();
                     
                     mNbPM = listPM.getLength();
                     for (int i = 0; i < mNbPM; i++) {
@@ -147,17 +144,18 @@ public class AsynchTaskDeletePM extends AsyncTask<String, Void, Void> {
                         Date    date        = new Date(longDate*1000);
                         String  strIdAuthor = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_ID_AUTHOR);
                         int     idAuthor    = Integer.parseInt(strIdAuthor);
-                        String  strAuthor   = pm.getAttribute(ATTR_NAME_PRIVATE_MSG_PSEUDO);
                         
-                        Log.d(LOG_TAG, "PM " + idPM + " " + strAuthor + " ("+ idAuthor +") " + date + " (" + strDate + ") : "  + strText);
+                        Log.d(LOG_TAG, "PM " + idPM + " (" + idAuthor + ") " + date + " (" + strDate + ") : "  + strText);
                         
-                        PrivateMessage newPM = new PrivateMessage(idPM, date, idAuthor, strAuthor, strText);
+                        /* TODO SRombauts : sera désormais fait par la nouvelle API
+                        PrivateMessage newPM = new PrivateMessage(idPM, date, idAuthor, strText);
                         
                         // Renseigne la bdd
                         Boolean bInserted = mPMDBAdapter.insertPM(newPM);
                         if (bInserted) {
                             Log.d(LOG_TAG, "PM " + idPM + " inserted");                                
                         }
+                        */
                     }
                 }
                 Log.d(LOG_TAG, "fetchPM... ok");                        

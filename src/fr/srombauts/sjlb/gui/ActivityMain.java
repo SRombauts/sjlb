@@ -20,11 +20,14 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 import fr.srombauts.sjlb.BuildConfig;
 import fr.srombauts.sjlb.R;
+import fr.srombauts.sjlb.db.ContentProviderFile;
 import fr.srombauts.sjlb.db.ContentProviderMsg;
+import fr.srombauts.sjlb.db.ContentProviderPM;
+import fr.srombauts.sjlb.db.ContentProviderSubj;
+import fr.srombauts.sjlb.db.ContentProviderUser;
 import fr.srombauts.sjlb.db.DBOpenHelper;
 import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.PrefsLoginPassword;
@@ -173,9 +176,6 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         mAA.notifyDataSetChanged();
         
         
-        // binding du champ de version
-        TextView    VersionView = (TextView)findViewById(R.id.versionView);
-        
         // Compte le nombre de messages récupérés en base locale
         ContentProviderMsg  msgs    = new ContentProviderMsg (this);
         final long NbMsg = msgs.getCount();
@@ -190,8 +190,8 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
             e.printStackTrace();
         }
 
-        // Puis affiches ces infos
-        VersionView.setText("version " + info.versionName + "       " + NbMsg + " messages");
+        // Puis affiches ces infos dans le titre
+        setTitle("SJLB version " + info.versionName + "     (" + NbMsg + " messages)");
     }    
     
     /**
@@ -289,7 +289,8 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
                 }
                 break;
             }
-/*          case (R.id.menu_reset): {
+            // TODO SRombauts : en mise au point uniquement
+            case (R.id.menu_reset): {
                 Log.d (LOG_TAG, "onOptionsItemSelected(menu_reset)");
                 ContentProviderUser users   = new ContentProviderUser (this);
                 users.clearUser();
@@ -307,7 +308,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
                 files.clearFiles();
                 files.close();
                 break;
-            }*/
+            }
             case (R.id.menu_prefs): {
                 Intent intent = new Intent(this, ActivityPreferences.class);
                 startActivity(intent);

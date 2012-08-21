@@ -6,11 +6,13 @@ import android.net.Uri;
 
 // Objet utilisé comme descripteur du contact associé à l'utilisateur
 public class UserContactDescr {
-    public Uri    lookupUri;
-    public Bitmap photo;
+    public String   mPseudo;
+    public Uri      mLookupUri;
+    public Bitmap   mPhoto;
 
-    public UserContactDescr () {
-        lookupUri   = null;
-        photo       = null;
+    public UserContactDescr (String aPseudo) {
+        mPseudo     = aPseudo;
+        mLookupUri  = null;
+        mPhoto      = null;
     }    
 }

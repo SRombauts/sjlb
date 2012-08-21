@@ -97,7 +97,7 @@ public class ContentProviderFile extends ContentProvider {
     }
     
     /**
-     * Insert un nouveau fichier attaché complet (ne fonctionne que si fichier non déjà connu)
+     * Insert un nouveau fichier attaché complet (TODO SRombauts : ne fonctionne que si fichier non déjà connu !? Est ce vrai ?? INSERT UNIQUE ?)
      * @param aAttachedFile le fichier à insérer
      * @return true si succès
      */
@@ -132,14 +132,21 @@ public class ContentProviderFile extends ContentProvider {
         return cursor;
     }
 
+    // teste l'existence d'n fichier
+    public Boolean isExist (int aMsgId, String aFilename) {
+        final String   sql          = "SELECT 1 FROM " + SJLB.File.TABLE_NAME + " WHERE " + SJLB.File.MSG_ID + "=? AND" + SJLB.File.FILENAME + "=?";
+        final String[] selectionArgs= {Integer.toString(aMsgId), aFilename};
+        Cursor cursor = mDBHelper.getReadableDatabase().rawQuery(sql, selectionArgs);
+        boolean bIsExist = (0 < cursor.getCount());
+        cursor.close ();
+        return bIsExist;
+    }
+
     // teste l'existence d'au moins un fichier pour un message particulier
-    public Boolean isExist (int aId) {
-        final String[] columns      = {SJLB.File.FILENAME};
-        final String   selection    = SJLB.File.MSG_ID + "=?";
-        final String[] selectionArgs= {Integer.toString(aId)};
-        Cursor cursor = mDBHelper.getReadableDatabase().query(  SJLB.File.TABLE_NAME,
-                                                                columns, selection, selectionArgs,
-                                                                null, null, null);
+    public Boolean hasFiles (int aMsgId) {
+        final String   sql          = "SELECT 1 FROM " + SJLB.File.TABLE_NAME + " WHERE " + SJLB.File.MSG_ID + "=?";
+        final String[] selectionArgs= {Integer.toString(aMsgId)};
+        Cursor cursor = mDBHelper.getReadableDatabase().rawQuery(sql, selectionArgs);
         boolean bIsExist = (0 < cursor.getCount());
         cursor.close ();
         return bIsExist;

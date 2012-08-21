@@ -84,7 +84,10 @@ public class ApplicationSJLB extends Application {
     public void initUserContactList () {
 
         // Liste les utilisateurs du site
-        Cursor cursor = getContentResolver().query (SJLB.User.CONTENT_URI, null, null, null, null);
+        Cursor cursor = getContentResolver().query (SJLB.User.CONTENT_URI,
+                                                    null,       // projection "*"
+                                                    null, null, // selection, selectionArgs
+                                                    null);
         // Créer la liste des utilisateurs du site, avec comme clef leur ID, et comme donnée un objet avec leur "LookupUri" et leur photo pour optimiser l'affichage dans la liste
         mUserContactList = new Vector<UserContactDescr> (cursor.getCount()+1);
         // Ajoute un utilisateur null à l'index 0
@@ -100,22 +103,23 @@ public class ApplicationSJLB extends Application {
                                                               null);
                 Log.d(LOG_TAG, cursor.getString(cursor.getColumnIndexOrThrow(SJLB.User.NAME)) + "' = " + subCursor.getCount());
 
-                UserContactDescr user = new UserContactDescr();
+                // Renseigne dans tous les cas le pseudo associé à l'Id de l'utilisateur, utilisé par la suite pour transcrire un Id en Pseudo 
+                UserContactDescr user = new UserContactDescr(cursor.getString(cursor.getColumnIndexOrThrow(SJLB.User.PSEUDO)));
                 if (0 < subCursor.getCount()) {
                     subCursor.moveToFirst ();
                     
                     // Fixe la barre de QuickContact
                     final long      contactId = subCursor.getLong(subCursor.getColumnIndexOrThrow(Contacts._ID));
                     final String    lookupKey = subCursor.getString(subCursor.getColumnIndexOrThrow(Contacts.LOOKUP_KEY));
-                    user.lookupUri = Contacts.getLookupUri(contactId, lookupKey);
+                    user.mLookupUri = Contacts.getLookupUri(contactId, lookupKey);
                     
                     // Ouvre la photo du contact
                     Uri         uri             = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId);
                     InputStream photoDataStream = Contacts.openContactPhotoInputStream(getContentResolver(), uri);
                     if (null != photoDataStream) {
-                        user.photo = BitmapFactory.decodeStream(photoDataStream);
+                        user.mPhoto = BitmapFactory.decodeStream(photoDataStream);
                     } else {
-                        user.photo = null;
+                        user.mPhoto = null;
                     }
                 }
                 

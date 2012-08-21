@@ -10,25 +10,32 @@ import java.util.Date;
 public class ForumMessage {
     private int     mId;
     private Date    mDate;
+    private Date    mDateEdit;
     private int     mAuthorId;
     private int     mSubjectId;
     private boolean mbUnread;
     private String  mText;
 
-    public ForumMessage(int aId, Date aDate, int aAuthorId, String aAuthor, int aSubjectId, boolean abUnread, String aText) {
+    // Constructeur
+    public ForumMessage(int aId, Date aDate, Date aDateEdit, int aAuthorId, int aSubjectId, boolean abUnread, String aText) {
         mId         = aId;
         mDate       = aDate;
+        mDateEdit   = aDateEdit;
         mAuthorId   = aAuthorId;
         mSubjectId  = aSubjectId;
         mbUnread    = abUnread;
         mText       = aText;
     }
     
+    // Getters basics (optimisés en release par ProGuard)
     public int getId () {
         return mId;
     }
     public Date getDate () {
         return mDate;
+    }
+    public Date getDateEdit () {
+        return mDateEdit;
     }
     public int getAuthorId () {
         return mAuthorId;
@@ -45,11 +52,11 @@ public class ForumMessage {
 
     // Résumé du contenu de l'objet sous forme d'une chaîne de caractère
     public String toString () {
-        return mId + ": " + getDateString (mDate) + " " + mAuthorId + " subj=" + mSubjectId + " unread=" + mbUnread + " : " + mText;
+        return mId + ": " + getDateString (mDate) + " (" + getDateString (mDateEdit) + ") " + mAuthorId + " subj=" + mSubjectId + " unread=" + mbUnread + " : " + mText;
     }    
 
 
-    // Formatte une date en chaîne de caractère
+    // Formate une date en chaîne de caractère
     static public String getDateString (Date aDate) {
         SimpleDateFormat    sdf         = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         String              dateString  = sdf.format(aDate);

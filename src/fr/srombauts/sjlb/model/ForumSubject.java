@@ -13,6 +13,7 @@ public class ForumSubject {
     private Date    mLastDate;
     private String  mText;
 
+    // Constructeur
     public ForumSubject(int aId, int aCategoryId, int aGroupId, Date aLastDate, String aText) {
         mId         = aId;
         mCategoryId = aCategoryId;
@@ -21,6 +22,7 @@ public class ForumSubject {
         mText       = aText;
     }
     
+    // Getters basics (optimisés en release par ProGuard)
     public int getId () {
         return mId;
     }
