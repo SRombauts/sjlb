@@ -93,6 +93,7 @@ public class AsynchTaskNewMsg extends AsyncTask<String, Void, Boolean> {
             
             // Récupère la date du message le plus récent déjà lu
             long lastMsgDate = mMsgDBAdapter.getDateLastMsg();
+            mMsgDBAdapter.close();
             
             // Instancie un client http et un header de requête "POST"  
             HttpClient  httpClient  = new DefaultHttpClient();  
