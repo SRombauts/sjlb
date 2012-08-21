@@ -28,7 +28,7 @@ import fr.srombauts.sjlb.db.ContentProviderMsg;
 import fr.srombauts.sjlb.db.DBOpenHelper;
 import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.PrefsLoginPassword;
-import fr.srombauts.sjlb.service.OnResponseListener;
+import fr.srombauts.sjlb.service.OnServiceResponseListener;
 import fr.srombauts.sjlb.service.ResponseReceiver;
 import fr.srombauts.sjlb.service.ServiceSJLB;
 import fr.srombauts.sjlb.service.StartService;
@@ -38,7 +38,7 @@ import fr.srombauts.sjlb.service.StartService;
  * Activité du menu principal, qui lance le service si besoin et permet de naviguer entre PM et Msg
  * @author 27/06/2010 SRombauts
  */
-public class ActivityMain extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, OnResponseListener {
+public class ActivityMain extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, OnServiceResponseListener {
     private static final String LOG_TAG         = "ActivityMain";
 
     private static final String SAVE_FILENAME   = "SavedIntent";
@@ -107,7 +107,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         // Rafraîchi l'affichage
         refreshCategoryList ();
         
-        // Demande à être notifié des résultats des demandes faites au service
+        // Demande à être notifié des résultats des actions réalisées par le service
         mResponseReceiver = new ResponseReceiver(this);
     }
     

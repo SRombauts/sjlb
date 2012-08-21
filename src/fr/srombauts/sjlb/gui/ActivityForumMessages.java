@@ -40,7 +40,7 @@ import fr.srombauts.sjlb.service.AsynchTaskDownloadImage;
 import fr.srombauts.sjlb.service.AsynchTaskNewMsg;
 import fr.srombauts.sjlb.service.CallbackImageDownload;
 import fr.srombauts.sjlb.service.CallbackTransfer;
-import fr.srombauts.sjlb.service.OnResponseListener;
+import fr.srombauts.sjlb.service.OnServiceResponseListener;
 import fr.srombauts.sjlb.service.ResponseReceiver;
 import fr.srombauts.sjlb.service.ServiceSJLB;
 import fr.srombauts.sjlb.service.StartService;
@@ -51,7 +51,7 @@ import fr.srombauts.sjlb.service.API;
  * Activité présentant la liste des sujets de la catégorie sélectionnée
  * @author 22/08/2010 SRombauts
  */
-public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, CallbackTransfer, OnResponseListener {
+public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, CallbackTransfer, OnServiceResponseListener {
     private static final String LOG_TAG = "ActivityMsg";
     
     public static final String  START_INTENT_EXTRA_CAT_ID       = "CategoryId";
@@ -142,6 +142,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         Log.d (LOG_TAG, "onResume... clear UNREAD flags");
 
         // Supprime l'éventuelle notification de Msg non lus
+        // TODO SRombauts : il faudrait plutôt la mettre à jour (la recréer) avec le nombre de messages non lus restant
         String              ns                      = Context.NOTIFICATION_SERVICE;
         NotificationManager notificationManager     = (NotificationManager) getSystemService(ns);
         notificationManager.cancel(API.NOTIFICATION_NEW_MSG_ID);
@@ -162,7 +163,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         final int nbUpdatedRowsSubj = getContentResolver ().update(SJLB.Subj.CONTENT_URI, valuesSubj, whereSubj, selectionArgs);
         Log.w (LOG_TAG, "nbUpdatedRowsSubj=" + nbUpdatedRowsSubj);
         
-        // Demande à être notifié des résultats des demandes faites au service
+        // Demande à être notifié des résultats des actions réalisées par le service
         mResponseReceiver = new ResponseReceiver(this);
     }
     

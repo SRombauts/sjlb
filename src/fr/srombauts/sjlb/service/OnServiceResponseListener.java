@@ -9,7 +9,7 @@ import android.content.Intent;
  * 
  * @author SRombauts
  */
-public interface OnResponseListener {
+public interface OnServiceResponseListener {
 
     /**
      * Sur réception d'une réponse du service SJLB

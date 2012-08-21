@@ -13,14 +13,14 @@ import android.content.IntentFilter;
  * @author SRombauts
  */
 public class ResponseReceiver extends BroadcastReceiver {
-    OnResponseListener mOnServiceResponseListener = null;
+    OnServiceResponseListener mOnServiceResponseListener = null;
     
     /**
      * Enregistre le BroadcastReceiver sur ACTION_RESPONSE et l'associe à un Listener de l'Activity qui souhaite être notifié
      * 
      * @param aResponseListener Contexte implémentant le listener recevant les notifications
      */
-    public ResponseReceiver(OnResponseListener aResponseListener) {
+    public ResponseReceiver(OnServiceResponseListener aResponseListener) {
         mOnServiceResponseListener = aResponseListener;
         IntentFilter filter = new IntentFilter(ServiceSJLB.ACTION_RESPONSE);
         ((Context)aResponseListener).registerReceiver(this, filter);

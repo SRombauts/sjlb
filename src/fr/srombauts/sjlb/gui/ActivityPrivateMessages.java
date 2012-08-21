@@ -31,7 +31,7 @@ import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.ForumMessage;
 import fr.srombauts.sjlb.model.UserContactDescr;
 import fr.srombauts.sjlb.service.AsynchTaskDeletePM;
-import fr.srombauts.sjlb.service.OnResponseListener;
+import fr.srombauts.sjlb.service.OnServiceResponseListener;
 import fr.srombauts.sjlb.service.ResponseReceiver;
 import fr.srombauts.sjlb.service.ServiceSJLB;
 import fr.srombauts.sjlb.service.StartService;
@@ -42,7 +42,7 @@ import fr.srombauts.sjlb.service.API;
  * Activité présentant la liste des messages privés
  * @author 14/06/2010 SRombauts
  */
-public class ActivityPrivateMessages extends ActivityTouchListener implements OnResponseListener {
+public class ActivityPrivateMessages extends ActivityTouchListener implements OnServiceResponseListener {
     private static final String LOG_TAG = "ActivityPM";
     
     static final private int    DIALOG_ID_PM_DELETE_ONE     = 1;
@@ -99,7 +99,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
         
         clearNotificationPM ();
         
-        // Demande à être notifié des résultats des demandes faites au service
+        // Demande à être notifié des résultats des actions réalisées par le service
         mResponseReceiver = new ResponseReceiver(this);
     }
     

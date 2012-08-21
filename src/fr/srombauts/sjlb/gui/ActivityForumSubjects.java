@@ -22,7 +22,7 @@ import android.widget.Toast;
 import fr.srombauts.sjlb.BuildConfig;
 import fr.srombauts.sjlb.R;
 import fr.srombauts.sjlb.db.SJLB;
-import fr.srombauts.sjlb.service.OnResponseListener;
+import fr.srombauts.sjlb.service.OnServiceResponseListener;
 import fr.srombauts.sjlb.service.ResponseReceiver;
 import fr.srombauts.sjlb.service.ServiceSJLB;
 import fr.srombauts.sjlb.service.StartService;
@@ -32,7 +32,7 @@ import fr.srombauts.sjlb.service.StartService;
  * Activité présentant la liste des sujets de la catégorie sélectionnée
  * @author 22/08/2010 SRombauts
  */
-public class ActivityForumSubjects extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, OnResponseListener {
+public class ActivityForumSubjects extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, OnServiceResponseListener {
     private static final String LOG_TAG         = "ActivitySubj";
     
     private static final String SAVE_FILENAME   = "SavedIntent";
@@ -115,7 +115,7 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         super.onResume();
         Log.d (LOG_TAG, "onResume");
         
-        // Demande à être notifié des résultats des demandes faites au service
+        // Demande à être notifié des résultats des actions réalisées par le service
         mResponseReceiver = new ResponseReceiver(this);
     }
     
