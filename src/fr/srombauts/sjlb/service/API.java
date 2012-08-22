@@ -62,12 +62,14 @@ import fr.srombauts.sjlb.model.User;
  *
  * Liste des arguments à fournir en entrée, selon le type de requête :
 Obligatoire pour toute requête :
-"login"          : login (pseudo) de l'utilisateur
-"password"       : password (encrypté en MD5) de l'utilisateur
-"date_first_msg" : date du plus vieux message déjà récupéré
-"date_last_msg"  : date du plus récent message récupéré
-"id_last_pm"     : id de pm le plus élevé déjà récupéré (dernier pm reçu)
-"date_last_user" : valeur du champ 'DateDerniereMaj' la plus récente (dernière maj du user reçue)
+"login"              : login (pseudo) de l'utilisateur
+"password"           : password (encrypté en MD5) de l'utilisateur
+"date_first_msg"     : date du plus vieux message déjà récupéré
+"date_last_msg"      : date du plus récent message récupéré
+"id_last_pm"         : id de pm le plus élevé déjà récupéré (dernier pm reçu)
+"date_last_user"     : valeur du champ 'DateDerniereMaj' la plus récente (dernière maj du user reçue)
+"date_last_msg_suppr": date du dernier message supprimé
+"date_last_pm_suppr" : date du dernier pm supprimé
 
 Post d'un nouveau message :
 "id_subj_new" : id du sujet où poster le nouveau message
@@ -113,6 +115,8 @@ Transmission des informations sur le terminal mobile et la version de l'applicat
 <unread id="20530"/>
 <unread id="20531"/>
 <unread id="20532"/>
+<msg_suppr id="17670" date="1345645432"/>
+<pm_suppr id="6473" date="1345645432"/>
 <msg id="20501" id_auteur="10" date="1345462107" date_edit="0" id_sujet="127" unread="0">Je confirme !!!
 
 Laura<fichier>ImageXxx.png</fichier></msg>
@@ -132,13 +136,15 @@ public class API {
     public static final int     NOTIFICATION_NEW_MSG_ID     = 2;
 
     static final private String API_URI                     = "http://www.sjlb.fr/Android/API.php";
-    static final private String PARAM_LOGIN                 = "login";          // login (pseudo) de l'utilisateur
-    static final private String PARAM_PASSWORD              = "password";       // password (encrypté en MD5) de l'utilisateur
-    static final private String PARAM_DATE_FIRST_MSG        = "date_first_msg"; // date du plus vieux message déjà récupéré
-    static final private String PARAM_DATE_LAST_MSG         = "date_last_msg";  // date du plus récent message récupéré
-    static final private String PARAM_ID_LAST_PM            = "id_last_pm";     // id de pm le plus élevé déjà récupéré (dernier pm reçu)
-    static final private String PARAM_DATE_LAST_USER        = "date_last_user"; // valeur du champ 'DateDerniereMaj' la plus récente (dernière maj du user reçue)
-    static final private String PARAM_LIST_MSG_LUS          = "msg_lus";        // liste d'id de messages lus sur l'application mobile, séparés par des virgules
+    static final private String PARAM_LOGIN                 = "login";              // login (pseudo) de l'utilisateur
+    static final private String PARAM_PASSWORD              = "password";           // password (encrypté en MD5) de l'utilisateur
+    static final private String PARAM_DATE_FIRST_MSG        = "date_first_msg";     // date du plus vieux message déjà récupéré
+    static final private String PARAM_DATE_LAST_MSG         = "date_last_msg";      // date du plus récent message récupéré
+    static final private String PARAM_ID_LAST_PM            = "id_last_pm";         // id de pm le plus élevé déjà récupéré (dernier pm reçu)
+    static final private String PARAM_DATE_LAST_USER        = "date_last_user";     // valeur du champ 'DateDerniereMaj' la plus récente (dernière maj du user reçue)
+    static final private String PARAM_DATE_LAST_MSG_SUPPR   = "date_last_msg_suppr";//  date du dernier message supprimé
+    static final private String PARAM_DATE_LAST_PM_SUPPR    = "date_last_pm_suppr"; //  date du dernier pm supprimé
+    static final private String PARAM_LIST_MSG_LUS          = "msg_lus";            // liste d'id de messages lus sur l'application mobile, séparés par des virgules
     
     static final private String PARAM_PHONE_MODEL           = "model";
     static final private String PARAM_BUILD_BRAND           = "brand";
@@ -147,9 +153,11 @@ public class API {
     static final private String PARAM_VERSION_APPLI         = "appli";
 
     static final private String NODE_NAME_BAD_LOGIN         = "login_error";
+    static final private String NODE_NAME_FORUM_UNREAD      = "unread";
+    static final private String NODE_NAME_FORUM_SUPPR       = "msg_suppr";
+    static final private String NODE_NAME_PRIVATE_SUPPR     = "pm_suppr";
     static final private String NODE_NAME_PRIVATE_MSG       = "pm";
     static final private String NODE_NAME_FORUM_MSG         = "msg";
-    static final private String NODE_NAME_FORUM_UNREAD      = "unread";
     static final private String NODE_NAME_FORUM_FILE        = "fichier";
     static final private String NODE_NAME_FORUM_SUBJ        = "sujet";
     static final private String NODE_NAME_USER              = "user";
@@ -234,6 +242,10 @@ public class API {
             long idLastPM           = mPMDBAdapter.getIdLastPM();
             long dateLastUpdateUser = mUserDBAdapter.getDateLastUpdateUser();
             
+            // TODO SRombauts : gérer les suppressions de msg et de pm 
+            final long dateLastMsgSuppr  = 1555555555; // bouchon !
+            final long dateLastPmSuppr   = 1555555555; // bouchon !
+            
             // Établi la liste des messages lus localement, à transmettre au site SJLB pour qu'il se mette à jour
             String strMsgLus = mMsgDBAdapter.getListMsgUnreadLocaly ();
             
@@ -254,12 +266,17 @@ public class API {
             nameValuePairs.add(new BasicNameValuePair(PARAM_LOGIN,      loginPassword.getLogin()));  
             nameValuePairs.add(new BasicNameValuePair(PARAM_PASSWORD,   loginPassword.getPasswordMD5()));
             // et si disponibles (ie après la première fois) les 2 dates du plus vieux et du plus récent message
-            nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_FIRST_MSG, Long.toString(dateFirstMsg)));
+            // TODO SRombauts : plus pratique en mise au point
+            //nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_FIRST_MSG, Long.toString(dateFirstMsg)));
             nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_LAST_MSG,  Long.toString(dateLastMsg)));
             // idem id du PM le plus récent et date de modif d'un utilisateur la plus récente
             nameValuePairs.add(new BasicNameValuePair(PARAM_ID_LAST_PM,     Long.toString(idLastPM)));
             nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_LAST_USER, Long.toString(dateLastUpdateUser)));
-            
+
+            // gestion des suppressions de msg et de pm 
+            nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_LAST_MSG_SUPPR,    Long.toString(dateLastMsgSuppr)));
+            nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_LAST_PM_SUPPR,     Long.toString(dateLastPmSuppr)));
+
             // puis l'éventuelle liste des messages lus localement
             if (0 < strMsgLus.length()) {
                 nameValuePairs.add(new BasicNameValuePair(PARAM_LIST_MSG_LUS, strMsgLus));
@@ -301,6 +318,66 @@ public class API {
                     Element eltLoginError = (Element)eltDocument.getElementsByTagName(NODE_NAME_BAD_LOGIN).item(0);
                     if (null == eltLoginError) {
     
+                        /////////////////////////////////////////////////////////////////////////////
+                        // Récupère la liste des utilisateurs
+                        // (en premier car la liste des utilisateurs est nécessaire pour la suite !)
+                        NodeList    listUser = eltDocument.getElementsByTagName(NODE_NAME_USER);
+                        if (null != listUser) {
+                            int nbUsers = listUser.getLength();
+                            for (int i = 0; i < nbUsers; i++) {
+                                Element eltUser        = (Element)listUser.item(i);
+        
+                                String  strIdUser   = eltUser.getAttribute(ATTR_NAME_USER_ID);
+                                int     idUser      = Integer.parseInt(strIdUser);
+                                String  strPseudo   = eltUser.getAttribute(ATTR_NAME_USER_PSEUDO);
+                                String  strName     = eltUser.getAttribute(ATTR_NAME_USER_NAME);
+                                String  strDateMaj  = eltUser.getAttribute(ATTR_NAME_USER_DATE_MAJ);
+                                long    longDateMaj = (long)Integer.parseInt(strDateMaj);
+                                Date    dateMaj     = new Date(longDateMaj*1000);
+
+                                String  strAddress  = null;
+                                String  strNotes    = null;
+
+                                // Récupère l'adresse de l'utilisateur
+                                NodeList    listAddr = eltUser.getElementsByTagName(NODE_NAME_FORUM_ADDRESS);
+                                if (null != listAddr) {
+                                    Element eltAddr = (Element)listAddr.item(0);
+                                    Node    txtAddr = eltAddr.getFirstChild();
+                                    if (null != txtAddr) {
+                                        strAddress  = eltAddr.getFirstChild().getNodeValue();
+                                    }
+                                }
+                                
+                                // Récupère les notes complémentaires à l'adresse de l'utilisateur
+                                NodeList    listNotes = eltUser.getElementsByTagName(NODE_NAME_FORUM_NOTES);
+                                if (null != listNotes) {
+                                    Element eltNotes = (Element)listNotes.item(0);
+                                    Node    txtNotes = eltNotes.getFirstChild();
+                                    if (null != txtNotes) {
+                                        strNotes  = txtNotes.getNodeValue();
+                                    }
+                                }
+                                
+                                Log.d(LOG_TAG, "User " + idUser + " " + strPseudo + " " + strName);
+                                
+                                User newUser = new User(idUser, strPseudo, strName, strAddress, strNotes, dateMaj);
+                                
+                                // Update l'utilisateur s'il existe déjà, sinon l'insert
+                                if (mUserDBAdapter.isExist(idUser)) {
+                                    mUserDBAdapter.updateUser(newUser);
+                                } else {
+                                    mUserDBAdapter.insertUser(newUser);
+                                }
+                            }
+                            
+                            // Ré-initialise la liste des utilisateurs
+                            ApplicationSJLB appSJLB = (ApplicationSJLB)mContext.getApplication();
+                            appSJLB.initUserContactList();
+                            
+                        } else {
+                            Log.e(LOG_TAG, "fetchNewContent: no <user> XML content");
+                        }
+                        
                         ///////////////////////////////////////////////////////////////////////////
                         // Récupère la liste des Messages "non lus" sur le site SJLB, pour gérer les notifications
                         // (Note : on vient de transmettre au site l'éventuelle liste des messages lus localement sur l'appli, donc il est au courant)
@@ -341,7 +418,8 @@ public class API {
                             Log.i(LOG_TAG, "clearMsgUnread = " + nbCleared);
                         }
                         
-                        // TODO SRombauts : récupérer de même la liste des PM pour être capable de détecter ceux qui ont été supprimés, et les supprimer !
+                        // TODO SRombauts : récupérer la liste des PM supprimés
+                        // TODO SRombauts : récupérer la liste des Msg supprimés
                                                 
                         ///////////////////////////////////////////////////////////////////////////
                         // Récupère la liste des Sujets
@@ -472,8 +550,8 @@ public class API {
                         // Récupère la liste des PM
                         NodeList    listPM = eltDocument.getElementsByTagName(NODE_NAME_PRIVATE_MSG);
                         if (null != listPM) {
-                            nbNewPM = listPM.getLength();
-                            for (int i = 0; i < nbNewPM; i++) {
+                            int nbPM = listPM.getLength();
+                            for (int i = 0; i < nbPM; i++) {
                                 Element eltPm       = (Element)listPM.item(i);
                                 
                                 String  strText     = eltPm.getFirstChild().getNodeValue();
@@ -490,6 +568,11 @@ public class API {
                                 
                                 Log.d(LOG_TAG, "PM " + idPM + " ("+ idAuthor +") " + strDate + " : '"  + strText + "' (" + strText.length()+ ")");
                                 
+                                // Compte les nouveaux pm envoyés à l'utilisateur par les autres (ie, à l'exclusion des pm envoyés par l'utilisateur lui même)
+                                if (((ApplicationSJLB)mContext.getApplication ()).getUserId() != idAuthor) {
+                                    nbNewPM++;
+                                }
+                                
                                 PrivateMessage newPM = new PrivateMessage(idPM, date, idAuthor, idDest, strText);
                                 
                                 // Renseigne la bdd
@@ -500,65 +583,6 @@ public class API {
                             }
                         } else {
                             Log.e(LOG_TAG, "fetchNewContent: no <pm> XML content");
-                        }
-
-                        ///////////////////////////////////////////////////////////////////////////
-                        // Récupère la liste des utilisateurs
-                        NodeList    listUser = eltDocument.getElementsByTagName(NODE_NAME_USER);
-                        if (null != listUser) {
-                            int nbUsers = listUser.getLength();
-                            for (int i = 0; i < nbUsers; i++) {
-                                Element eltUser        = (Element)listUser.item(i);
-        
-                                String  strIdUser   = eltUser.getAttribute(ATTR_NAME_USER_ID);
-                                int     idUser      = Integer.parseInt(strIdUser);
-                                String  strPseudo   = eltUser.getAttribute(ATTR_NAME_USER_PSEUDO);
-                                String  strName     = eltUser.getAttribute(ATTR_NAME_USER_NAME);
-                                String  strDateMaj  = eltUser.getAttribute(ATTR_NAME_USER_DATE_MAJ);
-                                long    longDateMaj = (long)Integer.parseInt(strDateMaj);
-                                Date    dateMaj     = new Date(longDateMaj*1000);
-
-                                String  strAddress  = null;
-                                String  strNotes    = null;
-
-                                // Récupère l'adresse de l'utilisateur
-                                NodeList    listAddr = eltUser.getElementsByTagName(NODE_NAME_FORUM_ADDRESS);
-                                if (null != listAddr) {
-                                    Element eltAddr = (Element)listAddr.item(0);
-                                    Node    txtAddr = eltAddr.getFirstChild();
-                                    if (null != txtAddr) {
-                                        strAddress  = eltAddr.getFirstChild().getNodeValue();
-                                    }
-                                }
-                                
-                                // Récupère les notes complémentaires à l'adresse de l'utilisateur
-                                NodeList    listNotes = eltUser.getElementsByTagName(NODE_NAME_FORUM_NOTES);
-                                if (null != listNotes) {
-                                    Element eltNotes = (Element)listNotes.item(0);
-                                    Node    txtNotes = eltNotes.getFirstChild();
-                                    if (null != txtNotes) {
-                                        strNotes  = txtNotes.getNodeValue();
-                                    }
-                                }
-                                
-                                Log.d(LOG_TAG, "User " + idUser + " " + strPseudo + " " + strName);
-                                
-                                User newUser = new User(idUser, strPseudo, strName, strAddress, strNotes, dateMaj);
-                                
-                                // Update l'utilisateur s'il existe déjà, sinon l'insert
-                                if (mUserDBAdapter.isExist(idUser)) {
-                                    mUserDBAdapter.updateUser(newUser);
-                                } else {
-                                    mUserDBAdapter.insertUser(newUser);
-                                }
-                            }
-                            
-                            // Ré-initialise la liste des utilisateurs
-                            ApplicationSJLB appSJLB = (ApplicationSJLB)mContext.getApplication();
-                            appSJLB.initUserContactList();
-                            
-                        } else {
-                            Log.e(LOG_TAG, "fetchNewContent: no <user> XML content");
                         }
                         
                         //////////////////////////////////////////////////////////////
