@@ -19,7 +19,7 @@ public class PrivateMessage {
         mId         = aId;
         mDate       = aDate;
         mAuthorId   = aAuthorId;
-        mAuthorId   = aDestId;
+        mDestId     = aDestId;
         mText       = aText;
     }
     
