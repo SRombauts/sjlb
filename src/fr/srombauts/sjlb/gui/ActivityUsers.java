@@ -167,15 +167,14 @@ public class ActivityUsers extends ActivityTouchListener {
             cache.notesView.setText(notes);
 
             // Récupère le contact éventuellement associé à l'utilisateur (Uri et photo)
-            ApplicationSJLB appSJLB = (ApplicationSJLB)getApplication ();
             int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.User._ID));
-            UserContactDescr user = appSJLB.mUserContactList.get(userId);
+            UserContactDescr user = ((ApplicationSJLB)getApplication ()).getUserContactList().get(userId);
             // Fixe la barre de QuickContact
-            cache.quickContactView.assignContactUri(user.mLookupUri);
+            cache.quickContactView.assignContactUri(user.getLookupUri());
             
             // Affiche la photo du contact si elle existe (sinon petite icône de robot par défaut)
-            if (null != user.mPhoto) {
-                cache.quickContactView.setImageBitmap(user.mPhoto);
+            if (null != user.getPhoto()) {
+                cache.quickContactView.setImageBitmap(user.getPhoto());
             } else {
                 cache.quickContactView.setImageResource(R.drawable.ic_contact_picture);
             }

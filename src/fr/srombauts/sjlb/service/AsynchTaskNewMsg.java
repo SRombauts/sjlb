@@ -101,8 +101,8 @@ public class AsynchTaskNewMsg extends AsyncTask<String, Void, Boolean> {
                
             // Ajout des paramètres
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);  
-            nameValuePairs.add(new BasicNameValuePair("login",          loginPassword.mLogin));  
-            nameValuePairs.add(new BasicNameValuePair("password",       loginPassword.mPasswordMD5));
+            nameValuePairs.add(new BasicNameValuePair("login",          loginPassword.getLogin()));  
+            nameValuePairs.add(new BasicNameValuePair("password",       loginPassword.getPasswordMD5()));
             if (0 < lastMsgDate) {
                 nameValuePairs.add(new BasicNameValuePair("date_dernier", Long.toString(lastMsgDate)));
                 Log.d(LOG_TAG, "fetchMsg (" + lastMsgDate + ")");

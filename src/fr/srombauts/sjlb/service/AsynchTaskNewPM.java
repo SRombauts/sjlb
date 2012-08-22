@@ -114,8 +114,8 @@ public class AsynchTaskNewPM extends AsyncTask<String, Void, Boolean> {
                
             // Ajout des paramètres
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);  
-            nameValuePairs.add(new BasicNameValuePair("login",              loginPassword.mLogin));  
-            nameValuePairs.add(new BasicNameValuePair("password",           loginPassword.mPasswordMD5));
+            nameValuePairs.add(new BasicNameValuePair("login",              loginPassword.getLogin()));  
+            nameValuePairs.add(new BasicNameValuePair("password",           loginPassword.getPasswordMD5()));
             nameValuePairs.add(new BasicNameValuePair("id_destinataire",    aIdDestinataire));
             nameValuePairs.add(new BasicNameValuePair("Message",            aText));
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  

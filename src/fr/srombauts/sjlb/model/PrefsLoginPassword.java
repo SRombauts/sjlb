@@ -15,8 +15,16 @@ import android.preference.PreferenceManager;
  * Récupération et encapsulation du couple login/password renseigné dans les préférences
 */
 public class PrefsLoginPassword {
-    public String mLogin;
-    public String mPasswordMD5;
+    private String mLogin;
+    private String mPasswordMD5;
+
+    // Accesseurs simples (optimisés en release par ProGuard)
+    public String getLogin() {
+        return mLogin;
+    }
+    public String getPasswordMD5() {
+        return mPasswordMD5;
+    }
 
     // Interdiction du constructeur par défaut
     @SuppressWarnings("unused")

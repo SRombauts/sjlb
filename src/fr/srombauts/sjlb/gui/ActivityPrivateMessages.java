@@ -65,9 +65,9 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
         setContentView(R.layout.activity_list);
         setTitle(getString(R.string.pm_description));
         
-        // Récupère un curseur sur les données (les messages Privés) 
+        // Récupère un curseur sur les données (les messages Privés) en filtrant sur l'Id de l'utilisateur de l'appli SJLB 
         mCursor = managedQuery( SJLB.PM.CONTENT_URI, null,
-                                null,// TODO SRombauts filtrer : SJLB.PM.DEST_ID + "=" + mUserId,
+                                SJLB.PM.DEST_ID + "=" + ((ApplicationSJLB)getApplication ()).getUserId(),
                                 null, null);
 
         // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
@@ -325,10 +325,10 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
             
             // Récupère le pseudo et le contact (Uri et photo) éventuellement associé à l'utilisateur
             int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.AUTHOR_ID));
-            UserContactDescr user = ((ApplicationSJLB)getApplication ()).mUserContactList.get(userId);
+            UserContactDescr user = ((ApplicationSJLB)getApplication ()).getUserContactList().get(userId);
             
             // Fixe les infos du message 
-            String  pseudo = user.mPseudo; // on utilise le pseudo fourni par la liste d'utilisateur, plus simple qu'un croisement en bdd
+            String  pseudo = user.getPseudo(); // on utilise le pseudo fourni par la liste d'utilisateur, plus simple qu'un croisement en bdd
             cache.pseudoView.setText(pseudo);
             String  strDate = ForumMessage.getDateString (new Date(cursor.getLong(cursor.getColumnIndexOrThrow(SJLB.PM.DATE)))) ;
             cache.dateView.setText(strDate);
@@ -337,11 +337,11 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
             cache.textView.setText(text);
 
             // Fixe la barre de QuickContact
-            cache.quickContactView.assignContactUri(user.mLookupUri);
+            cache.quickContactView.assignContactUri(user.getLookupUri());
             
             // Affiche la photo du contact si elle existe (sinon petite icône de robot par défaut)
-            if (null != user.mPhoto) {
-                cache.quickContactView.setImageBitmap(user.mPhoto);
+            if (null != user.getPhoto()) {
+                cache.quickContactView.setImageBitmap(user.getPhoto());
             } else {
                 cache.quickContactView.setImageResource(R.drawable.ic_contact_picture);
             }

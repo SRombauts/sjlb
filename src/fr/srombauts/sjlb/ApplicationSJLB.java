@@ -12,6 +12,8 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
 import android.util.Log;
 import fr.srombauts.sjlb.db.SJLB;
+import fr.srombauts.sjlb.model.LoginPasswordEmptyException;
+import fr.srombauts.sjlb.model.PrefsLoginPassword;
 import fr.srombauts.sjlb.model.UserContactDescr;
 import fr.srombauts.sjlb.service.IntentReceiverStartService;
 import fr.srombauts.sjlb.service.StartService;
@@ -48,7 +50,19 @@ public class ApplicationSJLB extends Application {
     */
     
     // Liste des contacts Google correspondant aux utilisateurs du site
-    public Vector<UserContactDescr> mUserContactList    = null;
+    private Vector<UserContactDescr>    mUserContactList    = null;
+
+    // Id de l'utilisateur de l'application
+    private int                         mUserId             = 0;
+    
+    // Accesseur simple (optimisé en release par ProGuard)
+    public final Vector<UserContactDescr> getUserContactList() {
+        return mUserContactList;
+    }
+    // Accesseur simple (optimisé en release par ProGuard)
+    public final int getUserId() {
+        return mUserId;
+    }
     
     /**
      * Appelée lorsque l'application démarre, avant toute autre activité
@@ -111,15 +125,15 @@ public class ApplicationSJLB extends Application {
                     // Fixe la barre de QuickContact
                     final long      contactId = subCursor.getLong(subCursor.getColumnIndexOrThrow(Contacts._ID));
                     final String    lookupKey = subCursor.getString(subCursor.getColumnIndexOrThrow(Contacts.LOOKUP_KEY));
-                    user.mLookupUri = Contacts.getLookupUri(contactId, lookupKey);
+                    user.setLookupUri(Contacts.getLookupUri(contactId, lookupKey));
                     
                     // Ouvre la photo du contact
                     Uri         uri             = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId);
                     InputStream photoDataStream = Contacts.openContactPhotoInputStream(getContentResolver(), uri);
                     if (null != photoDataStream) {
-                        user.mPhoto = BitmapFactory.decodeStream(photoDataStream);
+                        user.setPhoto(BitmapFactory.decodeStream(photoDataStream));
                     } else {
-                        user.mPhoto = null;
+                        user.setPhoto(null);
                     }
                 }
                 
@@ -131,5 +145,28 @@ public class ApplicationSJLB extends Application {
         }
         
         cursor.close();
+        
+        
+        // Recherche l'id de l'utilisateur de l'application à partir de son login
+        try {
+            // Utilise les préférences pour récupérer le login/mot de passe de l'utilisateur
+            PrefsLoginPassword loginPassword = new PrefsLoginPassword(this);
+            // (pour des problèmes de comparaison de chaîne sensible à la casse, on ne peut utiliser mUserContactList.indexOf(loginPassword.getLogin());)
+            int i=1;
+            while ( (0 == mUserId) && (i < mUserContactList.size()) ) {
+                if (mUserContactList.get(i).getPseudo().equalsIgnoreCase(loginPassword.getLogin())) {
+                    mUserId = i;
+                }
+                i++;
+            }
+            if (0 < mUserId) {
+                Log.i(LOG_TAG, "L'utilisateur " + loginPassword.getLogin() + " dispose de l'id " + mUserId);
+            } else {
+                Log.e(LOG_TAG, "Pas d'utilisateur correspondant au login " + loginPassword.getLogin());
+            }
+        } catch (LoginPasswordEmptyException e) {
+            e.printStackTrace();
+        }
+
     }
 }

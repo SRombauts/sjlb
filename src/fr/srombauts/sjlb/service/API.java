@@ -268,8 +268,8 @@ public class API {
 
             // commence par les 2 infos de login et le password
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(12);
-            nameValuePairs.add(new BasicNameValuePair(PARAM_LOGIN,      loginPassword.mLogin));  
-            nameValuePairs.add(new BasicNameValuePair(PARAM_PASSWORD,   loginPassword.mPasswordMD5));
+            nameValuePairs.add(new BasicNameValuePair(PARAM_LOGIN,      loginPassword.getLogin()));  
+            nameValuePairs.add(new BasicNameValuePair(PARAM_PASSWORD,   loginPassword.getPasswordMD5()));
             // et si disponibles (ie après la première fois) les 2 dates du plus vieux et du plus récent message
             nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_FIRST_MSG, Long.toString(dateFirstMsg)));
             nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_LAST_MSG,  Long.toString(dateLastMsg)));

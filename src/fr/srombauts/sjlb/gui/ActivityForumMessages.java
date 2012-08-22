@@ -362,10 +362,10 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             
             // Récupère le pseudo et le contact (Uri et photo) éventuellement associé à l'utilisateur
             int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.AUTHOR_ID));
-            UserContactDescr user = ((ApplicationSJLB)getApplication ()).mUserContactList.get(userId);
+            UserContactDescr user = ((ApplicationSJLB)getApplication ()).getUserContactList().get(userId);
             
             // Fixe la barre d'informations du message 
-            String  pseudo = user.mPseudo; // on utilise le pseudo fourni par la liste d'utilisateur, plus simple qu'un croisement en bdd
+            String  pseudo = user.getPseudo(); // on utilise le pseudo fourni par la liste d'utilisateur, plus simple qu'un croisement en bdd
             cache.pseudoView.setText(pseudo);
             String  strDate = ForumMessage.getDateString (new Date(cursor.getLong(cursor.getColumnIndexOrThrow(SJLB.Msg.DATE)))) ;
             cache.dateView.setText(strDate);
@@ -377,11 +377,11 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             cache.imageViewNew.setVisibility(bIsNew?ImageView.VISIBLE:ImageView.INVISIBLE); 
 
             // Fixe la barre de QuickContact
-            cache.quickContactView.assignContactUri(user.mLookupUri);
+            cache.quickContactView.assignContactUri(user.getLookupUri());
             
             // Affiche la photo du contact si elle existe (sinon petite icône de robot par défaut)
-            if (null != user.mPhoto) {
-                cache.quickContactView.setImageBitmap(user.mPhoto);
+            if (null != user.getPhoto()) {
+                cache.quickContactView.setImageBitmap(user.getPhoto());
             } else {
                 cache.quickContactView.setImageResource(R.drawable.ic_contact_picture);
             }

@@ -22,7 +22,11 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         super(aContext, aName, aFactory, aVersion);
     }
     
-    // Création des tables de la base si celle si est inexistante (ou n'était pas à jour)
+    /**
+     * Création des tables de la base si celle si est inexistante.
+     * 
+     * Voir onUpgrade() pour les cas où le schéma de bdd n'est pas à jour
+     */
     public void onCreate(SQLiteDatabase aDatabase) {
         Log.d(LOG_TAG, "onCreate");
         aDatabase.execSQL(SJLB.PM.TABLE_CREATE);

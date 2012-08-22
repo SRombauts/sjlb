@@ -102,8 +102,8 @@ public class AsynchTaskDeletePM extends AsyncTask<String, Void, Void> {
                
             // Ajout des paramètres
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);  
-            nameValuePairs.add(new BasicNameValuePair("login",      loginPassword.mLogin));  
-            nameValuePairs.add(new BasicNameValuePair("password",   loginPassword.mPasswordMD5));
+            nameValuePairs.add(new BasicNameValuePair("login",      loginPassword.getLogin()));  
+            nameValuePairs.add(new BasicNameValuePair("password",   loginPassword.getPasswordMD5()));
             nameValuePairs.add(new BasicNameValuePair("id_message", aPmIdToDelete));
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
             
