@@ -162,13 +162,32 @@ public class ContentProviderMsg extends ContentProvider {
     }
     
     // récupère un cursor avec la liste des Msg marqués UNREAD_LOCALY non lus mais localement lus 
-    public Cursor getMsgUnread () {
+    public Cursor getMsgUnreadLocaly () {
         final String[] columns  = {SJLB.Msg._ID};
         final String   selection= SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_LOCALY;
         return mDBHelper.getReadableDatabase().query(   SJLB.Msg.TABLE_NAME,
                                                         columns,
                                                         selection, null,
                                                         null, null, null);
+    }
+    
+    // Établit la liste des messages lus localement
+    public String getListMsgUnreadLocaly() {
+        String listMsgUnread = "";
+        Cursor cursor = getMsgUnreadLocaly ();
+        int    nbMsgLus = cursor.getCount ();
+        if (0 < nbMsgLus) {
+            if (cursor.moveToFirst ()) {
+                do {
+                    if (listMsgUnread != "") {
+                        listMsgUnread += ",";
+                    }
+                    listMsgUnread += cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg._ID));
+                } while (cursor.moveToNext ());
+            }
+        }
+        cursor.close ();
+        return listMsgUnread;
     }
     
     // Efface les flags UNREAD_LOCALY des messages lus localement

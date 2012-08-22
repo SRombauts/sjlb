@@ -32,7 +32,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.database.Cursor;
 import android.net.ParseException;
 import android.os.Build;
 import android.util.Log;
@@ -43,7 +42,6 @@ import fr.srombauts.sjlb.db.ContentProviderMsg;
 import fr.srombauts.sjlb.db.ContentProviderPM;
 import fr.srombauts.sjlb.db.ContentProviderSubj;
 import fr.srombauts.sjlb.db.ContentProviderUser;
-import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.gui.ActivityMain;
 import fr.srombauts.sjlb.gui.ActivityPrivateMessages;
 import fr.srombauts.sjlb.model.AttachedFile;
@@ -237,22 +235,7 @@ public class API {
             long dateLastUpdateUser = mUserDBAdapter.getDateLastUpdateUser();
             
             // Établi la liste des messages lus localement, à transmettre au site SJLB pour qu'il se mette à jour
-            // TODO SRombauts : déplacer ce qui suit dans une méthode dédiée
-            Cursor cursor = mMsgDBAdapter.getMsgUnread ();
-            String strMsgLus = "";
-            int    nbMsgLus = cursor.getCount ();
-            if (0 < nbMsgLus) {
-                if (cursor.moveToFirst ()) {
-                    do {
-                        Log.v(LOG_TAG, "refreshInfos id_msg_non_lu=" + cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg._ID)));
-                        if (strMsgLus != "") {
-                            strMsgLus += ",";
-                        }
-                        strMsgLus += cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg._ID));
-                    } while (cursor.moveToNext ());
-                }
-            }
-            cursor.close ();
+            String strMsgLus = mMsgDBAdapter.getListMsgUnreadLocaly ();
             
             // Instancie un client HTTP et un header de requête "POST"  
             HttpClient  httpClient  = new DefaultHttpClient();  
@@ -278,11 +261,10 @@ public class API {
             nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_LAST_USER, Long.toString(dateLastUpdateUser)));
             
             // puis l'éventuelle liste des messages lus localement
-            if (0 < nbMsgLus) {
-                Log.d(LOG_TAG, "strMsgLus=" + strMsgLus);
+            if (0 < strMsgLus.length()) {
                 nameValuePairs.add(new BasicNameValuePair(PARAM_LIST_MSG_LUS, strMsgLus));
             }
-            
+
             Log.i(LOG_TAG, "fetchNewContent (" + dateFirstMsg + "," + dateLastMsg + "," + idLastPM + "," + dateLastUpdateUser + " {" + strMsgLus + "} )");
 
             // y ajoute les 5 informations de version de l'équipement et de l'application
@@ -320,7 +302,8 @@ public class API {
                     if (null == eltLoginError) {
     
                         ///////////////////////////////////////////////////////////////////////////
-                        // Récupère la liste des Messages toujours non lus sur le site, pour gérer les notifications
+                        // Récupère la liste des Messages "non lus" sur le site SJLB, pour gérer les notifications
+                        // (Note : on vient de transmettre au site l'éventuelle liste des messages lus localement sur l'appli, donc il est au courant)
                         NodeList    listUnreadMsg = eltDocument.getElementsByTagName(NODE_NAME_FORUM_UNREAD);
                         if (null != listUnreadMsg) {
                             nbUnreadMsg = listUnreadMsg.getLength();
@@ -350,6 +333,15 @@ public class API {
                         } else {
                             Log.e(LOG_TAG, "fetchNewContent: no <unread> XML content");
                         }                        
+
+                        // Efface les flags UNREAD_LOCALY des messages lus localement puisqu'on a transmis l'info au serveur
+                        // (Note SRO : fait ici avant de récupérer les nouveaux messages, ainsi un message modifié peut être re-flagué non lus)
+                        if (0 < strMsgLus.length()) {
+                            int nbCleared = mMsgDBAdapter.clearMsgUnread ();
+                            Log.i(LOG_TAG, "clearMsgUnread = " + nbCleared);
+                        }
+                        
+                        // TODO SRombauts : récupérer de même la liste des PM pour être capable de détecter ceux qui ont été supprimés, et les supprimer !
                                                 
                         ///////////////////////////////////////////////////////////////////////////
                         // Récupère la liste des Sujets
@@ -573,12 +565,6 @@ public class API {
                         // Arrivé ici, c'est qu'il n'y a manifestement pas eu d'erreur (pas d'exception)
                         bSuccess = true;
 
-                        // Efface les flags UNREAD_LOCALY des messages lus localement
-                        if (0 < nbMsgLus) {
-                            int nbCleared = mMsgDBAdapter.clearMsgUnread ();
-                            Log.i(LOG_TAG, "clearMsgUnread = " + nbCleared);
-                        }
-                        
                         //////////////////////////////////////////////////////////////
                         // En fin de refresh : affiche les éventuelles notifications !
                         // Notification dans la barre de status s'il y a de nouveaux PM
