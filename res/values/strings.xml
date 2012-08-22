@@ -4,7 +4,10 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Improved service usage\n
+        - Screens now refresh automatically when possible\n
+        - Reworked the background service\n
+        - Added informations about users\n
+        - Small design improvements\n
     </string>
     <string name="loginscreen_title">   Login/password                                          </string>
     <string name="loginscreen_message"> Enter your login and password in the preferences menu   </string>

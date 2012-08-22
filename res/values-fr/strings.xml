@@ -4,7 +4,10 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Amélioration de l\'utilisation du service\n
+        - Désormais les écrans se rafraîchissent automatiquement lorsque de nouveaux messages sont disponibles\n
+        - Reconception du service de synchronisation\n
+        - Ajouts d\'informations sur les utilisateurs (addresses et notes éventuellement associées)\n
+        - Quelques amélioration du design\n
     </string>
     <string name="loginscreen_title">   Login et mot de passe                                                           </string>
     <string name="loginscreen_message"> Veuillez saisir votre login et votre mot de passe dans le menu des préférences  </string>
