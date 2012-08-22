@@ -38,10 +38,11 @@ public class ActivityUsers extends ActivityTouchListener {
         setContentView(R.layout.activity_list);
         setTitle(getString(R.string.user_description));
         
-        // Récupère un curseur sur les données (les membres) 
+        // Récupère un curseur sur les données (les membres, classé par ordre alphabétique de pseudo)
         mCursor = managedQuery( SJLB.User.CONTENT_URI, null,
                                 null,
-                                null, null);
+                                null,
+                                SJLB.User.PSEUDO_SORT_ORDER);
 
         // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
         mAdapter = new UserListItemAdapter( this,

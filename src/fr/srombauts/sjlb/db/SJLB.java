@@ -464,6 +464,11 @@ public final class SJLB {
          */
         public static final String  DEFAULT_SORT_ORDER  = _ID + " ASC";
 
+        /**
+         * The default sort order for this table
+         */
+        public static final String  PSEUDO_SORT_ORDER  = PSEUDO + " ASC";
+
 
         public static final String  TABLE_NAME   = "users";
 

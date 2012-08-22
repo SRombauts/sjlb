@@ -73,14 +73,16 @@ public class ContentProviderUser extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri arg0, String[] arg1, String arg2, String[] arg3,
-            String arg4) {
-        // TODO prendre en compte les paramètres pour faire la bonne requête !
-        return mDBHelper.getReadableDatabase().query(   SJLB.User.TABLE_NAME,
-                null, null, null, // toutes les colonnes, pas de sélection
-                null, null, null);
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        return mDBHelper.getReadableDatabase().query(
+                SJLB.User.TABLE_NAME,
+                projection, selection, selectionArgs,
+                null, // groupBy
+                null, // having
+                (null!=sortOrder)?sortOrder:SJLB.User.DEFAULT_SORT_ORDER
+                );
     }
-
+    
     @Override
     public int update(Uri arg0, ContentValues arg1, String arg2, String[] arg3) {
         // Auto-generated method stub
