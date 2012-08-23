@@ -70,7 +70,7 @@ public class ApplicationSJLB extends Application {
     @Override
     public void onCreate () {
         super.onCreate();
-        Log.e(LOG_TAG, "onCreate");
+        Log.d(LOG_TAG, "onCreate");
         
         // Lance l'alarme périodique, et le service, si pas déjà lancé, et provoque un rafraîchissement
         IntentReceiverStartService.startAlarm(this, LOG_TAG);
@@ -87,7 +87,7 @@ public class ApplicationSJLB extends Application {
     */
     public void onTerminate () {
         super.onTerminate();
-        Log.e(LOG_TAG, "onTerminate");
+        Log.d(LOG_TAG, "onTerminate");
         
         // Provoque un rafraîchissement des infos anticipé,
         // qui permet de signaler au site web SJLB les messages qui ont été lus   
@@ -96,7 +96,7 @@ public class ApplicationSJLB extends Application {
     
     // Renseigne la liste des contacts Google correspondant aux utilisateurs du site
     synchronized public void initUserContactList () {
-        Log.e(LOG_TAG, "initUserContactList");
+        Log.i(LOG_TAG, "initUserContactList");
 
         // Liste les utilisateurs du site
         Cursor cursor = getContentResolver().query (SJLB.User.CONTENT_URI,
@@ -168,7 +168,5 @@ public class ApplicationSJLB extends Application {
         } catch (LoginPasswordEmptyException e) {
             e.printStackTrace();
         }
-
-        Log.e(LOG_TAG, "initUserContactList done : " + mUserContactList.size() + " !");        
     }
 }

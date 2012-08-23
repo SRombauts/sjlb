@@ -322,8 +322,8 @@ public class API {
                         // Récupère la liste des utilisateurs
                         // (en premier car la liste des utilisateurs est nécessaire pour la suite !)
                         NodeList    listUser = eltDocument.getElementsByTagName(NODE_NAME_USER);
-                        if (null != listUser) {
-                            int nbUsers = listUser.getLength();
+                        int nbUsers = listUser.getLength();
+                        if (0 < nbUsers) {
                             for (int i = 0; i < nbUsers; i++) {
                                 Element eltUser        = (Element)listUser.item(i);
         
@@ -340,22 +340,18 @@ public class API {
 
                                 // Récupère l'adresse de l'utilisateur
                                 NodeList    listAddr = eltUser.getElementsByTagName(NODE_NAME_FORUM_ADDRESS);
-                                if (null != listAddr) {
-                                    Element eltAddr = (Element)listAddr.item(0);
-                                    Node    txtAddr = eltAddr.getFirstChild();
-                                    if (null != txtAddr) {
-                                        strAddress  = eltAddr.getFirstChild().getNodeValue();
-                                    }
+                                Element eltAddr = (Element)listAddr.item(0);
+                                Node    txtAddr = eltAddr.getFirstChild();
+                                if (null != txtAddr) {
+                                    strAddress  = eltAddr.getFirstChild().getNodeValue();
                                 }
                                 
                                 // Récupère les notes complémentaires à l'adresse de l'utilisateur
                                 NodeList    listNotes = eltUser.getElementsByTagName(NODE_NAME_FORUM_NOTES);
-                                if (null != listNotes) {
-                                    Element eltNotes = (Element)listNotes.item(0);
-                                    Node    txtNotes = eltNotes.getFirstChild();
-                                    if (null != txtNotes) {
-                                        strNotes  = txtNotes.getNodeValue();
-                                    }
+                                Element eltNotes = (Element)listNotes.item(0);
+                                Node    txtNotes = eltNotes.getFirstChild();
+                                if (null != txtNotes) {
+                                    strNotes  = txtNotes.getNodeValue();
                                 }
                                 
                                 Log.d(LOG_TAG, "User " + idUser + " " + strPseudo + " " + strName);
@@ -369,21 +365,23 @@ public class API {
                                     mUserDBAdapter.insertUser(newUser);
                                 }
                             }
+
+                            Log.i(LOG_TAG, "fetchNewContent: nbUsers=" + nbUsers);
                             
                             // Ré-initialise la liste des utilisateurs
                             ApplicationSJLB appSJLB = (ApplicationSJLB)mContext.getApplication();
                             appSJLB.initUserContactList();
                             
                         } else {
-                            Log.e(LOG_TAG, "fetchNewContent: no <user> XML content");
+                            Log.d(LOG_TAG, "fetchNewContent: no <user> XML content");
                         }
                         
                         ///////////////////////////////////////////////////////////////////////////
                         // Récupère la liste des Messages "non lus" sur le site SJLB, pour gérer les notifications
                         // (Note : on vient de transmettre au site l'éventuelle liste des messages lus localement sur l'appli, donc il est au courant)
                         NodeList    listUnreadMsg = eltDocument.getElementsByTagName(NODE_NAME_FORUM_UNREAD);
-                        if (null != listUnreadMsg) {
-                            nbUnreadMsg = listUnreadMsg.getLength();
+                        nbUnreadMsg = listUnreadMsg.getLength();
+                        if (0 < nbUnreadMsg) {
                             for (int i = 0; i < nbUnreadMsg; i++) {
                                 Element eltMsg      = (Element)listUnreadMsg.item(i);
                                 String  strIdMsg    = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_ID);
@@ -407,8 +405,9 @@ public class API {
                                     }
                                 }
                             }
+                            Log.i(LOG_TAG, "fetchNewContent: nbUnreadMsg=" + nbUnreadMsg);
                         } else {
-                            Log.e(LOG_TAG, "fetchNewContent: no <unread> XML content");
+                            Log.d(LOG_TAG, "fetchNewContent: no <unread> XML content");
                         }                        
 
                         // Efface les flags UNREAD_LOCALY des messages lus localement puisqu'on a transmis l'info au serveur
@@ -424,9 +423,8 @@ public class API {
                         ///////////////////////////////////////////////////////////////////////////
                         // Récupère la liste des Sujets
                         NodeList    listSubj = eltDocument.getElementsByTagName(NODE_NAME_FORUM_SUBJ);
-                        if (null != listSubj) {
-                            int nbSubj = listSubj.getLength();
-                            Log.d(LOG_TAG, "listSubj.getLength() = " + nbSubj);
+                        int nbSubj = listSubj.getLength();
+                        if (0 < nbSubj) {
                             for (int i = 0; i < nbSubj; i++) {
                                 Element eltSubj     = (Element)listSubj.item(i);
                                 
@@ -461,15 +459,16 @@ public class API {
                                 }
                                 
                             }
+                            Log.i(LOG_TAG, "fetchNewContent: nbSubj=" + nbSubj);
                         } else {
-                            Log.e(LOG_TAG, "fetchNewContent: no <sujet> XML content");
+                            Log.d(LOG_TAG, "fetchNewContent: no <sujet> XML content");
                         }
                         
                         ///////////////////////////////////////////////////////////////////////////
                         // Récupère la liste des Msg
                         NodeList    listMsg = eltDocument.getElementsByTagName(NODE_NAME_FORUM_MSG);
-                        if (null != listMsg) {
-                            int nbMsg = listMsg.getLength();
+                        int nbMsg = listMsg.getLength();
+                        if (0 < nbMsg) {
                             Log.d(LOG_TAG, "listMsg.getLength() = " + nbMsg);
                             for (int i = 0; i < nbMsg; i++) {
                                 Element eltMsg      = (Element)listMsg.item(i);
@@ -523,34 +522,32 @@ public class API {
     
                                 // Récupère la liste des fichiers attachés au Msg
                                 NodeList    listFile = eltMsg.getElementsByTagName(NODE_NAME_FORUM_FILE);
-                                if (null != listFile) {
-                                    int nbFile = listFile.getLength();
-                                    Log.v(LOG_TAG, "listFile.getLength() = " + nbFile);
-                                    for (int j = 0; j < nbFile; j++) {
-                                        Element eltFile     = (Element)listFile.item(j);
-                                        String  fileName    = eltFile.getFirstChild().getNodeValue();
-    
-                                        AttachedFile newAttachedFile = new AttachedFile(idMsg, fileName);
-                                        Log.d(LOG_TAG, "Fichier " + newAttachedFile);
-                                        
-                                        // TODO SRombauts : BUG ! supprimer d'abord tout fichier attachés pour cet ID de message !
-                                        if (mFileDBAdapter.insertFile(newAttachedFile)) {
-                                            Log.d(LOG_TAG, "AttachedFile " + fileName + " inserted");                                
-                                        } else {
-                                            Log.e(LOG_TAG, "AttachedFile " + fileName + " NOT inserted !");
-                                        }
+                                int nbFile = listFile.getLength();
+                                for (int j = 0; j < nbFile; j++) {
+                                    Element eltFile     = (Element)listFile.item(j);
+                                    String  fileName    = eltFile.getFirstChild().getNodeValue();
+
+                                    AttachedFile newAttachedFile = new AttachedFile(idMsg, fileName);
+                                    Log.d(LOG_TAG, "Fichier " + newAttachedFile);
+                                    
+                                    // TODO SRombauts : BUG ! supprimer d'abord tout fichier attachés pour cet ID de message !
+                                    if (mFileDBAdapter.insertFile(newAttachedFile)) {
+                                        Log.d(LOG_TAG, "AttachedFile " + fileName + " inserted");                                
+                                    } else {
+                                        Log.e(LOG_TAG, "AttachedFile " + fileName + " NOT inserted !");
                                     }
                                 }
                             }
+                            Log.i(LOG_TAG, "fetchNewContent: nbMsg=" + nbMsg);
                         } else {
-                            Log.e(LOG_TAG, "fetchNewContent: no <msg> XML content");
+                            Log.d(LOG_TAG, "fetchNewContent: no <msg> XML content");
                         }
 
                         ///////////////////////////////////////////////////////////////////////////
                         // Récupère la liste des PM
                         NodeList    listPM = eltDocument.getElementsByTagName(NODE_NAME_PRIVATE_MSG);
-                        if (null != listPM) {
-                            int nbPM = listPM.getLength();
+                        int nbPM = listPM.getLength();
+                        if (0 < nbPM) {
                             for (int i = 0; i < nbPM; i++) {
                                 Element eltPm       = (Element)listPM.item(i);
                                 
@@ -581,8 +578,9 @@ public class API {
                                     Log.d(LOG_TAG, "PM " + idPM + " inserted");                                
                                 }
                             }
+                            Log.i(LOG_TAG, "fetchNewContent: nbPM=" + nbPM);
                         } else {
-                            Log.e(LOG_TAG, "fetchNewContent: no <pm> XML content");
+                            Log.d(LOG_TAG, "fetchNewContent: no <pm> XML content");
                         }
                         
                         //////////////////////////////////////////////////////////////

@@ -153,7 +153,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         final String    whereMsg        = "(" + SJLB.Msg.SUBJECT_ID + "=? AND " + SJLB.Msg.UNREAD + "=" + SJLB.Msg.UNREAD_TRUE + ")";
         final String[]  selectionArgs   = {Long.toString(mSelectedSubjectId)};  // L'utilisation de "?" optimise la compilation SQL
         final int nbUpdatedRows = getContentResolver ().update(SJLB.Msg.CONTENT_URI, valuesMsg, whereMsg, selectionArgs);
-        Log.w (LOG_TAG, "nbUpdatedRows=" + nbUpdatedRows);
+        Log.i (LOG_TAG, "nbUpdatedRows=" + nbUpdatedRows);
         
         // Met à zéro le nombre de messages non lus restant dans le sujet
         ContentValues valuesSubj = new ContentValues();
@@ -161,7 +161,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         final String whereSubj = "(" + SJLB.Subj._ID + "=?)";
         // NOTE : selectionArgs est identique
         final int nbUpdatedRowsSubj = getContentResolver ().update(SJLB.Subj.CONTENT_URI, valuesSubj, whereSubj, selectionArgs);
-        Log.w (LOG_TAG, "nbUpdatedRowsSubj=" + nbUpdatedRowsSubj);
+        Log.i (LOG_TAG, "nbUpdatedRowsSubj=" + nbUpdatedRowsSubj);
         
         // Demande à être notifié des résultats des actions réalisées par le service
         mResponseReceiver = new ResponseReceiver(this);
