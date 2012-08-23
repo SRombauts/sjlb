@@ -134,6 +134,15 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         mMsgListView.setOnItemLongClickListener(this);
         mMsgListView.setOnTouchListener(this);
         mMsgListView.getRootView().setOnTouchListener(this);
+        
+        // Restaure un éventuel état sauvegardé (état de la boîte d'édition) suite à un changement d'orientation  :
+        if (null != savedInstanceState) {
+            final boolean bEditTextOpen = savedInstanceState.getBoolean("bEditTextOpen");
+            Log.i(LOG_TAG, "bEditTextOpen=" + bEditTextOpen);
+            if (bEditTextOpen) {
+                openEditText();
+            }
+        }        
     }
     
     @Override
@@ -170,12 +179,23 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     // Appelée lorsque l'activité passe de "au premier plan" à "en pause/cachée" 
     protected void onPause() {
         super.onPause();
+        Log.d (LOG_TAG, "onPause...");
         
         // Plus de notification de résultat du service, vu qu'on se met en pause !
         mResponseReceiver.unregister(this);
         mResponseReceiver = null;
     }
 
+    // Sauvegarde l'état de la boîte d'édition (pour restauration suite à un changement d'orientation par exemple)
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.i (LOG_TAG, "onSaveInstanceState");
+        final boolean bEditTextOpen = (-1 != mOriginalMsgListHeight);
+        outState.putBoolean("bEditTextOpen", bEditTextOpen);        
+    }
+    
+    
     /**
      * Sur réception d'une réponse du service SJLB
      * 
