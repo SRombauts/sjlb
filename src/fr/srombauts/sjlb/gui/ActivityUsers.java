@@ -33,6 +33,7 @@ public class ActivityUsers extends ActivityTouchListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(LOG_TAG, "onCreate...");
 
         // Layout de l'activité
         setContentView(R.layout.activity_list);
@@ -169,7 +170,7 @@ public class ActivityUsers extends ActivityTouchListener {
 
             // Récupère le contact éventuellement associé à l'utilisateur (Uri et photo)
             int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.User._ID));
-            UserContactDescr user = ((ApplicationSJLB)getApplication ()).getUserContactList().get(userId);
+            UserContactDescr user = ((ApplicationSJLB)getApplication ()).getUserContactById(userId);
             // Fixe la barre de QuickContact
             cache.quickContactView.assignContactUri(user.getLookupUri());
             

@@ -56,12 +56,12 @@ public class ApplicationSJLB extends Application {
     private int                         mUserId             = 0;
     
     // Accesseur simple (optimisé en release par ProGuard)
-    public final Vector<UserContactDescr> getUserContactList() {
-        return mUserContactList;
-    }
-    // Accesseur simple (optimisé en release par ProGuard)
-    public final int getUserId() {
+    synchronized public final int getUserId() {
         return mUserId;
+    }
+
+    synchronized public final UserContactDescr getUserContactById(int aUserId) {
+        return mUserContactList.get(aUserId);
     }
     
     /**
@@ -70,7 +70,7 @@ public class ApplicationSJLB extends Application {
     @Override
     public void onCreate () {
         super.onCreate();
-        Log.d(LOG_TAG, "onCreate");
+        Log.e(LOG_TAG, "onCreate");
         
         // Lance l'alarme périodique, et le service, si pas déjà lancé, et provoque un rafraîchissement
         IntentReceiverStartService.startAlarm(this, LOG_TAG);
@@ -87,7 +87,7 @@ public class ApplicationSJLB extends Application {
     */
     public void onTerminate () {
         super.onTerminate();
-        Log.d(LOG_TAG, "onTerminate");
+        Log.e(LOG_TAG, "onTerminate");
         
         // Provoque un rafraîchissement des infos anticipé,
         // qui permet de signaler au site web SJLB les messages qui ont été lus   
@@ -95,7 +95,8 @@ public class ApplicationSJLB extends Application {
     }
     
     // Renseigne la liste des contacts Google correspondant aux utilisateurs du site
-    public void initUserContactList () {
+    synchronized public void initUserContactList () {
+        Log.e(LOG_TAG, "initUserContactList");
 
         // Liste les utilisateurs du site
         Cursor cursor = getContentResolver().query (SJLB.User.CONTENT_URI,
@@ -168,5 +169,6 @@ public class ApplicationSJLB extends Application {
             e.printStackTrace();
         }
 
+        Log.e(LOG_TAG, "initUserContactList done : " + mUserContactList.size() + " !");        
     }
 }

@@ -362,7 +362,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             
             // Récupère le pseudo et le contact (Uri et photo) éventuellement associé à l'utilisateur
             int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.AUTHOR_ID));
-            UserContactDescr user = ((ApplicationSJLB)getApplication ()).getUserContactList().get(userId);
+            UserContactDescr user = ((ApplicationSJLB)getApplication ()).getUserContactById(userId);
             
             // Fixe la barre d'informations du message 
             String  pseudo = user.getPseudo(); // on utilise le pseudo fourni par la liste d'utilisateur, plus simple qu'un croisement en bdd
