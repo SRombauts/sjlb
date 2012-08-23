@@ -19,6 +19,8 @@
     <string name="button_show_user_list"> Users                   </string>
     <string name="button_send_pm">        Send Private Message    </string>
     <string name="button_send_msg">       Send Message            </string>
+
+    <string name="hint_send_msg">         Write you message, then remove the keyboard to push the \"send\" button"    </string>
     
     <!-- Preferences -->
     <string name="prefs_authentication">    Authentication  </string>
