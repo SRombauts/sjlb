@@ -30,10 +30,12 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ParseException;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import fr.srombauts.sjlb.ApplicationSJLB;
 import fr.srombauts.sjlb.R;
@@ -168,6 +170,7 @@ public class API {
     static final private String ATTR_NAME_PRIVATE_MSG_DATE      = "date";
     static final private String ATTR_NAME_PRIVATE_MSG_AUTHOR_ID = "id_auteur";
     static final private String ATTR_NAME_PRIVATE_MSG_DEST_ID   = "id_destinataire";
+    static final private String ATTR_NAME_PRIVATE_MSG_DATE_SUPPR= "date";
     
     static final private String ATTR_NAME_FORUM_SUBJ_ID             = "id";
     static final private String ATTR_NAME_FORUM_SUBJ_CAT_ID         = "id_categorie";
@@ -178,6 +181,7 @@ public class API {
     static final private String ATTR_NAME_FORUM_MSG_AUTHOR_ID   = "id_auteur";
     static final private String ATTR_NAME_FORUM_MSG_DATE        = "date";
     static final private String ATTR_NAME_FORUM_MSG_DATE_EDIT   = "date_edit";
+    static final private String ATTR_NAME_FORUM_MSG_DATE_SUPPR  = "date";
     static final private String ATTR_NAME_FORUM_MSG_SUBJECT_ID  = "id_sujet";
     static final private String ATTR_NAME_FORUM_MSG_UNREAD      = "unread";
     
@@ -242,9 +246,10 @@ public class API {
             long idLastPM           = mPMDBAdapter.getIdLastPM();
             long dateLastUpdateUser = mUserDBAdapter.getDateLastUpdateUser();
             
-            // TODO SRombauts : gérer les suppressions de msg et de pm 
-            final long dateLastMsgSuppr  = 1555555555; // bouchon !
-            final long dateLastPmSuppr   = 1555555555; // bouchon !
+            // Récupère dans les préférences les dates de suppression du dernier message et du dernier PM supprimé 
+            final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+            final long dateLastMsgSuppr  = prefs.getLong(PARAM_DATE_LAST_MSG_SUPPR, 0);
+            final long dateLastPmSuppr   = prefs.getLong(PARAM_DATE_LAST_PM_SUPPR, 0);
             
             // Établi la liste des messages lus localement, à transmettre au site SJLB pour qu'il se mette à jour
             String strMsgLus = mMsgDBAdapter.getListMsgUnreadLocaly ();
@@ -266,8 +271,7 @@ public class API {
             nameValuePairs.add(new BasicNameValuePair(PARAM_LOGIN,      loginPassword.getLogin()));  
             nameValuePairs.add(new BasicNameValuePair(PARAM_PASSWORD,   loginPassword.getPasswordMD5()));
             // et si disponibles (ie après la première fois) les 2 dates du plus vieux et du plus récent message
-            // TODO SRombauts : plus pratique en mise au point
-            //nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_FIRST_MSG, Long.toString(dateFirstMsg)));
+            nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_FIRST_MSG, Long.toString(dateFirstMsg)));
             nameValuePairs.add(new BasicNameValuePair(PARAM_DATE_LAST_MSG,  Long.toString(dateLastMsg)));
             // idem id du PM le plus récent et date de modif d'un utilisateur la plus récente
             nameValuePairs.add(new BasicNameValuePair(PARAM_ID_LAST_PM,     Long.toString(idLastPM)));
@@ -282,7 +286,7 @@ public class API {
                 nameValuePairs.add(new BasicNameValuePair(PARAM_LIST_MSG_LUS, strMsgLus));
             }
 
-            Log.i(LOG_TAG, "fetchNewContent (" + dateFirstMsg + "," + dateLastMsg + "," + idLastPM + "," + dateLastUpdateUser + " {" + strMsgLus + "} )");
+            Log.i(LOG_TAG, "fetchNewContent (" + dateFirstMsg + "," + dateLastMsg + "," + idLastPM + "," + dateLastUpdateUser + "," + dateLastMsgSuppr + "," + dateLastPmSuppr + " {" + strMsgLus + "} )");
 
             // y ajoute les 5 informations de version de l'équipement et de l'application
             // TODO SRombauts : ne transmettre que lorsque nouveau !
@@ -321,94 +325,98 @@ public class API {
                         /////////////////////////////////////////////////////////////////////////////
                         // Récupère la liste des utilisateurs
                         // (en premier car la liste des utilisateurs est nécessaire pour la suite !)
-                        NodeList    listUser = eltDocument.getElementsByTagName(NODE_NAME_USER);
-                        int nbUsers = listUser.getLength();
-                        if (0 < nbUsers) {
-                            for (int i = 0; i < nbUsers; i++) {
-                                Element eltUser        = (Element)listUser.item(i);
-        
-                                String  strIdUser   = eltUser.getAttribute(ATTR_NAME_USER_ID);
-                                int     idUser      = Integer.parseInt(strIdUser);
-                                String  strPseudo   = eltUser.getAttribute(ATTR_NAME_USER_PSEUDO);
-                                String  strName     = eltUser.getAttribute(ATTR_NAME_USER_NAME);
-                                String  strDateMaj  = eltUser.getAttribute(ATTR_NAME_USER_DATE_MAJ);
-                                long    longDateMaj = (long)Integer.parseInt(strDateMaj);
-                                Date    dateMaj     = new Date(longDateMaj*1000);
-
-                                String  strAddress  = null;
-                                String  strNotes    = null;
-
-                                // Récupère l'adresse de l'utilisateur
-                                NodeList    listAddr = eltUser.getElementsByTagName(NODE_NAME_FORUM_ADDRESS);
-                                Element eltAddr = (Element)listAddr.item(0);
-                                Node    txtAddr = eltAddr.getFirstChild();
-                                if (null != txtAddr) {
-                                    strAddress  = eltAddr.getFirstChild().getNodeValue();
+                        {
+                            NodeList    listUser = eltDocument.getElementsByTagName(NODE_NAME_USER);
+                            int nbUsers = listUser.getLength();
+                            if (0 < nbUsers) {
+                                for (int i = 0; i < nbUsers; i++) {
+                                    Element eltUser        = (Element)listUser.item(i);
+            
+                                    String  strIdUser   = eltUser.getAttribute(ATTR_NAME_USER_ID);
+                                    int     idUser      = Integer.parseInt(strIdUser);
+                                    String  strPseudo   = eltUser.getAttribute(ATTR_NAME_USER_PSEUDO);
+                                    String  strName     = eltUser.getAttribute(ATTR_NAME_USER_NAME);
+                                    String  strDateMaj  = eltUser.getAttribute(ATTR_NAME_USER_DATE_MAJ);
+                                    long    longDateMaj = (long)Integer.parseInt(strDateMaj);
+                                    Date    dateMaj     = new Date(longDateMaj*1000);
+    
+                                    String  strAddress  = null;
+                                    String  strNotes    = null;
+    
+                                    // Récupère l'adresse de l'utilisateur
+                                    NodeList    listAddr = eltUser.getElementsByTagName(NODE_NAME_FORUM_ADDRESS);
+                                    Element eltAddr = (Element)listAddr.item(0);
+                                    Node    txtAddr = eltAddr.getFirstChild();
+                                    if (null != txtAddr) {
+                                        strAddress  = eltAddr.getFirstChild().getNodeValue();
+                                    }
+                                    
+                                    // Récupère les notes complémentaires à l'adresse de l'utilisateur
+                                    NodeList    listNotes = eltUser.getElementsByTagName(NODE_NAME_FORUM_NOTES);
+                                    Element eltNotes = (Element)listNotes.item(0);
+                                    Node    txtNotes = eltNotes.getFirstChild();
+                                    if (null != txtNotes) {
+                                        strNotes  = txtNotes.getNodeValue();
+                                    }
+                                    
+                                    Log.d(LOG_TAG, "User " + idUser + " " + strPseudo + " " + strName);
+                                    
+                                    User newUser = new User(idUser, strPseudo, strName, strAddress, strNotes, dateMaj);
+                                    
+                                    // Update l'utilisateur s'il existe déjà, sinon l'insert
+                                    if (mUserDBAdapter.isExist(idUser)) {
+                                        mUserDBAdapter.updateUser(newUser);
+                                    } else {
+                                        mUserDBAdapter.insertUser(newUser);
+                                    }
                                 }
+    
+                                Log.i(LOG_TAG, "fetchNewContent: nbUsers=" + nbUsers);
                                 
-                                // Récupère les notes complémentaires à l'adresse de l'utilisateur
-                                NodeList    listNotes = eltUser.getElementsByTagName(NODE_NAME_FORUM_NOTES);
-                                Element eltNotes = (Element)listNotes.item(0);
-                                Node    txtNotes = eltNotes.getFirstChild();
-                                if (null != txtNotes) {
-                                    strNotes  = txtNotes.getNodeValue();
-                                }
+                                // Ré-initialise la liste des utilisateurs
+                                ApplicationSJLB appSJLB = (ApplicationSJLB)mContext.getApplication();
+                                appSJLB.initUserContactList();
                                 
-                                Log.d(LOG_TAG, "User " + idUser + " " + strPseudo + " " + strName);
-                                
-                                User newUser = new User(idUser, strPseudo, strName, strAddress, strNotes, dateMaj);
-                                
-                                // Update l'utilisateur s'il existe déjà, sinon l'insert
-                                if (mUserDBAdapter.isExist(idUser)) {
-                                    mUserDBAdapter.updateUser(newUser);
-                                } else {
-                                    mUserDBAdapter.insertUser(newUser);
-                                }
+                            } else {
+                                Log.d(LOG_TAG, "fetchNewContent: no <user> XML content");
                             }
-
-                            Log.i(LOG_TAG, "fetchNewContent: nbUsers=" + nbUsers);
-                            
-                            // Ré-initialise la liste des utilisateurs
-                            ApplicationSJLB appSJLB = (ApplicationSJLB)mContext.getApplication();
-                            appSJLB.initUserContactList();
-                            
-                        } else {
-                            Log.d(LOG_TAG, "fetchNewContent: no <user> XML content");
                         }
                         
                         ///////////////////////////////////////////////////////////////////////////
                         // Récupère la liste des Messages "non lus" sur le site SJLB, pour gérer les notifications
                         // (Note : on vient de transmettre au site l'éventuelle liste des messages lus localement sur l'appli, donc il est au courant)
-                        NodeList    listUnreadMsg = eltDocument.getElementsByTagName(NODE_NAME_FORUM_UNREAD);
-                        nbUnreadMsg = listUnreadMsg.getLength();
-                        if (0 < nbUnreadMsg) {
-                            for (int i = 0; i < nbUnreadMsg; i++) {
-                                Element eltMsg      = (Element)listUnreadMsg.item(i);
-                                String  strIdMsg    = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_ID);
-                                int     idMsg       = Integer.parseInt(strIdMsg);
-                                
-                                if (0 < idMsg) {
-                                    // Teste si le message est nouveau 
-                                    // (sinon c'est qu'il s'agit d'un message déjà récupéré, tel quel ou entre temps modifié)
-                                    if (false == mMsgDBAdapter.isExist(idMsg)) {
-                                        Log.i(LOG_TAG, "Msg " + idMsg + " nouveau");
-                                        nbNewMsg++;
-                                    }
-                                    else {
-                                        Log.d(LOG_TAG, "Msg " + idMsg + " recuperes precedemment");
-                                    }
-                                } else {
-                                    if (-1 == idMsg) {
-                                        Log.i(LOG_TAG, "Signal de l'agenda (ID -1)");
+                        {
+                            NodeList    listUnreadMsg = eltDocument.getElementsByTagName(NODE_NAME_FORUM_UNREAD);
+                            nbUnreadMsg = listUnreadMsg.getLength();
+                            if (0 < nbUnreadMsg) {
+                                for (int i = 0; i < nbUnreadMsg; i++) {
+                                    Element eltMsg      = (Element)listUnreadMsg.item(i);
+                                    String  strIdMsg    = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_ID);
+                                    int     idMsg       = Integer.parseInt(strIdMsg);
+                                    
+                                    if (0 < idMsg) {
+                                        // Teste si le message est nouveau 
+                                        // (sinon c'est qu'il s'agit d'un message déjà récupéré, tel quel ou entre temps modifié)
+                                        if (false == mMsgDBAdapter.isExist(idMsg)) {
+                                            Log.i(LOG_TAG, "Msg " + idMsg + " nouveau");
+                                            nbNewMsg++;
+                                        }
+                                        else {
+                                            Log.d(LOG_TAG, "Msg " + idMsg + " recuperes precedemment");
+                                        }
                                     } else {
-                                        Log.w(LOG_TAG, "Msg d'ID " + idMsg + " < 0");
+                                        if (-1 == idMsg) {
+                                            Log.i(LOG_TAG, "Signal de l'agenda (ID -1)");
+                                        } else {
+                                            Log.w(LOG_TAG, "Msg d'ID " + idMsg + " < 0");
+                                        }
                                     }
                                 }
+                                Log.i(LOG_TAG, "fetchNewContent: nbUnreadMsg=" + nbUnreadMsg);
+                            } else {
+                                Log.d(LOG_TAG, "fetchNewContent: no <unread> XML content");
                             }
-                            Log.i(LOG_TAG, "fetchNewContent: nbUnreadMsg=" + nbUnreadMsg);
-                        } else {
-                            Log.d(LOG_TAG, "fetchNewContent: no <unread> XML content");
-                        }                        
+                        }
 
                         // Efface les flags UNREAD_LOCALY des messages lus localement puisqu'on a transmis l'info au serveur
                         // (Note SRO : fait ici avant de récupérer les nouveaux messages, ainsi un message modifié peut être re-flagué non lus)
@@ -417,170 +425,229 @@ public class API {
                             Log.i(LOG_TAG, "clearMsgUnread = " + nbCleared);
                         }
                         
-                        // TODO SRombauts : récupérer la liste des PM supprimés
-                        // TODO SRombauts : récupérer la liste des Msg supprimés
+                        ///////////////////////////////////////////////////////////////////////////
+                        // Récupère la liste des Messages "supprimés" sur le site SJLB, pour gérer les effacements en bdd
+                        {
+                            NodeList    listSupprMsg = eltDocument.getElementsByTagName(NODE_NAME_FORUM_SUPPR);
+                            int  nbSupprMsg = listSupprMsg.getLength();
+                            if (0 < nbSupprMsg) {
+                                long longDateSuppr = 0;
+                                for (int i = 0; i < nbSupprMsg; i++) {
+                                    Element eltMsg          = (Element)listSupprMsg.item(i);
+                                    String  strIdMsg        = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_ID);
+                                    int     idMsg           = Integer.parseInt(strIdMsg);
+                                    String  strDateSuppr    = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_DATE_SUPPR);
+                                            longDateSuppr   = (long)Integer.parseInt(strDateSuppr);
+                                    
+                                    // Supprime le message la la base
+                                    Log.d(LOG_TAG, "fetchNewContent: Msg.delete(" + idMsg + ") date_suppr=" + strDateSuppr);
+                                    mMsgDBAdapter.delete(idMsg);
+                                }
+                                Log.i(LOG_TAG, "fetchNewContent: nbSupprMsg=" + nbSupprMsg + ", last_date_suppr=" + longDateSuppr);
+                                // Enregistre dans les préférences la date de suppression du dernier message supprimé
+                                SharedPreferences.Editor editor = prefs.edit();
+                                editor.putLong(PARAM_DATE_LAST_MSG_SUPPR, longDateSuppr);
+                                editor.commit();
+                            } else {
+                                Log.d(LOG_TAG, "fetchNewContent: no <unread> XML content");
+                            }
+                        }
+                                                
+                        ///////////////////////////////////////////////////////////////////////////
+                        // Récupère la liste des PM "supprimés" sur le site SJLB, pour gérer les effacements en bdd
+                        {
+                            NodeList    listSupprPM = eltDocument.getElementsByTagName(NODE_NAME_PRIVATE_SUPPR);
+                            int nbSupprPM = listSupprPM.getLength();
+                            if (0 < nbSupprPM) {
+                                long longDateSuppr = 0;
+                                for (int i = 0; i < nbSupprPM; i++) {
+                                    Element eltPM           = (Element)listSupprPM.item(i);
+                                    String  strIdPM         = eltPM.getAttribute(ATTR_NAME_PRIVATE_MSG_ID);
+                                    int     idPM            = Integer.parseInt(strIdPM);
+                                    String  strDateSuppr    = eltPM.getAttribute(ATTR_NAME_PRIVATE_MSG_DATE_SUPPR);
+                                            longDateSuppr   = (long)Integer.parseInt(strDateSuppr);
+       
+                                    // Supprime le message la la base
+                                    Log.d(LOG_TAG, "fetchNewContent: PM.delete(" + idPM + ") date_suppr=" + strDateSuppr);
+                                    mPMDBAdapter.delete(idPM);
+                                }
+                                Log.i(LOG_TAG, "fetchNewContent: nbSupprPM=" + nbSupprPM + ", last_date_suppr=" + longDateSuppr);
+                                // Enregistre dans les préférences la date de suppression du dernier message supprimé
+                                SharedPreferences.Editor editor = prefs.edit();
+                                editor.putLong(PARAM_DATE_LAST_PM_SUPPR, longDateSuppr);
+                                editor.commit();
+                            } else {
+                                Log.d(LOG_TAG, "fetchNewContent: no <unread> XML content");
+                            }
+                        }
                                                 
                         ///////////////////////////////////////////////////////////////////////////
                         // Récupère la liste des Sujets
-                        NodeList    listSubj = eltDocument.getElementsByTagName(NODE_NAME_FORUM_SUBJ);
-                        int nbSubj = listSubj.getLength();
-                        if (0 < nbSubj) {
-                            for (int i = 0; i < nbSubj; i++) {
-                                Element eltSubj     = (Element)listSubj.item(i);
-                                
-                                String  strText     = eltSubj.getFirstChild().getNodeValue();
-    
-                                String  strIdSubj   = eltSubj.getAttribute(ATTR_NAME_FORUM_SUBJ_ID);
-                                int     idSubj      = Integer.parseInt(strIdSubj);
-                                String  strIdCat    = eltSubj.getAttribute(ATTR_NAME_FORUM_SUBJ_CAT_ID);
-                                int     idCat       = Integer.parseInt(strIdCat);
-                                String  strIdGroup  = eltSubj.getAttribute(ATTR_NAME_FORUM_SUBJ_GROUP_ID);
-                                int     idGroup     = Integer.parseInt(strIdGroup);
-                                String  strLastDate = eltSubj.getAttribute(ATTR_NAME_FORUM_SUBJ_DERNIERE_DATE);
-                                long    longLastDate= (long)Integer.parseInt(strLastDate);
-                                Date    lastDate    = new Date(longLastDate*1000);
-                                
-                                ForumSubject newSubj = new ForumSubject(idSubj, idCat, idGroup, lastDate, strText);
-                                Log.d(LOG_TAG, "Subj " + newSubj);
-                                
-                                // Update le sujet s'il existe déjà, sinon l'insert
-                                if (mSubjDBAdapter.isExist(idSubj)) {
-                                    if (mSubjDBAdapter.updateSubj(newSubj)) {
-                                        Log.d(LOG_TAG, "Subj " + idSubj + " updated");                                
+                        {
+                            NodeList    listSubj = eltDocument.getElementsByTagName(NODE_NAME_FORUM_SUBJ);
+                            int nbSubj = listSubj.getLength();
+                            if (0 < nbSubj) {
+                                for (int i = 0; i < nbSubj; i++) {
+                                    Element eltSubj     = (Element)listSubj.item(i);
+                                    
+                                    String  strText     = eltSubj.getFirstChild().getNodeValue();
+        
+                                    String  strIdSubj   = eltSubj.getAttribute(ATTR_NAME_FORUM_SUBJ_ID);
+                                    int     idSubj      = Integer.parseInt(strIdSubj);
+                                    String  strIdCat    = eltSubj.getAttribute(ATTR_NAME_FORUM_SUBJ_CAT_ID);
+                                    int     idCat       = Integer.parseInt(strIdCat);
+                                    String  strIdGroup  = eltSubj.getAttribute(ATTR_NAME_FORUM_SUBJ_GROUP_ID);
+                                    int     idGroup     = Integer.parseInt(strIdGroup);
+                                    String  strLastDate = eltSubj.getAttribute(ATTR_NAME_FORUM_SUBJ_DERNIERE_DATE);
+                                    long    longLastDate= (long)Integer.parseInt(strLastDate);
+                                    Date    lastDate    = new Date(longLastDate*1000);
+                                    
+                                    ForumSubject newSubj = new ForumSubject(idSubj, idCat, idGroup, lastDate, strText);
+                                    Log.d(LOG_TAG, "Subj " + newSubj);
+                                    
+                                    // Update le sujet s'il existe déjà, sinon l'insert
+                                    if (mSubjDBAdapter.isExist(idSubj)) {
+                                        if (mSubjDBAdapter.updateSubj(newSubj)) {
+                                            Log.d(LOG_TAG, "Subj " + idSubj + " updated");                                
+                                        } else {
+                                            Log.e(LOG_TAG, "Subj " + idSubj + " NOT updated !");
+                                        }
                                     } else {
-                                        Log.e(LOG_TAG, "Subj " + idSubj + " NOT updated !");
+                                        if (mSubjDBAdapter.insertSubj(newSubj)) {
+                                            Log.d(LOG_TAG, "Subj " + idSubj + " inserted");                                
+                                        } else {
+                                            Log.e(LOG_TAG, "Subj " + idSubj + " NOT inserted !");
+                                        }
                                     }
-                                } else {
-                                    if (mSubjDBAdapter.insertSubj(newSubj)) {
-                                        Log.d(LOG_TAG, "Subj " + idSubj + " inserted");                                
-                                    } else {
-                                        Log.e(LOG_TAG, "Subj " + idSubj + " NOT inserted !");
-                                    }                                
+                                    
                                 }
-                                
+                                Log.i(LOG_TAG, "fetchNewContent: nbSubj=" + nbSubj);
+                            } else {
+                                Log.d(LOG_TAG, "fetchNewContent: no <sujet> XML content");
                             }
-                            Log.i(LOG_TAG, "fetchNewContent: nbSubj=" + nbSubj);
-                        } else {
-                            Log.d(LOG_TAG, "fetchNewContent: no <sujet> XML content");
                         }
                         
                         ///////////////////////////////////////////////////////////////////////////
                         // Récupère la liste des Msg
-                        NodeList    listMsg = eltDocument.getElementsByTagName(NODE_NAME_FORUM_MSG);
-                        int nbMsg = listMsg.getLength();
-                        if (0 < nbMsg) {
-                            Log.d(LOG_TAG, "listMsg.getLength() = " + nbMsg);
-                            for (int i = 0; i < nbMsg; i++) {
-                                Element eltMsg      = (Element)listMsg.item(i);
-                                
-                                String  strText     = eltMsg.getFirstChild().getNodeValue();
-    
-                                String  strIdMsg    = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_ID);
-                                int     idMsg       = Integer.parseInt(strIdMsg);
-                                String  strDate     = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_DATE);
-                                long    longDate    = (long)Integer.parseInt(strDate);
-                                Date    date        = new Date(longDate*1000);
-                                String  strDateEdit = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_DATE_EDIT);
-                                long    longDateEdit= (long)Integer.parseInt(strDateEdit);
-                                Date    dateEdit    = new Date(longDateEdit*1000);
-                                String  strIdAuthor = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_AUTHOR_ID);
-                                int     idAuthor    = Integer.parseInt(strIdAuthor);
-                                String  strIdSubject= eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_SUBJECT_ID);
-                                int     idSubject   = Integer.parseInt(strIdSubject);
-                                String  strUnread   = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_UNREAD);
-                                boolean bUnread     = (0 != Integer.parseInt(strUnread));
-                                
-                                ForumMessage newMsg = new ForumMessage(idMsg, date, dateEdit, idAuthor, idSubject, bUnread, strText);
-                                Log.v(LOG_TAG, "Msg " + newMsg);
-                                
-                                // Update le message s'il existe déjà, sinon l'insert
-                                if (mMsgDBAdapter.isExist(idMsg)) {
-                                    if (mMsgDBAdapter.updateMsg(newMsg)) {
-                                        Log.v(LOG_TAG, "Msg " + idMsg + " updated");
-                                    } else {
-                                        Log.e(LOG_TAG, "Msg " + idMsg + " NOT updated !");
-                                    }
-                                } else {
-                                    if (mMsgDBAdapter.insertMsg(newMsg)) {
-                                        Log.v(LOG_TAG, "Msg " + idMsg + " inserted");                                
-                                    } else {
-                                        Log.e(LOG_TAG, "Msg " + idMsg + " NOT inserted !");
-                                    }                                
-                                }
-                                
-                                // Dans le cas d'un message non lu, met aussi à jour (recalcule) le compteur de messages non lus du sujet en question
-                                if (bUnread) {
-                                    final int NbUnread = mMsgDBAdapter.getNbUnread(idSubject);
-                                    if (mSubjDBAdapter.updateNbUnread(idSubject, NbUnread))
-                                    {
-                                        Log.d(LOG_TAG, "NbUnread(" + idSubject + ")=" + NbUnread);                                
-                                    } else {
-                                        Log.e(LOG_TAG, "NbUnread(" + idSubject + ")=" + NbUnread);
-                                    }                                
-                                }
-                                
-    
-                                // Récupère la liste des fichiers attachés au Msg
-                                NodeList    listFile = eltMsg.getElementsByTagName(NODE_NAME_FORUM_FILE);
-                                int nbFile = listFile.getLength();
-                                for (int j = 0; j < nbFile; j++) {
-                                    Element eltFile     = (Element)listFile.item(j);
-                                    String  fileName    = eltFile.getFirstChild().getNodeValue();
-
-                                    AttachedFile newAttachedFile = new AttachedFile(idMsg, fileName);
-                                    Log.d(LOG_TAG, "Fichier " + newAttachedFile);
+                        {
+                            NodeList    listMsg = eltDocument.getElementsByTagName(NODE_NAME_FORUM_MSG);
+                            int nbMsg = listMsg.getLength();
+                            if (0 < nbMsg) {
+                                Log.d(LOG_TAG, "listMsg.getLength() = " + nbMsg);
+                                for (int i = 0; i < nbMsg; i++) {
+                                    Element eltMsg      = (Element)listMsg.item(i);
                                     
-                                    // TODO SRombauts : BUG ! supprimer d'abord tout fichier attachés pour cet ID de message !
-                                    if (mFileDBAdapter.insertFile(newAttachedFile)) {
-                                        Log.d(LOG_TAG, "AttachedFile " + fileName + " inserted");                                
+                                    String  strText     = eltMsg.getFirstChild().getNodeValue();
+        
+                                    String  strIdMsg    = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_ID);
+                                    int     idMsg       = Integer.parseInt(strIdMsg);
+                                    String  strDate     = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_DATE);
+                                    long    longDate    = (long)Integer.parseInt(strDate);
+                                    Date    date        = new Date(longDate*1000);
+                                    String  strDateEdit = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_DATE_EDIT);
+                                    long    longDateEdit= (long)Integer.parseInt(strDateEdit);
+                                    Date    dateEdit    = new Date(longDateEdit*1000);
+                                    String  strIdAuthor = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_AUTHOR_ID);
+                                    int     idAuthor    = Integer.parseInt(strIdAuthor);
+                                    String  strIdSubject= eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_SUBJECT_ID);
+                                    int     idSubject   = Integer.parseInt(strIdSubject);
+                                    String  strUnread   = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_UNREAD);
+                                    boolean bUnread     = (0 != Integer.parseInt(strUnread));
+                                    
+                                    ForumMessage newMsg = new ForumMessage(idMsg, date, dateEdit, idAuthor, idSubject, bUnread, strText);
+                                    Log.v(LOG_TAG, "Msg " + newMsg);
+                                    
+                                    // Update le message s'il existe déjà, sinon l'insert
+                                    if (mMsgDBAdapter.isExist(idMsg)) {
+                                        if (mMsgDBAdapter.updateMsg(newMsg)) {
+                                            Log.v(LOG_TAG, "Msg " + idMsg + " updated");
+                                        } else {
+                                            Log.e(LOG_TAG, "Msg " + idMsg + " NOT updated !");
+                                        }
                                     } else {
-                                        Log.e(LOG_TAG, "AttachedFile " + fileName + " NOT inserted !");
+                                        if (mMsgDBAdapter.insertMsg(newMsg)) {
+                                            Log.v(LOG_TAG, "Msg " + idMsg + " inserted");                                
+                                        } else {
+                                            Log.e(LOG_TAG, "Msg " + idMsg + " NOT inserted !");
+                                        }
+                                    }
+                                    
+                                    // Dans le cas d'un message non lu, met aussi à jour (recalcule) le compteur de messages non lus du sujet en question
+                                    if (bUnread) {
+                                        final int NbUnread = mMsgDBAdapter.getNbUnread(idSubject);
+                                        if (mSubjDBAdapter.updateNbUnread(idSubject, NbUnread))
+                                        {
+                                            Log.d(LOG_TAG, "NbUnread(" + idSubject + ")=" + NbUnread);                                
+                                        } else {
+                                            Log.e(LOG_TAG, "NbUnread(" + idSubject + ")=" + NbUnread);
+                                        }
+                                    }
+                                    
+        
+                                    // Récupère la liste des fichiers attachés au Msg
+                                    NodeList    listFile = eltMsg.getElementsByTagName(NODE_NAME_FORUM_FILE);
+                                    int nbFile = listFile.getLength();
+                                    for (int j = 0; j < nbFile; j++) {
+                                        Element eltFile     = (Element)listFile.item(j);
+                                        String  fileName    = eltFile.getFirstChild().getNodeValue();
+    
+                                        AttachedFile newAttachedFile = new AttachedFile(idMsg, fileName);
+                                        Log.d(LOG_TAG, "Fichier " + newAttachedFile);
+                                        
+                                        // TODO SRombauts : BUG ! supprimer d'abord tout fichier attachés pour cet ID de message !
+                                        if (mFileDBAdapter.insertFile(newAttachedFile)) {
+                                            Log.d(LOG_TAG, "AttachedFile " + fileName + " inserted");                                
+                                        } else {
+                                            Log.e(LOG_TAG, "AttachedFile " + fileName + " NOT inserted !");
+                                        }
                                     }
                                 }
+                                Log.i(LOG_TAG, "fetchNewContent: nbMsg=" + nbMsg);
+                            } else {
+                                Log.d(LOG_TAG, "fetchNewContent: no <msg> XML content");
                             }
-                            Log.i(LOG_TAG, "fetchNewContent: nbMsg=" + nbMsg);
-                        } else {
-                            Log.d(LOG_TAG, "fetchNewContent: no <msg> XML content");
                         }
 
                         ///////////////////////////////////////////////////////////////////////////
                         // Récupère la liste des PM
-                        NodeList    listPM = eltDocument.getElementsByTagName(NODE_NAME_PRIVATE_MSG);
-                        int nbPM = listPM.getLength();
-                        if (0 < nbPM) {
-                            for (int i = 0; i < nbPM; i++) {
-                                Element eltPm       = (Element)listPM.item(i);
-                                
-                                String  strText     = eltPm.getFirstChild().getNodeValue();
-    
-                                String  strIdPM     = eltPm.getAttribute(ATTR_NAME_PRIVATE_MSG_ID);
-                                int     idPM        = Integer.parseInt(strIdPM);
-                                String  strDate     = eltPm.getAttribute(ATTR_NAME_PRIVATE_MSG_DATE);
-                                long    longDate    = (long)Integer.parseInt(strDate);
-                                Date    date        = new Date(longDate*1000);
-                                String  strIdAuthor = eltPm.getAttribute(ATTR_NAME_PRIVATE_MSG_AUTHOR_ID);
-                                int     idAuthor    = Integer.parseInt(strIdAuthor);
-                                String  strIdDest   = eltPm.getAttribute(ATTR_NAME_PRIVATE_MSG_DEST_ID);
-                                int     idDest      = Integer.parseInt(strIdDest);
-                                
-                                Log.d(LOG_TAG, "PM " + idPM + " ("+ idAuthor +") " + strDate + " : '"  + strText + "' (" + strText.length()+ ")");
-                                
-                                // Compte les nouveaux pm envoyés à l'utilisateur par les autres (ie, à l'exclusion des pm envoyés par l'utilisateur lui même)
-                                if (((ApplicationSJLB)mContext.getApplication ()).getUserId() != idAuthor) {
-                                    nbNewPM++;
+                        {
+                            NodeList    listPM = eltDocument.getElementsByTagName(NODE_NAME_PRIVATE_MSG);
+                            int nbPM = listPM.getLength();
+                            if (0 < nbPM) {
+                                for (int i = 0; i < nbPM; i++) {
+                                    Element eltPm       = (Element)listPM.item(i);
+                                    
+                                    String  strText     = eltPm.getFirstChild().getNodeValue();
+        
+                                    String  strIdPM     = eltPm.getAttribute(ATTR_NAME_PRIVATE_MSG_ID);
+                                    int     idPM        = Integer.parseInt(strIdPM);
+                                    String  strDate     = eltPm.getAttribute(ATTR_NAME_PRIVATE_MSG_DATE);
+                                    long    longDate    = (long)Integer.parseInt(strDate);
+                                    Date    date        = new Date(longDate*1000);
+                                    String  strIdAuthor = eltPm.getAttribute(ATTR_NAME_PRIVATE_MSG_AUTHOR_ID);
+                                    int     idAuthor    = Integer.parseInt(strIdAuthor);
+                                    String  strIdDest   = eltPm.getAttribute(ATTR_NAME_PRIVATE_MSG_DEST_ID);
+                                    int     idDest      = Integer.parseInt(strIdDest);
+                                    
+                                    Log.d(LOG_TAG, "PM " + idPM + " ("+ idAuthor +") " + strDate + " : '"  + strText + "' (" + strText.length()+ ")");
+                                    
+                                    // Compte les nouveaux pm envoyés à l'utilisateur par les autres (ie, à l'exclusion des pm envoyés par l'utilisateur lui même)
+                                    if (((ApplicationSJLB)mContext.getApplication ()).getUserId() != idAuthor) {
+                                        nbNewPM++;
+                                    }
+                                    
+                                    PrivateMessage newPM = new PrivateMessage(idPM, date, idAuthor, idDest, strText);
+                                    
+                                    // Renseigne la bdd
+                                    Boolean bInserted = mPMDBAdapter.insertPM(newPM);
+                                    if (bInserted) {
+                                        Log.d(LOG_TAG, "PM " + idPM + " inserted");                                
+                                    }
                                 }
-                                
-                                PrivateMessage newPM = new PrivateMessage(idPM, date, idAuthor, idDest, strText);
-                                
-                                // Renseigne la bdd
-                                Boolean bInserted = mPMDBAdapter.insertPM(newPM);
-                                if (bInserted) {
-                                    Log.d(LOG_TAG, "PM " + idPM + " inserted");                                
-                                }
+                                Log.i(LOG_TAG, "fetchNewContent: nbPM=" + nbPM);
+                            } else {
+                                Log.d(LOG_TAG, "fetchNewContent: no <pm> XML content");
                             }
-                            Log.i(LOG_TAG, "fetchNewContent: nbPM=" + nbPM);
-                        } else {
-                            Log.d(LOG_TAG, "fetchNewContent: no <pm> XML content");
                         }
                         
                         //////////////////////////////////////////////////////////////
@@ -613,7 +680,7 @@ public class API {
                         
                         // Efface alors le mot de passe des préférences !
                         PrefsLoginPassword.InvalidatePassword (mContext);
-                    }                        
+                    }
                 } else {
                     Log.e(LOG_TAG, "fetchNewContent: no XML document: server error");
                 }

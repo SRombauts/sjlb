@@ -207,8 +207,15 @@ public class ContentProviderMsg extends ContentProvider {
         cursor.close ();
         return bIsExist;
     }
+    
+    // supprime un Msg particulier
+    public boolean delete(int aId) {
+        final String    whereClause = SJLB.Msg._ID + "=?";
+        final String[]  whereArgs   = {Integer.toString(aId)};
+        return mDBHelper.getWritableDatabase().delete(SJLB.Msg.TABLE_NAME, whereClause, whereArgs) > 0;
+    }
        
-    // vide la table des Msg
+    // vide complètement la table des Msg
     public boolean clearMsg() {
       return mDBHelper.getWritableDatabase().delete(SJLB.Msg.TABLE_NAME, null, null) > 0;
     }

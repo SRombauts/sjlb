@@ -108,10 +108,11 @@ public class ContentProviderPM extends ContentProvider {
         return (0 < mDBHelper.getWritableDatabase().insert(SJLB.PM.TABLE_NAME, null, newPMValues));
     }
 
-    // retire un PM juste par son ID
-    public boolean removePM(long aId) {
-        final String[] selectionArgs= {Long.toString(aId)};
-        return (0 < mDBHelper.getWritableDatabase().delete(SJLB.PM.TABLE_NAME, SJLB.PM._ID + "=?", selectionArgs));
+    // supprime un PM particulier
+    public boolean delete(int aId) {
+        final String    whereClause = SJLB.PM._ID + "=?";
+        final String[]  whereArgs   = {Integer.toString(aId)};
+        return mDBHelper.getWritableDatabase().delete(SJLB.PM.TABLE_NAME, whereClause, whereArgs) > 0;
     }
 
     // vide la table des PM
