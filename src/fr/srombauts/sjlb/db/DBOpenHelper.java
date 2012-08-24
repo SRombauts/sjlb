@@ -45,9 +45,10 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         if (   (8                     == aOldVersion)
             && (SJLB.DATABASE_VERSION == aNewVersion) ) {
             Log.i(LOG_TAG, "Upgrading from version 8 to 9, wich will preserve users table but not PM table");
-            // La table des utilisateurs doit être complétée de 3 champs
+            // La table des utilisateurs doit être complétée de 4 champs
             aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.ADDRESS + " text");
             aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.NOTES + " text");
+            aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.IS_ACTIVE + " integer");
             aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.DATE_MAJ + " integer");
             // La table des Msg doit être complétée d'un champ
             aDatabase.execSQL("ALTER TABLE " + SJLB.Msg.TABLE_NAME + " ADD " + SJLB.Msg.DATE_EDIT + " integer");

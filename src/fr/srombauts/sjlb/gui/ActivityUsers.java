@@ -40,8 +40,9 @@ public class ActivityUsers extends ActivityTouchListener {
         setTitle(getString(R.string.user_description));
         
         // Récupère un curseur sur les données (les membres, classé par ordre alphabétique de pseudo)
-        mCursor = managedQuery( SJLB.User.CONTENT_URI, null,
+        mCursor = managedQuery( SJLB.User.CONTENT_URI,
                                 null,
+                                SJLB.User.IS_ACTIVE + "=1",
                                 null,
                                 SJLB.User.PSEUDO_SORT_ORDER);
 

@@ -189,6 +189,7 @@ public class API {
     static final private String ATTR_NAME_USER_PSEUDO           = "pseudo";
     static final private String ATTR_NAME_USER_NAME             = "nom";
     static final private String ATTR_NAME_USER_DATE_MAJ         = "DateDerniereMaj";
+    static final private String ATTR_NAME_USER_IS_ACTIVE        = "is_active";
 
     private ServiceSJLB             mContext        = null;
     
@@ -294,7 +295,7 @@ public class API {
             final String versionAndroid = prefs.getString(PARAM_VERSION_ANDROID, "");
             final int    apiLevel       = prefs.getInt(PARAM_API_LEVEL, 0);
             final int    versionAppli   = prefs.getInt(PARAM_VERSION_APPLI, 0);
-            final int    versionCode = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), PackageManager.GET_ACTIVITIES).versionCode;
+            final int    versionCode    = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), PackageManager.GET_ACTIVITIES).versionCode;
             // ... seulement s'il y a du nouveau !
             if (   (false == phoneModel.equals(Build.MODEL))
                 || (false == buildBrand.equals(Build.BRAND))
@@ -355,6 +356,8 @@ public class API {
                                     String  strDateMaj  = eltUser.getAttribute(ATTR_NAME_USER_DATE_MAJ);
                                     long    longDateMaj = (long)Integer.parseInt(strDateMaj);
                                     Date    dateMaj     = new Date(longDateMaj*1000);
+                                    String  strIsActive = eltUser.getAttribute(ATTR_NAME_USER_IS_ACTIVE);
+                                    boolean isActive    = (0 != Integer.parseInt(strIsActive));
     
                                     String  strAddress  = null;
                                     String  strNotes    = null;
@@ -377,7 +380,7 @@ public class API {
                                     
                                     Log.d(LOG_TAG, "User " + idUser + " " + strPseudo + " " + strName);
                                     
-                                    User newUser = new User(idUser, strPseudo, strName, strAddress, strNotes, dateMaj);
+                                    User newUser = new User(idUser, strPseudo, strName, strAddress, strNotes, dateMaj, isActive);
                                     
                                     // Update l'utilisateur s'il existe déjà, sinon l'insert
                                     if (mUserDBAdapter.isExist(idUser)) {

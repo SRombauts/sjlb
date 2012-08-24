@@ -106,6 +106,7 @@ public class ContentProviderUser extends ContentProvider {
         newUserValues.put(SJLB.User.ADDRESS,   aUser.getAddress());
         newUserValues.put(SJLB.User.NOTES,     aUser.getNotes());
         newUserValues.put(SJLB.User.DATE_MAJ,  aUser.getDateMaj().getTime());
+        newUserValues.put(SJLB.User.IS_ACTIVE, aUser.isActive());
         return mDBHelper.getWritableDatabase().insert(SJLB.User.TABLE_NAME, null, newUserValues) > 0;
     }
 
@@ -122,6 +123,7 @@ public class ContentProviderUser extends ContentProvider {
         newUserValues.put(SJLB.User.ADDRESS,   aUser.getAddress());
         newUserValues.put(SJLB.User.NOTES,     aUser.getNotes());
         newUserValues.put(SJLB.User.DATE_MAJ,  aUser.getDateMaj().getTime());
+        newUserValues.put(SJLB.User.IS_ACTIVE, aUser.isActive());
         final String   selection      = SJLB.User._ID + "=?";
         final String[] selectionArgs  = {Long.toString (aUser.getId())};
         return mDBHelper.getWritableDatabase().update(SJLB.User.TABLE_NAME, newUserValues, selection, selectionArgs) > 0;

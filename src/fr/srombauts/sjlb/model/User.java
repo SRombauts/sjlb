@@ -14,15 +14,17 @@ public class User {
     private String  mAddress;
     private String  mNotes;
     private Date    mDateMaj;
+    private boolean mbIsActive;
 
     // Constructeur
-    public User(int aId, String aPseudo, String aName, String aAddress, String aNotes, Date aDateMaj) {
+    public User(int aId, String aPseudo, String aName, String aAddress, String aNotes, Date aDateMaj, boolean abIsActive) {
         mId         = aId;
         mPseudo     = aPseudo;
         mName       = aName;
         mAddress    = aAddress;
         mNotes      = aNotes;
         mDateMaj    = aDateMaj;
+        mbIsActive  = abIsActive;
     }
     
     // Getters basics (optimisés en release par ProGuard)
@@ -43,6 +45,9 @@ public class User {
     }
     public Date getDateMaj () {
         return mDateMaj;
+    }
+    public boolean isActive () {
+        return mbIsActive;
     }
     
     /**

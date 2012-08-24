@@ -22,6 +22,7 @@
         android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
         android:hint="@string/hint_send_msg"
         android:textSize="14sp"
+        android:visibility="invisible"
     />
     <Button
         android:id="@+id/textSendButton"

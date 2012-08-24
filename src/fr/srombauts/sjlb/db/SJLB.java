@@ -458,6 +458,13 @@ public final class SJLB {
          * <P>Type: INTEGER</P>
          */
         public static final String  DATE_MAJ              = "date_maj";
+        
+        /**
+         * Flag indiquant si l'utilisateur est actif sur le site SJLB
+         * <P>Type: INTEGER</P>
+         */
+        public static final String  IS_ACTIVE              = "is_active";
+
 
         /**
          * The default sort order for this table
@@ -478,7 +485,8 @@ public final class SJLB {
                                                     + NAME      + " text, "
                                                     + ADDRESS   + " text, "
                                                     + NOTES     + " text, "
-                                                    + DATE_MAJ  + " integer);";
+                                                    + DATE_MAJ  + " integer,"
+                                                    + IS_ACTIVE + " integer);";
 
         public static final String  TABLE_DROP   = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
