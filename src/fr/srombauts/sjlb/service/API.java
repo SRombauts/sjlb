@@ -288,14 +288,30 @@ public class API {
 
             Log.i(LOG_TAG, "fetchNewContent (" + dateFirstMsg + "," + dateLastMsg + "," + idLastPM + "," + dateLastUpdateUser + "," + dateLastMsgSuppr + "," + dateLastPmSuppr + " {" + strMsgLus + "} )");
 
-            // y ajoute les 5 informations de version de l'équipement et de l'application
-            // TODO SRombauts : ne transmettre que lorsque nouveau !
-            Log.i(LOG_TAG, "device: " + Build.MODEL + " (" + Build.MANUFACTURER + "/" + Build.BRAND + ") " + Build.VERSION.RELEASE + " (api_level=" + Build.VERSION.SDK_INT + ")");
-            nameValuePairs.add(new BasicNameValuePair(PARAM_PHONE_MODEL,    Build.MODEL));
-            nameValuePairs.add(new BasicNameValuePair(PARAM_BUILD_BRAND,    Build.BRAND));
-            nameValuePairs.add(new BasicNameValuePair(PARAM_VERSION_ANDROID,Build.VERSION.RELEASE));
-            nameValuePairs.add(new BasicNameValuePair(PARAM_API_LEVEL,      Integer.toString(Build.VERSION.SDK_INT)));
-            nameValuePairs.add(new BasicNameValuePair(PARAM_VERSION_APPLI,  Integer.toString(mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), PackageManager.GET_ACTIVITIES).versionCode)));
+            // y ajoute les 5 informations de version de l'équipement et de l'application...
+            final String phoneModel     = prefs.getString(PARAM_PHONE_MODEL, "");
+            final String buildBrand     = prefs.getString(PARAM_BUILD_BRAND, "");
+            final String versionAndroid = prefs.getString(PARAM_VERSION_ANDROID, "");
+            final int    apiLevel       = prefs.getInt(PARAM_API_LEVEL, 0);
+            final int    versionAppli   = prefs.getInt(PARAM_VERSION_APPLI, 0);
+            final int    versionCode = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), PackageManager.GET_ACTIVITIES).versionCode;
+            // ... seulement s'il y a du nouveau !
+            if (   (false == phoneModel.equals(Build.MODEL))
+                || (false == buildBrand.equals(Build.BRAND))
+                || (false == versionAndroid.equals(Build.VERSION.RELEASE))
+                || (apiLevel != Build.VERSION.SDK_INT)
+                || (versionAppli != versionCode)
+               )
+            {
+                Log.w(LOG_TAG, "SEND device: " + Build.MODEL + " (" + Build.MANUFACTURER + "/" + Build.BRAND + ") " + Build.VERSION.RELEASE + " (api_level=" + Build.VERSION.SDK_INT + ") versionCode=" + versionCode);
+                nameValuePairs.add(new BasicNameValuePair(PARAM_PHONE_MODEL,    Build.MODEL));
+                nameValuePairs.add(new BasicNameValuePair(PARAM_BUILD_BRAND,    Build.BRAND));
+                nameValuePairs.add(new BasicNameValuePair(PARAM_VERSION_ANDROID,Build.VERSION.RELEASE));
+                nameValuePairs.add(new BasicNameValuePair(PARAM_API_LEVEL,      Integer.toString(Build.VERSION.SDK_INT)));
+                nameValuePairs.add(new BasicNameValuePair(PARAM_VERSION_APPLI,  Integer.toString(versionCode)));
+            } else {
+                Log.d(LOG_TAG, "ALREADY SENT device: " + Build.MODEL + " (" + Build.MANUFACTURER + "/" + Build.BRAND + ") " + Build.VERSION.RELEASE + " (api_level=" + Build.VERSION.SDK_INT + ") versionCode=" + versionCode);
+            }
 
             // TODO SRombauts : ajouter l'état de l'application (ouverte/fermée) + le nombre de messages récupérés localement
             
@@ -371,14 +387,14 @@ public class API {
                                     }
                                 }
     
-                                Log.i(LOG_TAG, "fetchNewContent: nbUsers=" + nbUsers);
+                                Log.i(LOG_TAG, "nbUsers=" + nbUsers);
                                 
                                 // Ré-initialise la liste des utilisateurs
                                 ApplicationSJLB appSJLB = (ApplicationSJLB)mContext.getApplication();
                                 appSJLB.initUserContactList();
                                 
                             } else {
-                                Log.d(LOG_TAG, "fetchNewContent: no <user> XML content");
+                                Log.d(LOG_TAG, "no <user> XML content");
                             }
                         }
                         
@@ -412,9 +428,9 @@ public class API {
                                         }
                                     }
                                 }
-                                Log.i(LOG_TAG, "fetchNewContent: nbUnreadMsg=" + nbUnreadMsg);
+                                Log.i(LOG_TAG, "nbUnreadMsg=" + nbUnreadMsg);
                             } else {
-                                Log.d(LOG_TAG, "fetchNewContent: no <unread> XML content");
+                                Log.d(LOG_TAG, "no <unread> XML content");
                             }
                         }
 
@@ -440,16 +456,16 @@ public class API {
                                             longDateSuppr   = (long)Integer.parseInt(strDateSuppr);
                                     
                                     // Supprime le message la la base
-                                    Log.d(LOG_TAG, "fetchNewContent: Msg.delete(" + idMsg + ") date_suppr=" + strDateSuppr);
+                                    Log.d(LOG_TAG, "Msg.delete(" + idMsg + ") date_suppr=" + strDateSuppr);
                                     mMsgDBAdapter.delete(idMsg);
                                 }
-                                Log.i(LOG_TAG, "fetchNewContent: nbSupprMsg=" + nbSupprMsg + ", last_date_suppr=" + longDateSuppr);
+                                Log.i(LOG_TAG, "nbSupprMsg=" + nbSupprMsg + ", last_date_suppr=" + longDateSuppr);
                                 // Enregistre dans les préférences la date de suppression du dernier message supprimé
                                 SharedPreferences.Editor editor = prefs.edit();
                                 editor.putLong(PARAM_DATE_LAST_MSG_SUPPR, longDateSuppr);
                                 editor.commit();
                             } else {
-                                Log.d(LOG_TAG, "fetchNewContent: no <unread> XML content");
+                                Log.d(LOG_TAG, "no <msg_suppr> XML content");
                             }
                         }
                                                 
@@ -468,16 +484,16 @@ public class API {
                                             longDateSuppr   = (long)Integer.parseInt(strDateSuppr);
        
                                     // Supprime le message la la base
-                                    Log.d(LOG_TAG, "fetchNewContent: PM.delete(" + idPM + ") date_suppr=" + strDateSuppr);
+                                    Log.d(LOG_TAG, "PM.delete(" + idPM + ") date_suppr=" + strDateSuppr);
                                     mPMDBAdapter.delete(idPM);
                                 }
-                                Log.i(LOG_TAG, "fetchNewContent: nbSupprPM=" + nbSupprPM + ", last_date_suppr=" + longDateSuppr);
+                                Log.i(LOG_TAG, "nbSupprPM=" + nbSupprPM + ", last_date_suppr=" + longDateSuppr);
                                 // Enregistre dans les préférences la date de suppression du dernier message supprimé
                                 SharedPreferences.Editor editor = prefs.edit();
                                 editor.putLong(PARAM_DATE_LAST_PM_SUPPR, longDateSuppr);
                                 editor.commit();
                             } else {
-                                Log.d(LOG_TAG, "fetchNewContent: no <unread> XML content");
+                                Log.d(LOG_TAG, "no <pm_suppr> XML content");
                             }
                         }
                                                 
@@ -521,9 +537,9 @@ public class API {
                                     }
                                     
                                 }
-                                Log.i(LOG_TAG, "fetchNewContent: nbSubj=" + nbSubj);
+                                Log.i(LOG_TAG, "nbSubj=" + nbSubj);
                             } else {
-                                Log.d(LOG_TAG, "fetchNewContent: no <sujet> XML content");
+                                Log.d(LOG_TAG, "no <sujet> XML content");
                             }
                         }
                         
@@ -602,9 +618,9 @@ public class API {
                                         }
                                     }
                                 }
-                                Log.i(LOG_TAG, "fetchNewContent: nbMsg=" + nbMsg);
+                                Log.i(LOG_TAG, "nbMsg=" + nbMsg);
                             } else {
-                                Log.d(LOG_TAG, "fetchNewContent: no <msg> XML content");
+                                Log.d(LOG_TAG, "no <msg> XML content");
                             }
                         }
 
@@ -644,9 +660,9 @@ public class API {
                                         Log.d(LOG_TAG, "PM " + idPM + " inserted");                                
                                     }
                                 }
-                                Log.i(LOG_TAG, "fetchNewContent: nbPM=" + nbPM);
+                                Log.i(LOG_TAG, "nbPM=" + nbPM);
                             } else {
-                                Log.d(LOG_TAG, "fetchNewContent: no <pm> XML content");
+                                Log.d(LOG_TAG, "no <pm> XML content");
                             }
                         }
                         
@@ -654,6 +670,27 @@ public class API {
                         // Arrivé ici, c'est qu'il n'y a manifestement pas eu d'erreur (pas d'exception)
                         bSuccess = true;
 
+                        // Mémorise les informations de versions qui ont été transmis au site SJLB
+                        // ... seulement s'il y a eu du nouveau !
+                        if (   (false == phoneModel.equals(Build.MODEL))
+                            || (false == buildBrand.equals(Build.BRAND))
+                            || (false == versionAndroid.equals(Build.VERSION.RELEASE))
+                            || (apiLevel != Build.VERSION.SDK_INT)
+                            || (versionAppli != versionCode)
+                           )
+                        {
+                            Log.i(LOG_TAG, "SAVE device: " + Build.MODEL + " (" + Build.MANUFACTURER + "/" + Build.BRAND + ") " + Build.VERSION.RELEASE + " (api_level=" + Build.VERSION.SDK_INT + ") versionCode=" + versionCode);                            
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putString(PARAM_PHONE_MODEL, Build.MODEL);
+                            editor.putString(PARAM_BUILD_BRAND, Build.BRAND);
+                            editor.putString(PARAM_VERSION_ANDROID, Build.VERSION.RELEASE);
+                            editor.putInt(PARAM_API_LEVEL, Build.VERSION.SDK_INT);
+                            editor.putInt(PARAM_VERSION_APPLI, versionCode);
+                            editor.commit();
+                        } else {
+                            Log.d(LOG_TAG, "ALREADY SAVED device: " + Build.MODEL + " (" + Build.MANUFACTURER + "/" + Build.BRAND + ") " + Build.VERSION.RELEASE + " (api_level=" + Build.VERSION.SDK_INT + ") versionCode=" + versionCode);
+                        }
+                        
                         //////////////////////////////////////////////////////////////
                         // En fin de refresh : affiche les éventuelles notifications !
                         // Notification dans la barre de status s'il y a de nouveaux PM
@@ -682,15 +719,15 @@ public class API {
                         PrefsLoginPassword.InvalidatePassword (mContext);
                     }
                 } else {
-                    Log.e(LOG_TAG, "fetchNewContent: no XML document: server error");
+                    Log.e(LOG_TAG, "no XML document: server error");
                 }
             } else {
-                Log.e(LOG_TAG, "fetchNewContent: http error");
+                Log.e(LOG_TAG, "http error");
             }
             
         } catch (LoginPasswordEmptyException e) {
             // e.printStackTrace();
-            Log.w(LOG_TAG, "fetchNewContent: No Login/Password set in Preferences");                                        
+            Log.w(LOG_TAG, "No Login/Password set in Preferences");                                        
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {
@@ -698,7 +735,7 @@ public class API {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SAXException e) {
-            Log.w(LOG_TAG, "fetchNewContent: SAXException");                                        
+            Log.w(LOG_TAG, "SAXException");                                        
             e.printStackTrace();
         } catch (ClassCastException e) {        
             e.printStackTrace();
