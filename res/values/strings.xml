@@ -20,8 +20,11 @@
     <string name="button_send_pm">        Send Private Message    </string>
     <string name="button_send_msg">       Send Message            </string>
 
+    <!-- hint text and content description -->
     <string name="hint_send_msg">         Write you message, then remove the keyboard to push the \"send\" button"    </string>
     
+    <string name="file_description">      File    </string>
+
     <!-- Preferences -->
     <string name="prefs_authentication">    Authentication  </string>
     <string name="prefs_login_title">       Login           </string>
@@ -54,7 +57,6 @@
     <string name="menu_send_pm">        Send Private Message</string>
     <string name="menu_new_subj">       New Topic           </string>
     <string name="menu_new_msg">        New Response        </string>
-    <string name="menu_send_msg">       Send Message        </string>
     <string name="menu_update">         Refresh             </string>
     <string name="menu_reset">          Reset Local Data    </string>
     <string name="menu_delete_all_pm">  Delete All PM       </string>
@@ -69,8 +71,6 @@
     <string name="yes">                 Yes     </string>
     <string name="no">                  No      </string>
     
-    <string name="file_description">    File    </string>
-
     <!-- Toast notifications -->
     <string name="toast_auth_needed">       Action not available : need login/password ! </string>
     <string name="toast_refreshing">        Refreshing&#8230;   </string>
@@ -86,7 +86,7 @@
     <string name="notification_title_msg">  Unread Message(s)       </string>
     <string name="notification_text_msg">   unread message(s)       </string>
 
-    <!-- URI -->
+    <!-- URI : TODO SRombauts à sortir des chaînes de traductions au profil de constantes dans le code ! -->
     <string name="sjlb_forum_uri">      http://www.sjlb.fr/Site/Forum.php                       </string>
     <string name="sjlb_forum_cat_uri">  http://www.sjlb.fr/Site/ForumSujets.php?id_categorie=   </string>
     <string name="sjlb_forum_subj_uri"> http://www.sjlb.fr/Site/ForumReponses.php?id_categorie= </string>
@@ -94,7 +94,6 @@
     <string name="sjlb_forum_subj_dernier"> #dernier_message                                    </string>
     <string name="sjlb_fichiers_attaches">  http://www.sjlb.fr/FichiersAttaches/                </string>
 
-    <string name="sjlb_polling_uri">    http://www.sjlb.fr/Android/Polling.php                  </string>
     <string name="sjlb_users_uri">      http://www.sjlb.fr/Android/Users.php                    </string>
     <string name="sjlb_pm_uri">         http://www.sjlb.fr/Android/PrivateMessages.php          </string>
     <string name="sjlb_msg_uri">        http://www.sjlb.fr/Android/ForumMessages.php            </string>

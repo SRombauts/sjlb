@@ -17,7 +17,7 @@ import fr.srombauts.sjlb.model.PrefsInterface;
  * 
  * @author 27/08/2010 SRombauts
  */
-public class ActivityTouchListener extends Activity implements OnTouchListener {
+abstract public class ActivityTouchListener extends Activity implements OnTouchListener {
     private static final String LOG_TAG = "ActivityTouchListener";
     
     protected float         mTouchStartPositionX    = 0;

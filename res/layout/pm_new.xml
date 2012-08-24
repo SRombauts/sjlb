@@ -19,11 +19,11 @@
     <EditText
         android:id="@+id/textEditText"
         android:layout_width="fill_parent"
-        android:layout_height="160dp"
+        android:layout_height="152dp"
         android:layout_marginTop="4dp"
         android:gravity="top"
         android:textSize="14sp"
-        android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
+        android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
     />
     <Button
         android:layout_width="fill_parent" 

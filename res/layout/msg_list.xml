@@ -19,10 +19,9 @@
         android:layout_height="152dp"
         android:layout_marginTop="4dp"
         android:gravity="top"
-        android:inputType="textCapSentences|textAutoCorrect|textAutoComplete|textMultiLine|textLongMessage"
+        android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
         android:hint="@string/hint_send_msg"
         android:textSize="14sp"
-        android:visibility="invisible"
     />
     <Button
         android:id="@+id/textSendButton"

@@ -20,7 +20,10 @@
     <string name="button_send_pm">        Envoyer le message privé   </string>
     <string name="button_send_msg">       Envoyer le message         </string>
 
+    <!-- hint text and content description -->
     <string name="hint_send_msg">         Rédigez votre message, puis faites disparaître le clavier et utilisez le bouton ci-dessous pour \"Envoyer le message\""    </string>
+    
+    <string name="file_description">      Fichier    </string>
     
     <!-- Preferences -->
     <string name="prefs_authentication">    Authentification                </string>
