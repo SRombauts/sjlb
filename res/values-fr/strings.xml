@@ -11,7 +11,7 @@
     <string name="loginscreen_message"> Veuillez saisir votre login et votre mot de passe dans le menu des préférences  </string>
     
     <string name="pm_description">        Messages Privés            </string>
-    <string name="pm_sent_description">   Messages Privés            </string>
+    <string name="pm_sent_description">   Messages Privés Envoyés    </string>
     <string name="user_description">      Membres                    </string>
     
     <string name="button_show_pm">        Messages Privés            </string>
