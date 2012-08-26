@@ -194,7 +194,6 @@ fr.srombauts.sjlb.gui.ActivityMain -> fr.srombauts.sjlb.gui.ActivityMain:
     boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
     void onShowPM(android.view.View) -> onShowPM
     void onShowUserList(android.view.View) -> onShowUserList
-    void startActivityPM() -> d
     boolean onLeftGesture() -> a
     boolean onRightGesture() -> b
 fr.srombauts.sjlb.gui.ActivityNewPrivateMessage -> fr.srombauts.sjlb.gui.ActivityNewPrivateMessage:
@@ -227,6 +226,7 @@ fr.srombauts.sjlb.gui.ActivityPrivateMessages -> fr.srombauts.sjlb.gui.ActivityP
     boolean onContextItemSelected(android.view.MenuItem) -> onContextItemSelected
     android.app.Dialog onCreateDialog(int) -> onCreateDialog
     void onPrepareDialog(int,android.app.Dialog) -> onPrepareDialog
+    void onShowPMSent(android.view.View) -> onShowPMSent
     void deletePM(long) -> a
     void deleteAllPM() -> c
     void onNewPM(android.view.View) -> onNewPM
@@ -252,7 +252,27 @@ fr.srombauts.sjlb.gui.ActivityPrivateMessages$PmListItemAdapter -> fr.srombauts.
     fr.srombauts.sjlb.gui.ActivityPrivateMessages this$0 -> a
     void bindView(android.view.View,android.content.Context,android.database.Cursor) -> bindView
     android.view.View newView(android.content.Context,android.database.Cursor,android.view.ViewGroup) -> newView
-fr.srombauts.sjlb.gui.ActivityTouchListener -> fr.srombauts.sjlb.gui.m:
+fr.srombauts.sjlb.gui.ActivityPrivateMessagesSent -> fr.srombauts.sjlb.gui.ActivityPrivateMessagesSent:
+    android.database.Cursor mCursor -> a
+    fr.srombauts.sjlb.gui.ActivityPrivateMessagesSent$PmListItemAdapter mAdapter -> b
+    android.widget.ListView mPrivateMessagesListView -> e
+    fr.srombauts.sjlb.service.ResponseReceiver mResponseReceiver -> f
+    void onCreate(android.os.Bundle) -> onCreate
+    void onNewIntent(android.content.Intent) -> onNewIntent
+    void onResume() -> onResume
+    void onPause() -> onPause
+    void onServiceResponse(android.content.Intent) -> a
+    boolean onLeftGesture() -> a
+fr.srombauts.sjlb.gui.ActivityPrivateMessagesSent$MessageListItemCache -> fr.srombauts.sjlb.gui.m:
+    android.widget.QuickContactBadge quickContactView -> a
+    android.widget.TextView pseudoView -> b
+    android.widget.TextView dateView -> c
+    android.widget.TextView textView -> d
+fr.srombauts.sjlb.gui.ActivityPrivateMessagesSent$PmListItemAdapter -> fr.srombauts.sjlb.gui.n:
+    fr.srombauts.sjlb.gui.ActivityPrivateMessagesSent this$0 -> a
+    void bindView(android.view.View,android.content.Context,android.database.Cursor) -> bindView
+    android.view.View newView(android.content.Context,android.database.Cursor,android.view.ViewGroup) -> newView
+fr.srombauts.sjlb.gui.ActivityTouchListener -> fr.srombauts.sjlb.gui.o:
     float mTouchStartPositionX -> c
     float mTouchStartPositionY -> d
     float mSensibility -> a
@@ -266,24 +286,24 @@ fr.srombauts.sjlb.gui.ActivityUsers -> fr.srombauts.sjlb.gui.ActivityUsers:
     void onCreate(android.os.Bundle) -> onCreate
     void onResume() -> onResume
     boolean onLeftGesture() -> a
-fr.srombauts.sjlb.gui.ActivityUsers$UserListItemAdapter -> fr.srombauts.sjlb.gui.n:
+fr.srombauts.sjlb.gui.ActivityUsers$UserListItemAdapter -> fr.srombauts.sjlb.gui.p:
     fr.srombauts.sjlb.gui.ActivityUsers this$0 -> a
     void bindView(android.view.View,android.content.Context,android.database.Cursor) -> bindView
     android.view.View newView(android.content.Context,android.database.Cursor,android.view.ViewGroup) -> newView
-fr.srombauts.sjlb.gui.ActivityUsers$UserListItemCache -> fr.srombauts.sjlb.gui.o:
+fr.srombauts.sjlb.gui.ActivityUsers$UserListItemCache -> fr.srombauts.sjlb.gui.q:
     android.widget.QuickContactBadge quickContactView -> a
     android.widget.TextView pseudoView -> b
     android.widget.TextView nameView -> c
     android.widget.TextView addressView -> d
     android.widget.TextView notesView -> e
-fr.srombauts.sjlb.gui.LoginPasswordPopup -> fr.srombauts.sjlb.gui.p:
+fr.srombauts.sjlb.gui.LoginPasswordPopup -> fr.srombauts.sjlb.gui.r:
     android.app.Activity mActivity -> a
-fr.srombauts.sjlb.gui.LoginPasswordPopup$1 -> fr.srombauts.sjlb.gui.q:
+fr.srombauts.sjlb.gui.LoginPasswordPopup$1 -> fr.srombauts.sjlb.gui.s:
     fr.srombauts.sjlb.gui.LoginPasswordPopup this$0 -> a
     void onClick(android.content.DialogInterface,int) -> onClick
-fr.srombauts.sjlb.gui.WhatsNewScreen -> fr.srombauts.sjlb.gui.r:
+fr.srombauts.sjlb.gui.WhatsNewScreen -> fr.srombauts.sjlb.gui.t:
     android.app.Activity mActivity -> a
-fr.srombauts.sjlb.gui.WhatsNewScreen$1 -> fr.srombauts.sjlb.gui.s:
+fr.srombauts.sjlb.gui.WhatsNewScreen$1 -> fr.srombauts.sjlb.gui.u:
     fr.srombauts.sjlb.gui.WhatsNewScreen this$0 -> a
     android.content.SharedPreferences val$prefs -> b
     android.content.pm.PackageInfo val$packageInfo -> c
