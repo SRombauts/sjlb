@@ -15,7 +15,6 @@ import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.LoginPasswordEmptyException;
 import fr.srombauts.sjlb.model.PrefsLoginPassword;
 import fr.srombauts.sjlb.model.UserContactDescr;
-import fr.srombauts.sjlb.service.IntentReceiverStartService;
 import fr.srombauts.sjlb.service.StartService;
 
 
@@ -72,9 +71,6 @@ public class ApplicationSJLB extends Application {
         super.onCreate();
         Log.d(LOG_TAG, "onCreate");
         
-        // Lance l'alarme périodique, et le service, si pas déjà lancé, et provoque un rafraîchissement
-        IntentReceiverStartService.startAlarm(this, LOG_TAG);
-
         // Renseigne la liste des contacts Google correspondant aux utilisateurs du site
         initUserContactList ();
     }

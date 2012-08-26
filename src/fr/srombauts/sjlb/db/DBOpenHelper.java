@@ -44,24 +44,41 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase aDatabase, int aOldVersion, int aNewVersion) {
         if (   (8                     == aOldVersion)
             && (SJLB.DATABASE_VERSION == aNewVersion) ) {
-            Log.i(LOG_TAG, "Upgrading from version 8 to 9, wich will preserve users table but not PM table");
-            // La table des utilisateurs doit être complétée de 4 champs
-            aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.ADDRESS + " text");
-            aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.NOTES + " text");
-            aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.IS_ACTIVE + " integer");
-            aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.DATE_MAJ + " integer");
-            // La table des Msg doit être complétée d'un champ
-            aDatabase.execSQL("ALTER TABLE " + SJLB.Msg.TABLE_NAME + " ADD " + SJLB.Msg.DATE_EDIT + " integer");
-            // La table des PM doit être reconstruite, le plus simple c'est de l'effacer
-            aDatabase.execSQL(SJLB.PM.TABLE_DROP);
-            aDatabase.execSQL(SJLB.PM.TABLE_CREATE);
+                Log.i(LOG_TAG, "Upgrading from version 8 to 9, wich will preserve users table but not PM table");
+                // La table des utilisateurs doit être complétée de 4 champs
+                aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.ADDRESS + " text");
+                aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.NOTES + " text");
+                aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.IS_ACTIVE + " integer");
+                aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.DATE_MAJ + " integer");
+                // La table des Msg doit être complétée d'un champ
+                aDatabase.execSQL("ALTER TABLE " + SJLB.Msg.TABLE_NAME + " ADD " + SJLB.Msg.DATE_EDIT + " integer");
+                // La table des PM doit être reconstruite, le plus simple c'est de l'effacer
+                aDatabase.execSQL(SJLB.PM.TABLE_DROP);
+                aDatabase.execSQL(SJLB.PM.TABLE_CREATE);
+        } else if (   (7                     == aOldVersion)
+                   && (SJLB.DATABASE_VERSION == aNewVersion) ) {
+                Log.i(LOG_TAG, "Upgrading from version 7 to 9, wich will preserve data on all but PM table");
+                // La table des utilisateurs doit être complétée de 4 champs
+                aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.ADDRESS + " text");
+                aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.NOTES + " text");
+                aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.IS_ACTIVE + " integer");
+                aDatabase.execSQL("ALTER TABLE " + SJLB.User.TABLE_NAME + " ADD " + SJLB.User.DATE_MAJ + " integer");
+                // La table des Msg doit être complétée d'un champ
+                aDatabase.execSQL("ALTER TABLE " + SJLB.Msg.TABLE_NAME + " ADD " + SJLB.Msg.DATE_EDIT + " integer");
+                // La table des Sujet doit être complétée d'un champ
+                aDatabase.execSQL("ALTER TABLE " + SJLB.Subj.TABLE_NAME + " ADD " + SJLB.Subj.NB_UNREAD + " integer");
+                // La table des PM doit être reconstruite, le plus simple c'est de l'effacer
+                aDatabase.execSQL(SJLB.PM.TABLE_DROP);
+                aDatabase.execSQL(SJLB.PM.TABLE_CREATE);
         } else if (   (7 == aOldVersion)
                    && (8 == aNewVersion) ) {
             Log.i(LOG_TAG, "Upgrading from version 7 to 8, wich will preserve data");
+            // La table des Sujet doit être complétée d'un champ
             aDatabase.execSQL("ALTER TABLE " + SJLB.Subj.TABLE_NAME + " ADD " + SJLB.Subj.NB_UNREAD + " integer");
         } else if (   (6 == aOldVersion)
                    && (7 == aNewVersion) ) {
             Log.i(LOG_TAG, "Upgrading from version 6 to 7, wich will preserve data");
+            // La table des fichiers attachés doit être créée
             aDatabase.execSQL(SJLB.File.TABLE_CREATE);
         } else if (   (2 == aOldVersion)
                    && (3 == aNewVersion) ) {
@@ -73,7 +90,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
             aDatabase.execSQL(SJLB.PM.TABLE_DROP);
             aDatabase.execSQL(SJLB.Subj.TABLE_DROP);
             aDatabase.execSQL(SJLB.Msg.TABLE_DROP);
-            aDatabase.execSQL(SJLB.File.TABLE_CREATE);
+            aDatabase.execSQL(SJLB.File.TABLE_DROP);
             aDatabase.execSQL(SJLB.User.TABLE_DROP);
             onCreate(aDatabase);
         }

@@ -650,7 +650,7 @@ public class API {
                                     
                                     Log.d(LOG_TAG, "PM " + idPM + " ("+ idAuthor +") " + strDate + " : '"  + strText + "' (" + strText.length()+ ")");
                                     
-                                    // Compte les nouveaux pm envoyés à l'utilisateur par les autres (ie, à l'exclusion des pm envoyés par l'utilisateur lui même)
+                                    // Compte les nouveaux pm envoyés à l'utilisateur par les autres (ie, pas les pm dont l'utilisateur est l'auteur)
                                     if (((ApplicationSJLB)mContext.getApplication ()).getUserId() != idAuthor) {
                                         nbNewPM++;
                                     }

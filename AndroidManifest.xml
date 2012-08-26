@@ -3,8 +3,8 @@
      PAS pour les tests, car cette valeur pourrait être utilisée pour signaler automatiquement une mise à jour disponible -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="fr.srombauts.sjlb"
-      android:versionCode="70"
-      android:versionName="0.7.0">
+      android:versionCode="71"
+      android:versionName="0.7.1">
 <!--  android:installLocation="auto" : seulement à partir de l'API level 8 -->
       
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
@@ -13,7 +13,6 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <!-- Juliette est en 7  (2.1-update1)
-         Amélie   est en 8  (2.2)
          Les autres   en 10 (2.3.3+) -->
     <uses-sdk android:minSdkVersion="7"       
               android:targetSdkVersion="11" /> <!-- 11 (3.0, Honeycomb) permet d'utiliser l'ActionBar sur une tablette -->

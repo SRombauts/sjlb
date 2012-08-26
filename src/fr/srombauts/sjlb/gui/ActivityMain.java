@@ -31,6 +31,7 @@ import fr.srombauts.sjlb.db.ContentProviderUser;
 import fr.srombauts.sjlb.db.DBOpenHelper;
 import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.PrefsLoginPassword;
+import fr.srombauts.sjlb.service.IntentReceiverStartService;
 import fr.srombauts.sjlb.service.OnServiceResponseListener;
 import fr.srombauts.sjlb.service.ResponseReceiver;
 import fr.srombauts.sjlb.service.ServiceSJLB;
@@ -112,6 +113,9 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         
         // Demande à être notifié des résultats des actions réalisées par le service
         mResponseReceiver = new ResponseReceiver(this);
+
+        // Lance l'alarme périodique, et le service, si pas déjà lancé, et provoque un rafraîchissement
+        IntentReceiverStartService.startAlarm(this, LOG_TAG);
     }
     
     // Appelée lorsque l'activité passe de "au premier plan" à "en pause/cachée" 
