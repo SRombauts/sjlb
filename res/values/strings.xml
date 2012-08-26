@@ -11,10 +11,12 @@
     <string name="loginscreen_message"> Enter your login and password in the preferences menu   </string>
     
     <string name="pm_description">        Private Messages        </string>
+    <string name="pm_sent_description">   Private Messages Sent   </string>
     <string name="user_description">      Users                   </string>
     
     <string name="button_show_pm">        Private messages        </string>
     <string name="button_show_user_list"> Users                   </string>
+    <string name="button_show_pm_sent">   Private messages sent   </string>
     <string name="button_send_pm">        Send Private Message    </string>
     <string name="button_send_msg">       Send Message            </string>
 

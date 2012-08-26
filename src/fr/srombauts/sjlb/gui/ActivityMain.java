@@ -277,10 +277,6 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
                 }
                 break;
             }
-            case (R.id.menu_show_pm): {
-                startActivityPM ();
-                break;
-            }
             case (R.id.menu_update): {
                 // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
                 if (PrefsLoginPassword.AreFilled (this)) {
@@ -332,20 +328,6 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
      * Sur click du bouton correspondant, lance l'activité d'affichage des PM
      */
     public void onShowPM (View v) {
-        startActivityPM ();
-    }
-
-    /**
-     * Sur click du bouton correspondant, lance l'activité d'affichage des membres du site SJLB
-     */
-    public void onShowUserList (View v) {
-        startActivityUsers ();
-    }
-
-    /**
-     * Lance l'activité présentant la liste des PM
-     */
-    public void startActivityPM () {
         // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
         if (PrefsLoginPassword.AreFilled (this)) {
             // Lance l'activité lisant les PM
@@ -358,9 +340,9 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
     }
 
     /**
-     * Lance l'activité présentant la liste des membres du site SJLB 
+     * Sur click du bouton correspondant, lance l'activité d'affichage des membres du site SJLB
      */
-    public void startActivityUsers () {
+    public void onShowUserList (View v) {
         // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
         if (PrefsLoginPassword.AreFilled (this)) {
             // Lance l'activité lisant la liste des utilisateurs

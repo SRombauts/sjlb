@@ -29,20 +29,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".gui.ActivityForumSubjects">
-        </activity>
+        <activity android:name=".gui.ActivityForumSubjects" />
         <activity android:name=".gui.ActivityForumMessages"
             android:windowSoftInputMode="adjustPan">
             >
         </activity>
-        <activity android:name=".gui.ActivityPrivateMessages">
-        </activity>
-        <activity android:name=".gui.ActivityUsers">
-        </activity>
-        <activity android:name=".gui.ActivityNewPrivateMessage">
-        </activity>
-        <activity android:name=".gui.ActivityPreferences">
-        </activity>
+        <activity android:name=".gui.ActivityPrivateMessages" />
+        <activity android:name=".gui.ActivityPrivateMessagesSent" />
+        <activity android:name=".gui.ActivityUsers" />
+        <activity android:name=".gui.ActivityNewPrivateMessage" />
+        <activity android:name=".gui.ActivityPreferences" />
 	    <receiver android:name=".service.IntentReceiverStartService">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -51,8 +47,7 @@
                 <action android:name="fr.srombauts.sjlb.ACTION_REFRESH_ALARM" />
             </intent-filter>
 	    </receiver>
-	    <service android:name=".service.ServiceSJLB">
-        </service>
+	    <service android:name=".service.ServiceSJLB" />
         <provider android:name=".db.ContentProviderUser"
                   android:authorities="fr.srombauts.sjlb.user"
         />

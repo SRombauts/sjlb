@@ -30,16 +30,16 @@ import fr.srombauts.sjlb.R;
 import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.ForumMessage;
 import fr.srombauts.sjlb.model.UserContactDescr;
+import fr.srombauts.sjlb.service.API;
 import fr.srombauts.sjlb.service.AsynchTaskDeletePM;
 import fr.srombauts.sjlb.service.OnServiceResponseListener;
 import fr.srombauts.sjlb.service.ResponseReceiver;
 import fr.srombauts.sjlb.service.ServiceSJLB;
 import fr.srombauts.sjlb.service.StartService;
-import fr.srombauts.sjlb.service.API;
 
 
 /**
- * Activité présentant la liste des messages privés
+ * Activité présentant la liste des messages privés reçus
  * @author 14/06/2010 SRombauts
  */
 public class ActivityPrivateMessages extends ActivityTouchListener implements OnServiceResponseListener {
@@ -62,10 +62,10 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
         super.onCreate(savedInstanceState);
 
         // Layout de l'activité, et titre
-        setContentView(R.layout.activity_list);
+        setContentView(R.layout.pm_list);
         setTitle(getString(R.string.pm_description));
         
-        // Récupère un curseur sur les données (les messages Privés) en filtrant sur l'Id de l'utilisateur de l'appli SJLB 
+        // Récupère un curseur sur les données (les messages Privés reçus) en filtrant sur l'Id de l'utilisateur de l'appli SJLB 
         mCursor = managedQuery( SJLB.PM.CONTENT_URI, null,
                                 SJLB.PM.DEST_ID + "=" + ((ApplicationSJLB)getApplication ()).getUserId(),
                                 null, null);
@@ -275,6 +275,15 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
                 break;
         }        
     }
+
+    /**
+     * Sur click du bouton correspondant, lance l'activité d'affichage des PM
+     */
+    public void onShowPMSent (View v) {
+        // Lance l'activité lisant les PM envoyés
+        Intent intent = new Intent(this, ActivityPrivateMessagesSent.class);
+        startActivity(intent);
+    }
     
     /**
      * Effacement d'un message privé
@@ -324,7 +333,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
             final MessageListItemCache  cache = (MessageListItemCache) view.getTag();
             
             // Récupère le pseudo et le contact (Uri et photo) éventuellement associé à l'utilisateur
-            int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.AUTHOR_ID));
+            int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.PM.AUTHOR_ID));
             UserContactDescr user = ((ApplicationSJLB)getApplication ()).getUserContactById(userId);
             
             // Fixe les infos du message 
