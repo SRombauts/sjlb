@@ -36,6 +36,7 @@ import fr.srombauts.sjlb.model.ForumMessage;
 import fr.srombauts.sjlb.model.UserContactDescr;
 import fr.srombauts.sjlb.service.API;
 import fr.srombauts.sjlb.service.AsynchTaskNewMsg;
+import fr.srombauts.sjlb.service.CallbackTransfer;
 import fr.srombauts.sjlb.service.OnServiceResponseListener;
 import fr.srombauts.sjlb.service.ResponseReceiver;
 import fr.srombauts.sjlb.service.ServiceSJLB;
@@ -46,7 +47,7 @@ import fr.srombauts.sjlb.service.StartService;
  * Activité présentant la liste des messages du sujet sélectionné
  * @author 22/08/2010 SRombauts
  */
-public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, OnServiceResponseListener {
+public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, CallbackTransfer, OnServiceResponseListener {
     private static final String LOG_TAG = "ActivityMsg";
     
     public static final String  START_INTENT_EXTRA_CAT_ID       = "CategoryId";
@@ -341,6 +342,16 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                             Long.toString(mSelectedGroupId),
                             mEditText.getText().toString());
     }    
+
+    // Appelée lorsqu'un transfert s'est terminé (post d'un nouveau messages, effacement d'un PM...)
+    // TODO SRombauts : en attendant de passer l'envoi de message dans le service, fait un refresh après l'envoi 
+    public void onTransferDone (boolean abResult) {
+        // Si le message a été envoyé avec succès, on peur refermer la zone de saisie texte
+        if (abResult) {
+            closeEditText ();
+        }
+    }
+    
     
     @Override
     protected boolean onLeftGesture () {
@@ -458,5 +469,6 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         public ImageView            imageViewNew;
         public Button               fileButton;
     }
+
 
 }
