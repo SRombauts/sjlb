@@ -228,6 +228,7 @@ public class ContentProviderMsg extends ContentProvider {
     }
 
     // compte les messages non lus d'un sujet donné
+    // TODO SRombauts : compter le nombre de messages à l'aide de COUNT() !
     public int getNbUnread (int aSubjectId) {
         final String[] columns      = {SJLB.Msg._ID};
         final String   selection    = "(" + SJLB.Msg.SUBJECT_ID + "=?" + " AND "
