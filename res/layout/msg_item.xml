@@ -58,9 +58,12 @@
         android:textColor="#000"
         android:autoLink="all"
         />
-    <ListView
-        android:id="@+id/msgFileListview"
+    <Button
+        android:id="@+id/msgFileButton"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:text="@string/button_show_files"
+        android:visibility="invisible"
     />    
 </LinearLayout>

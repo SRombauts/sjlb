@@ -7,21 +7,19 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -36,22 +34,19 @@ import fr.srombauts.sjlb.R;
 import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.ForumMessage;
 import fr.srombauts.sjlb.model.UserContactDescr;
-import fr.srombauts.sjlb.service.AsynchTaskDownloadImage;
+import fr.srombauts.sjlb.service.API;
 import fr.srombauts.sjlb.service.AsynchTaskNewMsg;
-import fr.srombauts.sjlb.service.CallbackImageDownload;
-import fr.srombauts.sjlb.service.CallbackTransfer;
 import fr.srombauts.sjlb.service.OnServiceResponseListener;
 import fr.srombauts.sjlb.service.ResponseReceiver;
 import fr.srombauts.sjlb.service.ServiceSJLB;
 import fr.srombauts.sjlb.service.StartService;
-import fr.srombauts.sjlb.service.API;
 
 
 /**
- * Activité présentant la liste des sujets de la catégorie sélectionnée
+ * Activité présentant la liste des messages du sujet sélectionné
  * @author 22/08/2010 SRombauts
  */
-public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, CallbackTransfer, OnServiceResponseListener {
+public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, OnServiceResponseListener {
     private static final String LOG_TAG = "ActivityMsg";
     
     public static final String  START_INTENT_EXTRA_CAT_ID       = "CategoryId";
@@ -346,16 +341,6 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                             Long.toString(mSelectedGroupId),
                             mEditText.getText().toString());
     }    
-
-    // Appelée lorsqu'un transfert s'est terminé (post d'un nouveau messages, effacement d'un PM...)
-    // TODO SRombauts : en attendant de passer l'envoi de message dans le service, fait un refresh après l'envoi 
-    public void onTransferDone (boolean abResult) {
-        // Si le message a été envoyé avec succès, on peur refermer la zone de saisie texte
-        if (abResult) {
-            closeEditText ();
-        }
-    }
-    
     
     @Override
     protected boolean onLeftGesture () {
@@ -367,9 +352,12 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     // NOTE SRombauts : pas besoin de onRightGesture()
     
     // Adaptateur mappant les données du curseur dans des objets du cache du pool d'objets View utilisés par la ListView
-    private final class MessageListItemAdapter extends ResourceCursorAdapter implements OnItemClickListener {
+    private final class MessageListItemAdapter extends ResourceCursorAdapter implements OnClickListener {
+        Context mContext;
+        
         public MessageListItemAdapter(Context context, int layout, Cursor cursor) {
             super(context, layout, cursor);
+            mContext = context;
         }
 
         // Met à jour avec un nouveau contenu un objet de cache du pool de view utilisées par la ListView 
@@ -379,7 +367,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
             final MessageListItemCache  cache = (MessageListItemCache) view.getTag();
-            
+                        
             // Récupère le pseudo et le contact (Uri et photo) éventuellement associé à l'utilisateur
             int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.AUTHOR_ID));
             UserContactDescr user = ((ApplicationSJLB)getApplication ()).getUserContactById(userId);
@@ -406,40 +394,22 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                 cache.quickContactView.setImageResource(R.drawable.ic_contact_picture);
             }
 
-            
-            // Affiche la liste les éventuels fichiers attachés, pour l'ID du message concerné
-            // cursor.getColumnIndexOrThrow(SJLB.Msg._ID) retourne 6 !
-            int msgId = cursor.getInt(0); // SJLB.Msg._ID, à ne pas confondre avec SJLB.Msg
+            // mémorise l'ID du message (en cas de clic sur le bouton "fichiers attachés")
+            cache.msgId = cursor.getLong(0); // cursor.getColumnIndexOrThrow(SJLB.Msg._ID)
             
             // Récupère un curseur sur les données (les fichiers) en filtrant sur l'id du sujet sélectionné
             final String[] columns = {SJLB.File.FILENAME};
             Cursor cursorFiles = managedQuery(  SJLB.File.CONTENT_URI,
                                                 columns, // ne récupère que le filename
-                                                SJLB.File.MSG_ID + "=" + msgId,
+                                                SJLB.File.MSG_ID + "=" + cache.msgId,
                                                 null, null);
 
-            // Constitue le tableau de fichiers
-            FileListItem [] arrayFileListItem = new FileListItem [cursorFiles.getCount()];
             int count = cursorFiles.getCount();
-            //Log.d(LOG_TAG, "msgId " + msgId + " cursorFiles.getCount()=" + cursorFiles.getCount());
-            for (int i=0; i<count ;i++)
-            {
-                // Récupère le nom du fichier
-                boolean bMoved = cursorFiles.moveToPosition(i);
-                if (bMoved) {
-                    FileListItem file = new FileListItem();
-                    file.filename = cursorFiles.getString(cursorFiles.getColumnIndexOrThrow(SJLB.File.FILENAME));
-                    arrayFileListItem[i] = file;
-                }
+            if (0<count) {
+                Log.d(LOG_TAG, "msgId " + cache.msgId + " nbFiles=" + cursorFiles.getCount());
+                cache.fileButton.setVisibility(View.VISIBLE);
+                cache.fileButton.setOnClickListener (this);
             }
-
-            // Créer l'adapteur entre la liste de fichiers et le layout et les informations sur le mapping des colonnes
-            FileListItemAdapter adapterFiles = new FileListItemAdapter( context,
-                                                                        R.layout.file_item,
-                                                                        arrayFileListItem);
-
-            cache.fileListView.setAdapter (adapterFiles);
-            cache.fileListView.setOnItemClickListener (this);
         }
 
         // Création d'une nouvelle View et de son objet de cache (vide) pour le pool
@@ -451,11 +421,12 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             MessageListItemCache cache = new MessageListItemCache();
             // et binding sur les View décrites par le Layout
             cache.quickContactView  = (QuickContactBadge)   view.findViewById(R.id.msgBadge);
+            cache.quickContactView  = (QuickContactBadge)   view.findViewById(R.id.msgBadge);
             cache.pseudoView        = (TextView)            view.findViewById(R.id.msgPseudo);
             cache.dateView          = (TextView)            view.findViewById(R.id.msgDate);
             cache.textView          = (TextView)            view.findViewById(R.id.msgText);
             cache.imageViewNew      = (ImageView)           view.findViewById(R.id.msgNew);
-            cache.fileListView      = (ListView)            view.findViewById(R.id.msgFileListview);
+            cache.fileButton        = (Button)              view.findViewById(R.id.msgFileButton);
             // enregistre cet objet de cache
             view.setTag(cache);
 
@@ -463,13 +434,15 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         }
         
         /**
-         *  Sur clic sur un fichier, l'affiche ou le télécharge
+         *  Sur clic sur le bouton pour voir la liste des fichiers
          */
-        public void onItemClick(AdapterView<?> parent, View view, int index, long arg3) {
+        @Override
+        public void onClick(View view) {
             // lien vers le fichier sur le Site Web :
-            final FileListItem  file = (FileListItem) view.getTag();
-            Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(getString(R.string.sjlb_fichiers_attaches) + file.filename));
-            Log.d (LOG_TAG, "onClick: " + getString(R.string.sjlb_fichiers_attaches) + file.filename );                
+            final MessageListItemCache  cache = (MessageListItemCache) ((View) view.getParent()).getTag();
+            Intent intent = new Intent(mContext, ActivityFiles.class);
+            intent.putExtra(ActivityFiles.START_INTENT_EXTRA_MSG_ID, cache.msgId);
+            Log.i (LOG_TAG, "TODO onClick: cache.msgId=" + cache.msgId + "intent=" + intent);                
             startActivity(intent);
         }
     }
@@ -477,89 +450,13 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
 
     // Objet utilisé comme cache des données d'une View, dans un pool d'objets utilisés par la ListView
     final static class MessageListItemCache {
+        public long                 msgId;
         public QuickContactBadge    quickContactView;
         public TextView             pseudoView;
         public TextView             dateView;
         public TextView             textView;
         public ImageView            imageViewNew;
-        public ListView             fileListView;
+        public Button               fileButton;
     }
 
-    
-    
-    // TODO SRombauts : documentation !
-    private class FileListItemAdapter extends ArrayAdapter<FileListItem> {
-
-        private FileListItem[] mListeItem;
-
-        public FileListItemAdapter(Context context, int textViewResourceId, FileListItem[] items) {
-            super(context, textViewResourceId, items);
-            mListeItem = items;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            //Log.d (LOG_TAG, "getView(" + position + "," + convertView + "," + parent + ")" );
-
-            View view = convertView;
-            if (view == null) {
-                LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = vi.inflate(R.layout.file_item, null);
-
-                // TODO SRombauts : tests en cours
-                FileListItem it = mListeItem[position];
-                if (it != null) {
-                    Log.d (LOG_TAG, "getView(" + it.filename + ")" );
-                    
-                    it.imageViewFile = (ImageView) view.findViewById(R.id.fileImage);
-                    // TODO SRombauts : tente de réserver un espace carré pour l'image
-                    //it.imageViewFile.getLayoutParams().width = it.imageViewFile.getHeight();
-                    
-                    // Lance ici le téléchargement du fichier en tache de fond (SSI il s'agit bien d'une image !)
-                    if (null == it.imageBitmap) {
-                        AsynchTaskDownloadImage ImageDownloader = new AsynchTaskDownloadImage(it);
-                        ImageDownloader.execute(getString(R.string.sjlb_fichiers_attaches) + it.filename);
-                    }
-                    
-                    // Affiche le nom du fichier
-                    it.textViewFile  = (TextView) view.findViewById(R.id.filename);
-                    it.textViewFile.setText (it.filename);
-                }
-                // Mémorise dans la vue les infos sous-jacentes
-                view.setTag (it);
-
-            }
-            return view;
-        }
-    }    
-        
-    // Objet représentant une image et le nom du fichier associé
-    final static class FileListItem implements CallbackImageDownload {
-        public ImageView    imageViewFile;
-        public TextView     textViewFile;
-        public Bitmap       imageBitmap;
-        public String       filename;
-        
-        public void onImageDownloaded(Bitmap aBitmap) {
-            if (null != aBitmap) {
-                Log.d (LOG_TAG, "onImageDownloaded(" + aBitmap + ")" );
-                textViewFile.setVisibility(TextView.GONE);
-                imageViewFile.setImageBitmap(aBitmap);
-                imageViewFile.setAdjustViewBounds(true);
-                imageViewFile.setHorizontalScrollBarEnabled(true);
-                //imageViewFile.getSuggestedMinimumHeight(); 
-                /* TODO SRombauts : tests en cours
-                imageViewFile.invalidate ();
-                imageViewFile.requestLayout();
-                imageViewFile.getParent().requestLayout();
-                imageViewFile.getParent().recomputeViewAttributes (imageViewFile);
-                mMsgListView.invalidate();
-                mMsgListView.requestLayout();
-                */
-            } else {
-                Log.e (LOG_TAG, "onImageDownloaded(" + aBitmap + ")" );
-            }
-        }
-        
-    }
 }

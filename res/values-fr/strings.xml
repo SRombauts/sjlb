@@ -4,8 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Ajout d\'un écran listant les messages privés envoyés\n
-        - Corrections de quelques bugs\n
+        - Ajout d\'un écran listant les fichiers attachés à un message\n
     </string>
     <string name="loginscreen_title">   Login et mot de passe                                                           </string>
     <string name="loginscreen_message"> Veuillez saisir votre login et votre mot de passe dans le menu des préférences  </string>
@@ -13,13 +12,15 @@
     <string name="pm_description">        Messages Privés            </string>
     <string name="pm_sent_description">   Messages Privés Envoyés    </string>
     <string name="user_description">      Membres                    </string>
+    <string name="files_description">     Fichiers Attachés          </string>
     
     <string name="button_show_pm">        Messages Privés            </string>
     <string name="button_show_user_list"> Membres                    </string>
     <string name="button_show_pm_sent">   Messages Privés Envoyés    </string>
     <string name="button_send_pm">        Envoyer le message privé   </string>
     <string name="button_send_msg">       Envoyer le message         </string>
-
+    <string name="button_show_files">     Fichiers Attachés          </string>
+    
     <!-- hint text and content description -->
     <string name="hint_send_msg">         Rédigez votre message, puis faites disparaître le clavier et utilisez le bouton ci-dessous pour \"Envoyer le message\""    </string>
     
