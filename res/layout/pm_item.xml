@@ -39,7 +39,7 @@
                 />
             </LinearLayout>
     </LinearLayout>
-        <TextView
+    <TextView
         android:id="@+id/pmText"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

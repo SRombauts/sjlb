@@ -27,13 +27,17 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
     private static final String LOG_TAG = "ActivityFiles";
     
     public static final String  START_INTENT_EXTRA_MSG_ID           = "MessageId";
+    public static final String  START_INTENT_EXTRA_MSG_TEXT         = "MessageText";
+    public static final String  START_INTENT_EXTRA_SUBJ_LABEL       = "SubjectLabel";
     
     private static final String URI_REPERTOIRE_FICHIERS_ATTACHES    = "http://www.sjlb.fr/FichiersAttaches/";
 
-    private FileListItemAdapter mAdapter            = null;
+    private FileListItemAdapter mAdapter                = null;
     private FileListItem[]      mFileListItem;
 
-    private long                mSelectedMessageId  = 0;
+    private long                mSelectedMessageId      = 0;
+    private String              mSelectedMessageText    = "";
+    private String              mSelectedSubjectLabel   = "";
     
     /** Called when the activity is first created. */
     @Override
@@ -42,26 +46,31 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
         Log.d (LOG_TAG, "onCreate...");
         
         // Layout de l'activité
-        setContentView(R.layout.activity_list);
+        setContentView(R.layout.file_list);
         
         // Récupère l'éventuel paramètre de lancement (id de du sujet du forum sélectionnée)
         Intent startIntent = getIntent();
         if (null != startIntent.getExtras())
         {
             mSelectedMessageId     = startIntent.getExtras().getLong  (START_INTENT_EXTRA_MSG_ID);
+            mSelectedMessageText   = startIntent.getExtras().getString(START_INTENT_EXTRA_MSG_TEXT);
+            mSelectedSubjectLabel  = startIntent.getExtras().getString(START_INTENT_EXTRA_SUBJ_LABEL);
             Log.i(LOG_TAG, "SelectedMessage (" + mSelectedMessageId + ")");
         }
         
         // Map la description du sujet pour la renseigner dans le titre
-        // TODO SRombauts : réserver un champ texte pour afficher aussi le message
-        setTitle(getString(R.string.files_description));
+        setTitle(mSelectedSubjectLabel);        
+
+        // Affiche le texte du message avant les images
+        TextView    fileTextView = (TextView)findViewById(R.id.file_msg_text);
+        fileTextView.setText(mSelectedMessageText);
         
         // Récupère un curseur sur les données (les fichiers attachés) en filtrant sur l'id du message sélectionné
         final String[] columns = {SJLB.File.FILENAME};
-        Cursor cursor = managedQuery( SJLB.File.CONTENT_URI,
-                                columns, // ne récupère que le filename
-                                SJLB.File.MSG_ID + "=" + mSelectedMessageId,
-                                null, null);
+        Cursor cursor = managedQuery(SJLB.File.CONTENT_URI,
+                                     columns, // ne récupère que le filename
+                                     SJLB.File.MSG_ID + "=" + mSelectedMessageId,
+                                     null, null);
 
         // Constitue le tableau de fichiers
         mFileListItem = new FileListItem [cursor.getCount()];
@@ -88,11 +97,11 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
                                             R.layout.file_item,
                                             mFileListItem);
 
-        ListView    fileListView = (ListView)findViewById(R.id.activity_listview);
+        ListView    fileListView = (ListView)findViewById(R.id.file_listview);
         fileListView.setAdapter (mAdapter);
 
         // Enregistre les listener d'IHM que la classe implémente
-        // TODO SRombauts
+        // TODO SRombauts : permettre de voir l'image en ligne, ou de la sauvegarder dans la galerie du téléphone
         //mFileListView.setOnItemClickListener (this);
     }
     

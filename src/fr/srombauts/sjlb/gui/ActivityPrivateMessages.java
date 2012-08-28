@@ -75,7 +75,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
                                           R.layout.pm_item,
                                           mCursor);
         
-        mPrivateMessagesListView = (ListView)findViewById(R.id.activity_listview);
+        mPrivateMessagesListView = (ListView)findViewById(R.id.pm_listview);
         mPrivateMessagesListView.setAdapter (mAdapter);
         // Scroll tout en bas de la liste des messages
         mPrivateMessagesListView.setSelection(mCursor.getCount()-1);

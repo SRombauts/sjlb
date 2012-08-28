@@ -455,7 +455,9 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             // lien vers le fichier sur le Site Web :
             final MessageListItemCache  cache = (MessageListItemCache) ((View) view.getParent()).getTag();
             Intent intent = new Intent(mContext, ActivityFiles.class);
-            intent.putExtra(ActivityFiles.START_INTENT_EXTRA_MSG_ID, cache.msgId);
+            intent.putExtra(ActivityFiles.START_INTENT_EXTRA_MSG_ID,        cache.msgId);
+            intent.putExtra(ActivityFiles.START_INTENT_EXTRA_MSG_TEXT,      cache.textView.getText());
+            intent.putExtra(ActivityFiles.START_INTENT_EXTRA_SUBJ_LABEL,    mSelectedSubjectLabel);
             Log.d (LOG_TAG, "onClick: Message Id=" + cache.msgId);                
             startActivity(intent);
         }

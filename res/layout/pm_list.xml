@@ -33,7 +33,7 @@
     >
 	    
 	    <ListView
-	        android:id="@+id/activity_listview"
+	        android:id="@+id/pm_listview"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
 	        android:background="#FFF"
