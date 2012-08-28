@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import fr.srombauts.sjlb.ApplicationSJLB;
 import fr.srombauts.sjlb.R;
 import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.service.AsynchTaskDownloadImage;
@@ -77,18 +78,21 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
         int nbFiles = cursor.getCount();
         //Log.v(LOG_TAG, "mSelectedMessageId=" + mSelectedMessageId + " cursor.getCount()=" + cursor.getCount());
         for (int position = 0; position < nbFiles; position++) {
+            // TODO SRombauts : filtrer sur les extensions d'image reconnues uniquement !
             if (cursor.moveToPosition(position)) {
                 // Récupère le nom du fichier
                 FileListItem fileItem = new FileListItem();
                 fileItem.fileName = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.File.FILENAME));
                 mFileListItem[position] = fileItem;
-                // Lance ici le téléchargement du fichier en tache de fond
-                // TODO SRombauts : mémoriser les bitmaps au niveau de l'application pour pouvoir les restaurer rapidement (changement d'orientation) ou les partager entre activités
-                // TODO SRombauts : ne faire ça que s'il s'agit d'une extension d'image reconnue !
-                fileItem.fileDownloader = new AsynchTaskDownloadImage(this);
-                Log.i(LOG_TAG, "ImageDownloader.execute(" + fileItem.fileName + ", " + position + ")");
-                fileItem.fileDownloader.execute(URI_REPERTOIRE_FICHIERS_ATTACHES + fileItem.fileName,
-                                        Long.toString(position));
+                // Récupère l'image éventuellement précédemment téléchargée durant la vie de l'application (avant changement d'orientation par exemple) 
+                fileItem.fileBitmap = ((ApplicationSJLB)getApplication ()).getFichiersAttaches(fileItem.fileName);
+                if (null == fileItem.fileBitmap) {
+                    // Sinon, lance ici le téléchargement du fichier en tache de fond
+                    fileItem.fileDownloader = new AsynchTaskDownloadImage(this);
+                    Log.i(LOG_TAG, "ImageDownloader.execute(" + fileItem.fileName + ", " + position + ")");
+                    fileItem.fileDownloader.execute(URI_REPERTOIRE_FICHIERS_ATTACHES + fileItem.fileName,
+                                                    Long.toString(position));
+                }
             }
         }
 
@@ -123,7 +127,9 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
         // Interrompt tout chargement éventuellement en cours
         int nbFiles = mFileListItem.length;
         for (int position = 0; position < nbFiles; position++) {
-            mFileListItem[position].fileDownloader.cancel();
+            if (null != mFileListItem[position].fileDownloader) {
+                mFileListItem[position].fileDownloader.cancel();
+            }
         }
     }
     
@@ -137,8 +143,10 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
     public void onImageDownloaded(Bitmap aBitmap, int aPosition) {
         FileListItem fileItem = mFileListItem[aPosition];
         if (null != aBitmap) {
-            // TODO SRombauts : mémoriser les bitmaps au niveau de l'application pour pouvoir les restaurer rapidement (changement d'orientation) ou les partager entre activités
+            // Met le bitmap dans la liste,
             fileItem.fileBitmap = aBitmap;
+            // et le mémorise en plus au niveau de l'application pour pouvoir le restaurer rapidement (changement d'orientation, ou partage entre activités)
+            ((ApplicationSJLB)getApplication ()).setFichiersAttaches(fileItem.fileName, aBitmap);
             Log.i (LOG_TAG, "onImageDownloaded(" + fileItem.fileName + ", " + aPosition + ")=" + fileItem.fileBitmap);
             mAdapter.notifyDataSetChanged();
         } else {

@@ -1,11 +1,13 @@
 package fr.srombauts.sjlb;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Vector;
 
 import android.app.Application;
 import android.content.ContentUris;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.ContactsContract;
@@ -50,6 +52,9 @@ public class ApplicationSJLB extends Application {
     
     // Liste des contacts Google correspondant aux utilisateurs du site
     private Vector<UserContactDescr>    mUserContactList    = null;
+    
+    // Table associant aux noms des fichiers attachés les bitmaps téléchargés
+    private HashMap<String,Bitmap>      mMapFichiersAttaches= new HashMap<String,Bitmap>();
 
     // Id de l'utilisateur de l'application
     private int                         mUserId             = 0;
@@ -59,10 +64,21 @@ public class ApplicationSJLB extends Application {
         return mUserId;
     }
 
+    // Accesseur au contact de l'utilisateur par son ID
     synchronized public final UserContactDescr getUserContactById(int aUserId) {
         return mUserContactList.get(aUserId);
     }
+
+    // Setter de l'image téléchargée correspondant à l'URL fournie (le cas échéant, sinon null)
+    synchronized public final void setFichiersAttaches(String aUrl, Bitmap aBitmap) {
+        mMapFichiersAttaches.put(aUrl, aBitmap);
+    }
     
+    // Accesseur à l'image téléchargée correspondant à l'URL fournie (le cas échéant, sinon null)
+    synchronized public final Bitmap getFichiersAttaches(String aUrl) {
+        return mMapFichiersAttaches.get(aUrl);
+    }
+
     /**
      * Appelée lorsque l'application démarre, avant toute autre activité
      */
