@@ -442,7 +442,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             final MessageListItemCache  cache = (MessageListItemCache) ((View) view.getParent()).getTag();
             Intent intent = new Intent(mContext, ActivityFiles.class);
             intent.putExtra(ActivityFiles.START_INTENT_EXTRA_MSG_ID, cache.msgId);
-            Log.i (LOG_TAG, "TODO onClick: cache.msgId=" + cache.msgId + "intent=" + intent);                
+            Log.d (LOG_TAG, "onClick: Message Id=" + cache.msgId);                
             startActivity(intent);
         }
     }
