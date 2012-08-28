@@ -416,10 +416,13 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                                                 null, null);
 
             int count = cursorFiles.getCount();
-            if (0<count) {
-                Log.d(LOG_TAG, "msgId " + cache.msgId + " nbFiles=" + cursorFiles.getCount());
+            if (0 < count) {
+                Log.d(LOG_TAG, "msgId=" + cache.msgId + " nbFiles=" + cursorFiles.getCount());
                 cache.fileButton.setVisibility(View.VISIBLE);
                 cache.fileButton.setOnClickListener (this);
+            } else {
+                cache.fileButton.setVisibility(View.GONE);
+                cache.fileButton.setOnClickListener (null);
             }
         }
 

@@ -8,7 +8,8 @@ public interface CallbackImageDownload
      * Appelée lorsqu'un téléchargement d'une image s'est terminé
      * dans le contexte du thread de GUI (méthode dite synchronisée)
      * 
-     * @param abResult
+     * @param aBitmap   Image correspondant au fichier téléchargé
+     * @param aPosition Position du fichier dans la liste des fichiers attachés d'un message
      */
-    public void onImageDownloaded (Bitmap aBitmap);
+    public void onImageDownloaded (Bitmap aBitmap, int aPosition);
 }

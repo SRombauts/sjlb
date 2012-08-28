@@ -17,11 +17,16 @@ import android.util.Log;
 
 /**
  * Travail en tâche de fond, chargée d'envoyer un nouveau message du forum
+ * 
+ * Paramètres :
+ * - l'URL absolue du fichier à télécharger
+ * - la position du fichier dans la liste
  */
 public class AsynchTaskDownloadImage extends AsyncTask<String, Void, Bitmap> {
     private static final String     LOG_TAG        = "DownloadImageTask";
     
     private String                  mUrl;
+    private int                     mPosition;
 
     private CallbackImageDownload   mCallbackDownload = null;
     
@@ -32,11 +37,24 @@ public class AsynchTaskDownloadImage extends AsyncTask<String, Void, Bitmap> {
     public AsynchTaskDownloadImage(CallbackImageDownload aCallbackDownload) {
         mCallbackDownload   = aCallbackDownload;
     }
+    
+    /**
+     * @brief Annule le transfert en court et reset la callback
+     * 
+     * Doit être appelé dans le thread de l'UI
+     */
+    public void cancel() {
+        if (AsyncTask.Status.FINISHED != getStatus()) {
+            Log.i(LOG_TAG, "annulation " + mUrl + "' (" + mPosition + ")");
+            super.cancel(true); // force la fin de toute opération en cours
+        }
+        mCallbackDownload   = null;
+        mUrl                = null;
+    }
 
     protected void onPreExecute() {      
-        Log.d(LOG_TAG, "onPreExecute");
+        //Log.v(LOG_TAG, "onPreExecute");
     }
-    
     
     /**
      * Lance la récupération et le parse de la liste XML des messages non lus
@@ -46,10 +64,10 @@ public class AsynchTaskDownloadImage extends AsyncTask<String, Void, Bitmap> {
     protected Bitmap doInBackground(String... args) {
         Bitmap bitmap = null;
         
-        mUrl =  args[0];
+        mUrl        = args[0];
+        mPosition   = Integer.parseInt(args[1]);
         
-        // TODO ; lancement du téléchargement
-        Log.d(LOG_TAG, "lancement du téléchargement de '" + mUrl + "'");
+        Log.i(LOG_TAG, "lancement du téléchargement de '" + mUrl + "' (" + mPosition + ")");
 
         {
             try
@@ -93,14 +111,16 @@ public class AsynchTaskDownloadImage extends AsyncTask<String, Void, Bitmap> {
         super.onPostExecute(aBitmap);
 
         if (null != aBitmap) {
-            Log.i(LOG_TAG, "onPostExecute(" + mUrl + ") OK");
+            Log.i(LOG_TAG, "onPostExecute(" + mUrl + ", " + mPosition + ") OK");
         }
         else {
-            Log.e(LOG_TAG, "onPostExecute(" + mUrl + ") KO");
+            Log.e(LOG_TAG, "onPostExecute(" + mUrl + ", " + mPosition + ") KO");
         }
         
         // Notifie l'activité appelante à l'aide d'une callback
-        mCallbackDownload.onImageDownloaded(aBitmap);
+        if (null != mCallbackDownload) {
+            mCallbackDownload.onImageDownloaded(aBitmap, mPosition);
+        }
     }
 }
 
