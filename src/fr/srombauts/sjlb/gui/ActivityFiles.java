@@ -62,10 +62,6 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
         // Map la description du sujet pour la renseigner dans le titre
         setTitle(mSelectedSubjectLabel);        
 
-        // Affiche le texte du message avant les images
-        TextView    fileTextView = (TextView)findViewById(R.id.file_msg_text);
-        fileTextView.setText(mSelectedMessageText);
-        
         // Récupère un curseur sur les données (les fichiers attachés) en filtrant sur l'id du message sélectionné
         final String[] columns = {SJLB.File.FILENAME};
         Cursor cursor = managedQuery(SJLB.File.CONTENT_URI,
@@ -73,17 +69,21 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
                                      SJLB.File.MSG_ID + "=" + mSelectedMessageId,
                                      null, null);
 
-        // Constitue le tableau de fichiers
-        mFileListItem = new FileListItem [cursor.getCount()];
+        // Constitue le tableau de fichiers ;
+        mFileListItem = new FileListItem[cursor.getCount()+1];
+        
+        // commence par un item vide réservé à l'affichage du texte du message (à la position 0)
+        FileListItem msgTextItem = new FileListItem();
+        mFileListItem[0] = msgTextItem;
+        
         int nbFiles = cursor.getCount();
         //Log.v(LOG_TAG, "mSelectedMessageId=" + mSelectedMessageId + " cursor.getCount()=" + cursor.getCount());
-        for (int position = 0; position < nbFiles; position++) {
+        for (int position = 1; position < (nbFiles+1); position++) {
             // TODO SRombauts : filtrer sur les extensions d'image reconnues uniquement !
-            if (cursor.moveToPosition(position)) {
+            if (cursor.moveToPosition(position-1)) {
                 // Récupère le nom du fichier
                 FileListItem fileItem = new FileListItem();
                 fileItem.fileName = cursor.getString(cursor.getColumnIndexOrThrow(SJLB.File.FILENAME));
-                mFileListItem[position] = fileItem;
                 // Récupère l'image éventuellement précédemment téléchargée durant la vie de l'application (avant changement d'orientation par exemple) 
                 fileItem.fileBitmap = ((ApplicationSJLB)getApplication ()).getFichiersAttaches(fileItem.fileName);
                 if (null == fileItem.fileBitmap) {
@@ -93,6 +93,8 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
                     fileItem.fileDownloader.execute(URI_REPERTOIRE_FICHIERS_ATTACHES + fileItem.fileName,
                                                     Long.toString(position));
                 }
+                // insert l'item dans la liste des fichiers
+                mFileListItem[position] = fileItem;
             }
         }
 
@@ -105,6 +107,7 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
         fileListView.setAdapter (mAdapter);
 
         // Enregistre les listener d'IHM que la classe implémente
+        fileListView.setOnTouchListener(this);
         // TODO SRombauts : permettre de voir l'image en ligne, ou de la sauvegarder dans la galerie du téléphone
         //mFileListView.setOnItemClickListener (this);
     }
@@ -154,16 +157,14 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
         }
     }
     
-    
     @Override
     protected boolean onLeftGesture () {
-        Log.i (LOG_TAG, "onTouch: va a l'ecran de gauche... quitte l'activité pour retour à la liste des message");
+        Log.i (LOG_TAG, "onTouch: va a l'ecran de gauche... quitte l'activité pour retour à la liste des messages");
         finish ();
         return true;
     }
 
     // NOTE SRombauts : pas besoin de onRightGesture()
-    
     
     /** 
      * @brief ArayAdapter gérant l'affichage de la liste des images téléchargées
@@ -181,9 +182,10 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
             //Log.d (LOG_TAG, "getView(" + position + "," + convertView + "," + parent + ")");
             
             View        view;
-            TextView    fileTextView;
+            TextView    fileMsgTextView;
             ImageView   fileImageView;
-
+            TextView    fileTextView;
+           
             // Construit ou récupère la vue appropriée
             if (convertView == null) {
                 Log.v (LOG_TAG, "inflate");
@@ -195,22 +197,36 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
             // Récupère l'item correspondant à la position
             FileListItem fileItem = getItem(position);
                     
-            fileTextView  = (TextView) view.findViewById(R.id.filename);
+            fileMsgTextView = (TextView)  view.findViewById(R.id.file_msg_text);
+            fileImageView   = (ImageView) view.findViewById(R.id.file_image);
+            fileTextView    = (TextView)  view.findViewById(R.id.file_name);
 
-            if (null == fileItem.fileBitmap) {
-                // Affiche le nom du fichier tant que l'image n'est pas disponible
-                fileTextView.setText (fileItem.fileName);
-                Log.d (LOG_TAG, "getView(" + fileItem.fileName + ", " + position + ") : fileBitmap=" + fileItem.fileBitmap);
-            } else {
-                // Cache le nom du fichier dès que le fichier est disponible
+            if (0 == position) {
+                // Cas particulier de l'item en position 0 : utilisé pour afficher le texte du message ;
+                fileMsgTextView.setText (mSelectedMessageText);
+                fileMsgTextView.setVisibility(View.VISIBLE);
                 fileTextView.setVisibility(View.GONE);
-                // et affiche l'image téléchargée
-                fileImageView = (ImageView) view.findViewById(R.id.fileImage);
-                fileImageView.setImageBitmap(fileItem.fileBitmap);
-                fileImageView.setAdjustViewBounds(true);
-                Log.d (LOG_TAG, "getView(" + fileItem.fileName + ", " + position + ")");
+                fileImageView.setVisibility(View.GONE);
+                Log.v (LOG_TAG, "getView(" + position + ")");
+            } else {
+                fileMsgTextView.setVisibility(View.GONE);
+                if (null == fileItem.fileBitmap) {
+                    // Affiche le nom du fichier tant que l'image n'est pas disponible
+                    fileTextView.setText(fileItem.fileName);
+                    fileTextView.setVisibility(View.VISIBLE);
+                    fileImageView.setVisibility(View.GONE);
+                    Log.v (LOG_TAG, "getView(" + fileItem.fileName + ", " + position + ") : fileBitmap=" + fileItem.fileBitmap);
+                } else {
+                    // Cache le nom du fichier dès que le fichier est disponible
+                    fileTextView.setVisibility(View.GONE);
+                    // et affiche l'image téléchargée
+                    fileImageView.setVisibility(View.VISIBLE);
+                    fileImageView.setImageBitmap(fileItem.fileBitmap);
+                    fileImageView.setAdjustViewBounds(true);
+                    Log.v (LOG_TAG, "getView(" + fileItem.fileName + ", " + position + ")");
+                }
             }
-
+            
             return view;
         }
     }    

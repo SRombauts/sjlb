@@ -3,10 +3,22 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="#FFF"
     >
+    <TextView
+        android:id="@+id/file_msg_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="#ffff"
+        android:textSize="14sp"
+        android:textColor="#000"
+        android:autoLink="all"
+        />
     <ImageView
-        android:id="@+id/fileImage"
+        android:id="@+id/file_image"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:scaleType="centerInside"
@@ -15,7 +27,7 @@
         android:contentDescription="@string/file_description"
         />
     <TextView
-        android:id="@+id/filename"
+        android:id="@+id/file_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center"

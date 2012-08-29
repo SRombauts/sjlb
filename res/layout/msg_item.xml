@@ -62,8 +62,11 @@
         android:id="@+id/msgFileButton"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
+        android:layout_marginLeft="75dp"
+        android:layout_marginRight="75dp"
+        android:gravity="center"
+        android:textSize="12sp"
         android:text="@string/button_show_files"
-        android:visibility="invisible"
+        android:visibility="gone"
     />    
 </LinearLayout>

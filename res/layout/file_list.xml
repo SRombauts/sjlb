@@ -5,19 +5,6 @@
     android:layout_height="fill_parent"
     android:background="#e4e4e4"
     >
-    <TextView
-        android:id="@+id/file_msg_text"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:layout_marginLeft="10dp"
-	     android:layout_marginRight="10dp"
-        android:background="#ffff"
-        android:textSize="14sp"
-        android:textColor="#000"
-        android:autoLink="all"
-        />
     <ListView
         android:id="@+id/file_listview"
         android:layout_width="fill_parent"

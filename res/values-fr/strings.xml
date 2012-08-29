@@ -4,7 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Ajout d\'un écran listant les fichiers attachés à un message\n
+        Nouvel écran dédié à l\'affichage des fichiers attachés à un message\n
     </string>
     <string name="loginscreen_title">   Login et mot de passe                                                           </string>
     <string name="loginscreen_message"> Veuillez saisir votre login et votre mot de passe dans le menu des préférences  </string>
