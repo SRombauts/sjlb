@@ -296,7 +296,6 @@ public class API {
             final int    apiLevel       = prefs.getInt(PARAM_API_LEVEL, 0);
             final int    versionAppli   = prefs.getInt(PARAM_VERSION_APPLI, 0);
             final int    versionCode    = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), PackageManager.GET_ACTIVITIES).versionCode;
-            // ... seulement s'il y a du nouveau !
             if (   (false == phoneModel.equals(Build.MODEL))
                 || (false == buildBrand.equals(Build.BRAND))
                 || (false == versionAndroid.equals(Build.VERSION.RELEASE))
@@ -305,6 +304,7 @@ public class API {
                )
             {
                 Log.w(LOG_TAG, "SEND device: " + Build.MODEL + " (" + Build.MANUFACTURER + "/" + Build.BRAND + ") " + Build.VERSION.RELEASE + " (api_level=" + Build.VERSION.SDK_INT + ") versionCode=" + versionCode);
+                // ne renvoie tout que s'il y a du nouveau !
                 nameValuePairs.add(new BasicNameValuePair(PARAM_PHONE_MODEL,    Build.MODEL));
                 nameValuePairs.add(new BasicNameValuePair(PARAM_BUILD_BRAND,    Build.BRAND));
                 nameValuePairs.add(new BasicNameValuePair(PARAM_VERSION_ANDROID,Build.VERSION.RELEASE));
@@ -312,6 +312,8 @@ public class API {
                 nameValuePairs.add(new BasicNameValuePair(PARAM_VERSION_APPLI,  Integer.toString(versionCode)));
             } else {
                 Log.d(LOG_TAG, "ALREADY SENT device: " + Build.MODEL + " (" + Build.MANUFACTURER + "/" + Build.BRAND + ") " + Build.VERSION.RELEASE + " (api_level=" + Build.VERSION.SDK_INT + ") versionCode=" + versionCode);
+                // sinon, renvoi tout de même le modèle, pour faire du logging
+                nameValuePairs.add(new BasicNameValuePair(PARAM_PHONE_MODEL,    Build.MODEL));
             }
 
             // TODO SRombauts : ajouter l'état de l'application (ouverte/fermée) + le nombre de messages récupérés localement
