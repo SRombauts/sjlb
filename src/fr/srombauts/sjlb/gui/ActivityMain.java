@@ -195,7 +195,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         }
 
         // Puis affiches ces infos dans le titre
-        setTitle("SJLB version " + info.versionName + "     (" + NbMsg + " messages)");
+        setTitle("SJLB v" + info.versionName + "   (" + NbMsg + " messages)");
     }    
     
     /**
@@ -218,14 +218,14 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
     }
     
     // Sur clic sur l'une des catégories
-    public void onItemClick(AdapterView<?> parent, View view, int index, long arg3) {
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         // Utilise les préférences pour voir si le login et mot de passe sont renseignés  :
         if (PrefsLoginPassword.AreFilled (this)) {
             // Lance l'activité correspondante avec en paramètre l'id et le label de la catégorie sélectionnée
             mSavedIntent = new Intent(this, ActivityForumSubjects.class);
             String[] categoryLabels = getResources().getStringArray(R.array.category_labels);
-            mSelectedCategoryId     = index+1;
-            mSelectedCategoryLabel  = categoryLabels[index];
+            mSelectedCategoryId     = position+1;
+            mSelectedCategoryLabel  = categoryLabels[position];
             mSavedIntent.putExtra(ActivityForumSubjects.START_INTENT_EXTRA_CAT_ID,    mSelectedCategoryId);
             mSavedIntent.putExtra(ActivityForumSubjects.START_INTENT_EXTRA_CAT_LABEL, mSelectedCategoryLabel);
             Log.d (LOG_TAG, "onItemClick: mSavedIntent.putExtra(" + mSelectedCategoryId + ", " + mSelectedCategoryLabel + ")");

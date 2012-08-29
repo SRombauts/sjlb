@@ -19,7 +19,8 @@
     <string name="button_show_pm_sent">   Messages Privés Envoyés    </string>
     <string name="button_send_pm">        Envoyer le message privé   </string>
     <string name="button_send_msg">       Envoyer le message         </string>
-    <string name="button_show_files">     Fichiers Attachés          </string>
+    <string name="button_show_file">      Fichier attaché            </string>
+    <string name="button_show_files">     fichiers attachés          </string>
     
     <!-- hint text and content description -->
     <string name="hint_send_msg">         Rédigez votre message, puis faites disparaître le clavier et utilisez le bouton ci-dessous pour \"Envoyer le message\""    </string>

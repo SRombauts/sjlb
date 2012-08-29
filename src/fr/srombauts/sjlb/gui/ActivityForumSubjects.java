@@ -93,7 +93,6 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
         mSubjectsListView.setOnItemClickListener(this);
         mSubjectsListView.setOnItemLongClickListener(this);
         mSubjectsListView.setOnTouchListener(this);
-        mSubjectsListView.getRootView().setOnTouchListener(this);
 
         // Restaure les valeurs du dernier intent seulement si elles correspondent à la même catégorie que celle sélectionnée
         SharedPreferences settings = getSharedPreferences(SAVE_FILENAME, 0);
@@ -213,9 +212,9 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     /**
      *  Sur sélection d'un sujet, lance l'activité "messages du forum" avec en paramètre l'id du sujet :
      */
-    public void onItemClick(AdapterView<?> parent, View view, int index, long arg3) {
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         mSavedIntent = new Intent(this, ActivityForumMessages.class);
-        mCursor.moveToPosition(index);
+        mCursor.moveToPosition(position);
         mSelectedSubjId      = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj._ID));
         mSelectedSubjLabel   = mCursor.getString(mCursor.getColumnIndexOrThrow(SJLB.Subj.TEXT));
         mSelectedGroupId     = mCursor.getLong  (mCursor.getColumnIndexOrThrow(SJLB.Subj.GROUP_ID));

@@ -1,18 +1,29 @@
 package fr.srombauts.sjlb.gui;
 
+import java.io.File;
+import java.io.FileOutputStream;
+
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
+import android.media.MediaScannerConnection.MediaScannerConnectionClient;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import fr.srombauts.sjlb.ApplicationSJLB;
 import fr.srombauts.sjlb.R;
 import fr.srombauts.sjlb.db.SJLB;
@@ -24,7 +35,7 @@ import fr.srombauts.sjlb.service.CallbackImageDownload;
  * Activité présentant la liste des sujets de la catégorie sélectionnée
  * @author 22/08/2010 SRombauts
  */
-public class ActivityFiles extends ActivityTouchListener implements CallbackImageDownload {
+public class ActivityFiles extends ActivityTouchListener implements OnItemClickListener, CallbackImageDownload {
     private static final String LOG_TAG = "ActivityFiles";
     
     public static final String  START_INTENT_EXTRA_MSG_ID           = "MessageId";
@@ -108,8 +119,9 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
 
         // Enregistre les listener d'IHM que la classe implémente
         fileListView.setOnTouchListener(this);
-        // TODO SRombauts : permettre de voir l'image en ligne, ou de la sauvegarder dans la galerie du téléphone
-        //mFileListView.setOnItemClickListener (this);
+
+        // Enregistre le menu contextuel de la liste
+        fileListView.setOnItemClickListener(this);
     }
     
     @Override
@@ -124,15 +136,112 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
         Log.d (LOG_TAG, "onPause...");
      }
     
-    protected void onStop() {
-        super.onStop();
-        Log.d (LOG_TAG, "onStop... : cancel downloads");
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.i (LOG_TAG, "onDestroy... : cancel downloads");
         // Interrompt tout chargement éventuellement en cours
         int nbFiles = mFileListItem.length;
         for (int position = 0; position < nbFiles; position++) {
             if (null != mFileListItem[position].fileDownloader) {
                 mFileListItem[position].fileDownloader.cancel();
             }
+        }
+    }
+    
+    /**
+     * @brief Click sur une image affichée : la récupère dans la galerie du téléphone (si pas déjà présente) et l'affiche dans ce contexte
+     */
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (null != mFileListItem[position].fileBitmap) {
+            final String[]  projection  = { MediaStore.Images.Media._ID };
+            final String    selection   = MediaStore.Images.Media.TITLE + "=?";
+            final String[]  args        = { mFileListItem[position].fileName };
+            final String    imageUrl;
+            Cursor cursor = MediaStore.Images.Media.query(getContentResolver(),
+                                                          MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                                          projection, selection, args, null);
+            if (null != cursor) {
+                //Log.v(LOG_TAG, "projection[0]=" + projection[0] + " selection=" + selection + " args[0]=" + args[0] + ": count=" + cursor.getCount());
+                if (0 < cursor.getCount()) {
+                    cursor.moveToFirst();
+                    long imageId = cursor.getLong(0);                
+                    imageUrl = MediaStore.Images.Media.EXTERNAL_CONTENT_URI + "/"+ imageId;
+                    Log.d(LOG_TAG, "Photo déjà dans la galerie (" + imageUrl + ")");
+                    Toast.makeText(this, "Photo déjà dans la galerie", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Si pas déjà sauvegardée, l'insert ici :
+                    imageUrl = saveImage(mFileListItem[position].fileBitmap, mFileListItem[position].fileName);
+                }
+                cursor.close();
+                if (null != imageUrl) {
+                    Log.i(LOG_TAG, "startActivity(ACTION_VIEW, " + imageUrl + ")");
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(imageUrl), "image/*");
+                    startActivity(intent);                
+                } else {
+                    Log.e(LOG_TAG, "onItemClick(" + mFileListItem[position].fileBitmap + ") : no image !");
+                }
+            }
+        }        
+    }
+    
+    // Enregistre dans l'espace dédiés aux médias partagés (sd card ou zone de flash réservé)
+    private String saveImage(Bitmap aBitmap, String aFilename) {
+        String  imageUrl = null;
+        try {
+            String path = Environment.getExternalStorageDirectory().toString() + "/sjlb/";
+            new File(path).mkdir();
+            File file = new File(path, aFilename);
+            Log.d(LOG_TAG, "file=" + file);
+            FileOutputStream out = new FileOutputStream(file);
+            aBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+            imageUrl = MediaStore.Images.Media.insertImage(getContentResolver(),
+                                                           file.getAbsolutePath(),
+                                                           file.getName(),
+                                                           file.getName());
+            // Indique au scanner de média la présence d'un nouveau fichier, pour le rendre immédiatement disponible dans la galerie de photo
+            MyMediaScannerConnectionClient  mediaClient = new MyMediaScannerConnectionClient();
+            MediaScannerConnection          mediaScanner= new MediaScannerConnection(this, mediaClient);
+            mediaClient.startScanner(mediaScanner, file.getAbsolutePath());
+
+            Log.i(LOG_TAG, "saveImage(" + file + ")");
+            Toast.makeText(getApplicationContext(), "Photo ajoutée à la galerie SJLB", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return imageUrl;
+    }
+    
+    // Indique au scanner de média la présence d'un nouveau fichier, pour le rendre immédiatement disponible dans la galerie de photo
+    class MyMediaScannerConnectionClient implements MediaScannerConnectionClient {
+
+        private MediaScannerConnection  mScanner;
+        private String                  mPath;
+
+        public void startScanner(MediaScannerConnection aScanner, String aPath) {
+            Log.d(LOG_TAG, "startScanner(" + aPath + ")");
+            mScanner = aScanner;
+            mPath    = aPath;
+            mScanner.connect();
+        }
+        
+        @Override
+        public void onMediaScannerConnected() {
+            Log.v(LOG_TAG, "onMediaScannerConnected(" + mPath + ")");
+            mScanner.scanFile(mPath, null);
+
+        }
+
+        @Override
+        public void onScanCompleted(String path, Uri uri) {
+            Log.i(LOG_TAG, "Media Scan completed on file: path=" + path + " uri=" + uri);
+            mScanner.disconnect();
+            mScanner = null;
         }
     }
     
@@ -209,12 +318,16 @@ public class ActivityFiles extends ActivityTouchListener implements CallbackImag
                 fileImageView.setVisibility(View.GONE);
                 Log.v (LOG_TAG, "getView(" + position + ")");
             } else {
+                // dans les autres cas, cache le champ texte du message
                 fileMsgTextView.setVisibility(View.GONE);
+                
                 if (null == fileItem.fileBitmap) {
                     // Affiche le nom du fichier tant que l'image n'est pas disponible
                     fileTextView.setText(fileItem.fileName);
                     fileTextView.setVisibility(View.VISIBLE);
-                    fileImageView.setVisibility(View.GONE);
+                    // et affiche l'icône de fichier par défaut
+                    fileImageView.setImageDrawable(getResources().getDrawable(R.drawable.file_icon));
+                    fileImageView.setVisibility(View.VISIBLE);
                     Log.v (LOG_TAG, "getView(" + fileItem.fileName + ", " + position + ") : fileBitmap=" + fileItem.fileBitmap);
                 } else {
                     // Cache le nom du fichier dès que le fichier est disponible

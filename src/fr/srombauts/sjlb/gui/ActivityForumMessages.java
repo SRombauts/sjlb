@@ -129,7 +129,6 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         mMsgListView.setOnItemClickListener(this);
         mMsgListView.setOnItemLongClickListener(this);
         mMsgListView.setOnTouchListener(this);
-        mMsgListView.getRootView().setOnTouchListener(this);
         
         // Restaure un éventuel état sauvegardé (état de la boîte d'édition) suite à un changement d'orientation  :
         if (null != savedInstanceState) {
@@ -265,7 +264,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     /**
      *  Sur clic sur un message, fait apparaître la boîte de réponse
      */
-    public void onItemClick(AdapterView<?> parent, View view, int index, long arg3) {
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         openEditText ();
     }
     
@@ -417,8 +416,15 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
 
             int count = cursorFiles.getCount();
             if (0 < count) {
-                Log.d(LOG_TAG, "msgId=" + cache.msgId + " nbFiles=" + cursorFiles.getCount());
+                Log.d(LOG_TAG, "msgId=" + cache.msgId + " nbFiles=" + count);
                 cache.fileButton.setVisibility(View.VISIBLE);
+                final String attachedFileText;
+                if (1 == count) {
+                    attachedFileText = getString(R.string.button_show_file);
+                } else {
+                    attachedFileText = count + " " + getString(R.string.button_show_files);
+                }
+                cache.fileButton.setText(attachedFileText);
                 cache.fileButton.setOnClickListener (this);
             } else {
                 cache.fileButton.setVisibility(View.GONE);

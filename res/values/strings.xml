@@ -19,7 +19,8 @@
     <string name="button_show_pm_sent">   Private messages sent   </string>
     <string name="button_send_pm">        Send Private Message    </string>
     <string name="button_send_msg">       Send Message            </string>
-    <string name="button_show_files">     Attached Files          </string>
+    <string name="button_show_file">      Attached file           </string>
+    <string name="button_show_files">     attached files          </string>
     
     <!-- hint text and content description -->
     <string name="hint_send_msg">         Write you message, then remove the keyboard to push the \"send\" button"    </string>
