@@ -3,8 +3,8 @@
      PAS pour les tests, car cette valeur pourrait être utilisée pour signaler automatiquement une mise à jour disponible -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="fr.srombauts.sjlb"
-      android:versionCode="72"
-      android:versionName="0.7.2">
+      android:versionCode="80"
+      android:versionName="0.8.0">
 <!--  android:installLocation="auto" : seulement à partir de l'API level 8 -->
       
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
@@ -13,8 +13,8 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <!-- Juliette est en 7  (2.1-update1)
-         Les autres   en 10 (2.3.3+) -->
+    <!-- Juliette était en 7  (2.1-update1)
+         Les autres     en 10 (2.3.3+) -->
     <uses-sdk android:minSdkVersion="7"       
               android:targetSdkVersion="11" /> <!-- 11 (3.0, Honeycomb) permet d'utiliser l'ActionBar sur une tablette -->
     

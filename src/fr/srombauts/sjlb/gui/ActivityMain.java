@@ -195,7 +195,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         }
 
         // Puis affiches ces infos dans le titre
-        setTitle("SJLB v" + info.versionName + "   (" + NbMsg + " messages)");
+        setTitle("SJLB " + info.versionName + "   (" + NbMsg + " messages)");
     }    
     
     /**
