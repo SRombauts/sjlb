@@ -4,7 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Dedicated listview for attached filed\n
+        Backgroud service cleanup\n
     </string>
     <string name="loginscreen_title">   Login/password                                          </string>
     <string name="loginscreen_message"> Enter your login and password in the preferences menu   </string>

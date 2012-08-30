@@ -124,4 +124,19 @@ public class StartService {
             Log.e(LOG_TAG, "sendMsg: SJLB Service was not started");
         }
     }
+    /**
+     * Transmet au service une consigne (un Intent) de delete de tous les PM.
+     * 
+     * Lance le service s'il n'est pas déjà lancé, sinon ne fait qu'ajouter la demande d'affacement de tous les pm à sa fifo d'Intent
+     */
+    public static void delAllPM (Context context) {
+        Intent intentService = new Intent();
+        intentService.setClassName( "fr.srombauts.sjlb", "fr.srombauts.sjlb.service.ServiceSJLB");
+        intentService.setAction(ServiceSJLB.ACTION_DEL_PM);
+        intentService.putExtra(ServiceSJLB.START_INTENT_EXTRA_PM_ID,  "all");
+        ComponentName cname = context.startService(intentService);
+        if (cname == null) {
+            Log.e(LOG_TAG, "sendMsg: SJLB Service was not started");
+        }
+    }
 }

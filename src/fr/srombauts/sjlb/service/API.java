@@ -138,22 +138,50 @@ public class API {
     public static final int     NOTIFICATION_NEW_MSG_ID     = 2;
 
     static final private String API_URI                     = "http://www.sjlb.fr/Android/API.php";
+    
+    ////////////////////////////////////////////////
+    // Paramètres POST :
+    // Paramètres obligatoire pour toute requête :
     static final private String PARAM_LOGIN                 = "login";              // login (pseudo) de l'utilisateur
     static final private String PARAM_PASSWORD              = "password";           // password (encrypté en MD5) de l'utilisateur
     static final private String PARAM_DATE_FIRST_MSG        = "date_first_msg";     // date du plus vieux message déjà récupéré
     static final private String PARAM_DATE_LAST_MSG         = "date_last_msg";      // date du plus récent message récupéré
     static final private String PARAM_ID_LAST_PM            = "id_last_pm";         // id de pm le plus élevé déjà récupéré (dernier pm reçu)
     static final private String PARAM_DATE_LAST_USER        = "date_last_user";     // valeur du champ 'DateDerniereMaj' la plus récente (dernière maj du user reçue)
-    static final private String PARAM_DATE_LAST_MSG_SUPPR   = "date_last_msg_suppr";//  date du dernier message supprimé
-    static final private String PARAM_DATE_LAST_PM_SUPPR    = "date_last_pm_suppr"; //  date du dernier pm supprimé
-    static final private String PARAM_LIST_MSG_LUS          = "msg_lus";            // liste d'id de messages lus sur l'application mobile, séparés par des virgules
-    
-    static final private String PARAM_PHONE_MODEL           = "model";
+    static final private String PARAM_DATE_LAST_MSG_SUPPR   = "date_last_msg_suppr";// date du dernier message supprimé
+    static final private String PARAM_DATE_LAST_PM_SUPPR    = "date_last_pm_suppr"; // date du dernier pm supprimé
+    // Post d'un nouveau message :
+    static final private String PARAM_MSG_NEW_ID_SUBJ       = "id_subj_new";    // id du sujet où poster le nouveau message
+    static final private String PARAM_MSG_NEW_TEXT          = "msg_new";     // texte du message (doit être non vide)
+
+    // Edition d'un message existant :
+    static final private String PARAM_MSG_EDIT_ID           = "id_msg_edit"; // id du message à éditer
+    static final private String PARAM_MSG_EDIT_TEXT         = "msg_edit";    // nouveau texte du message (doit être non vide)
+    static final private String PARAM_MSG_EDIT_RAISON       = "raison_edit"; // texte optionnel expliquant la raison de l'édition
+
+    // Suppression d'un message existant :
+    static final private String PARAM_MSG_DEL_ID            = "id_msg_del"; // id du message à supprimer
+
+    // Post d'un nouveau PM :
+    static final private String PARAM_PM_NEW_DEST_ID        = "id_dest_pm"; // id du destinataire du nouveau pm
+    static final private String PARAM_PM_NEW_TEXT           = "pm_new";     // texte du pm à créer
+
+    // Suppression d'un PM existant :
+    static final private String PARAM_PM_DEL_ID             = "id_pm_del";  // id du pm à supprimer
+     
+    // Effacement des flags "nouveaux messages" :
+    static final private String PARAM_LIST_MSG_LUS          = "msg_lus";    // liste d'id de messages lus sur l'application mobile, séparés par des virgules
+
+    // Paramètres d'information sur le terminal
+    static final private String PARAM_PHONE_MODEL           = "model";  // modèle du terminal : systématique pour les logs serveur
     static final private String PARAM_BUILD_BRAND           = "brand";
     static final private String PARAM_VERSION_ANDROID       = "android";
     static final private String PARAM_API_LEVEL             = "api";
     static final private String PARAM_VERSION_APPLI         = "appli";
 
+    /////////////////////////////
+    // Réponse XML
+    // Noeuds
     static final private String NODE_NAME_BAD_LOGIN         = "login_error";
     static final private String NODE_NAME_FORUM_UNREAD      = "unread";
     static final private String NODE_NAME_FORUM_SUPPR       = "msg_suppr";
@@ -165,18 +193,18 @@ public class API {
     static final private String NODE_NAME_USER              = "user";
     static final private String NODE_NAME_FORUM_ADDRESS     = "address";
     static final private String NODE_NAME_FORUM_NOTES       = "notes";
-
+    // Attributs "pm"
     static final private String ATTR_NAME_PRIVATE_MSG_ID        = "id";
     static final private String ATTR_NAME_PRIVATE_MSG_DATE      = "date";
     static final private String ATTR_NAME_PRIVATE_MSG_AUTHOR_ID = "id_auteur";
     static final private String ATTR_NAME_PRIVATE_MSG_DEST_ID   = "id_destinataire";
     static final private String ATTR_NAME_PRIVATE_MSG_DATE_SUPPR= "date";
-    
+    // Attributs "sujets"
     static final private String ATTR_NAME_FORUM_SUBJ_ID             = "id";
     static final private String ATTR_NAME_FORUM_SUBJ_CAT_ID         = "id_categorie";
     static final private String ATTR_NAME_FORUM_SUBJ_GROUP_ID       = "id_groupe";
     static final private String ATTR_NAME_FORUM_SUBJ_DERNIERE_DATE  = "derniere_date";
-
+    // Attributs "messages"
     static final private String ATTR_NAME_FORUM_MSG_ID          = "id";
     static final private String ATTR_NAME_FORUM_MSG_AUTHOR_ID   = "id_auteur";
     static final private String ATTR_NAME_FORUM_MSG_DATE        = "date";
@@ -184,7 +212,7 @@ public class API {
     static final private String ATTR_NAME_FORUM_MSG_DATE_SUPPR  = "date";
     static final private String ATTR_NAME_FORUM_MSG_SUBJECT_ID  = "id_sujet";
     static final private String ATTR_NAME_FORUM_MSG_UNREAD      = "unread";
-    
+    // Attributs "users"
     static final private String ATTR_NAME_USER_ID               = "id";
     static final private String ATTR_NAME_USER_PSEUDO           = "pseudo";
     static final private String ATTR_NAME_USER_NAME             = "nom";
@@ -198,7 +226,7 @@ public class API {
     private ContentProviderMsg      mMsgDBAdapter   = null;
     private ContentProviderFile     mFileDBAdapter  = null;
     private ContentProviderUser     mUserDBAdapter  = null;
-      
+    
     /**
      * Constructeur utilisé pour mémorisée la référence sur le service appelant
      * @param context
@@ -213,6 +241,15 @@ public class API {
         mUserDBAdapter  = new ContentProviderUser(context);
     }
 
+    public boolean refresh() {
+        Log.d(LOG_TAG, "refresh");
+        return sendAndFetchNewContent(null, null, null, null, null, null);
+    }
+
+    public boolean delPM(String aPmId) {
+        Log.d(LOG_TAG, "delPM(" + aPmId + ")");
+        return sendAndFetchNewContent(null, null, null, null, null, aPmId);
+    }
 
     /**
      * Récupération et parse de la liste XML des messages non lus, des pm non récupérés, et des infos mises à jours des utilisateurs 
@@ -223,10 +260,21 @@ public class API {
      * - les nouveaux messages (bien qu'il puisent avoir déjà été récupérés par l'application mobile)
      * - les messages modifiés (qui ont déjà été récupéré, mais dont le contenu a changé entre temps)
      * 
-     * @todo SRombauts : compléter la documentation
+     * TODO SRombauts : compléter la documentation
+     * @param aMessageId    
+     * @param aSubjectId    
+     * @param aText         
+     * @param aEditText     
+     * @param aDestId       
+     * @param aPmId         
+     * @return bSuccess     true si tout s'est bien passé
      */
-    // TODO SRombauts : ajouter les paramètres optionnels pour envoyer un nouveau msg, un pm, les modifier ou les supprimer... 
-    boolean fetchNewContent() {
+    private boolean sendAndFetchNewContent(String aMessageId,
+                                           String aSubjectId,
+                                           String aText,
+                                           String aEditText,
+                                           String aDestId,
+                                           String aPmId) {
         boolean bSuccess    = false;
 
         int     nbNewPM     = 0;    // Nombre d'ID de PM inconnus (issu de la liste XML de nouveaux PM)
@@ -234,7 +282,14 @@ public class API {
         int     nbNewMsg    = 0;    // Nombre de messages mis à jour ou ajoutés lors de cette opération de synchro avec le site SJLB
         
         try {
-            Log.d(LOG_TAG, "fetchNewContent...");
+            Log.i(LOG_TAG, "fetchNewContent"
+                    +  "(aMessageId=" + aMessageId
+                    + ", aSubjectId=" + aSubjectId
+                    + ", aText="      + aText
+                    + ", aEditText=" + aEditText
+                    + ", aDestId=" + aDestId
+                    + ", aPmId=" + aPmId
+                    + ")...");
             
             // Utilise les préférences pour récupérer le login/mot de passe :
             PrefsLoginPassword loginPassword = new PrefsLoginPassword(mContext);
@@ -303,7 +358,7 @@ public class API {
                 || (versionAppli != versionCode)
                )
             {
-                Log.w(LOG_TAG, "SEND device: " + Build.MODEL + " (" + Build.MANUFACTURER + "/" + Build.BRAND + ") " + Build.VERSION.RELEASE + " (api_level=" + Build.VERSION.SDK_INT + ") versionCode=" + versionCode);
+                Log.i(LOG_TAG, "SEND device: " + Build.MODEL + " (" + Build.MANUFACTURER + "/" + Build.BRAND + ") " + Build.VERSION.RELEASE + " (api_level=" + Build.VERSION.SDK_INT + ") versionCode=" + versionCode);
                 // ne renvoie tout que s'il y a du nouveau !
                 nameValuePairs.add(new BasicNameValuePair(PARAM_PHONE_MODEL,    Build.MODEL));
                 nameValuePairs.add(new BasicNameValuePair(PARAM_BUILD_BRAND,    Build.BRAND));
@@ -317,6 +372,39 @@ public class API {
             }
 
             // TODO SRombauts : ajouter l'état de l'application (ouverte/fermée) + le nombre de messages récupérés localement
+
+            // TODO SRombauts : ajouter tous les paramètres optionnels dès lors qu'ils sont non nuls
+            if (   (null != aSubjectId)
+                && (null != aText) ) {
+                // Post d'un nouveau message :
+                //static final private String PARAM_MSG_NEW_ID_SUBJ       = "id_subj_new";    // id du sujet où poster le nouveau message
+                //static final private String PARAM_MSG_NEW_TEXT          = "msg_new";     // texte du message (doit être non vide)
+            }
+            if (   (null != aMessageId)
+                && (null != aText)
+                && (null != aEditText) ) {
+                // Edition d'un message existant :
+                //static final private String PARAM_MSG_EDIT_ID           = "id_msg_edit"; // id du message à éditer
+                //static final private String PARAM_MSG_EDIT_TEXT         = "msg_edit";    // nouveau texte du message (doit être non vide)
+                //static final private String PARAM_MSG_EDIT_RAISON       = "raison_edit"; // texte optionnel expliquant la raison de l'édition
+            }
+            if (   (null != aMessageId)
+                && (null == aText)
+                && (null == aEditText) ) {
+                // Suppression d'un message existant :
+                //static final private String PARAM_MSG_DEL_ID            = "id_msg_del"; // id du message à supprimer
+            }
+            if (   (null != aDestId)
+                && (null != aText) ) {
+                // Post d'un nouveau PM :
+                //static final private String PARAM_PM_NEW_DEST_ID        = "id_dest_pm"; // id du destinataire du nouveau pm
+                //static final private String PARAM_PM_NEW_TEXT           = "pm_new";     // texte du pm à créer
+            }
+            if (null != aPmId) {
+                // Suppression d'un PM existant :
+                nameValuePairs.add(new BasicNameValuePair(PARAM_PM_DEL_ID, aPmId));  
+                Log.i(LOG_TAG, "Suppression d'un PM existant " + PARAM_PM_DEL_ID + "=" + aPmId);
+            }
             
             // puis place tous ces paramètres dans la requête HTTP POST
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));  
@@ -740,7 +828,7 @@ public class API {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SAXException e) {
-            Log.w(LOG_TAG, "SAXException");                                        
+            Log.e(LOG_TAG, "SAXException");                                        
             e.printStackTrace();
         } catch (ClassCastException e) {        
             e.printStackTrace();

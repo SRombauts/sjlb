@@ -64,10 +64,14 @@ public class ServiceSJLB extends IntentService {
         // - lancer une récupération de la liste des messages non lus
         final String action = intent.getAction();
         if (action.equals(ACTION_REFRESH)) {
-            bSuccess = mAPI.fetchNewContent();
+            bSuccess = mAPI.refresh();
+        }
+        else if (action.equals(ACTION_DEL_PM)) {
+            String mPmId  = intent.getExtras().getString(START_INTENT_EXTRA_PM_ID);
+            bSuccess = mAPI.delPM(mPmId);
         }
         else {
-            Log.e(LOG_TAG, "action=" + action);
+            Log.e(LOG_TAG, "FIXME action=" + action);
         }
 
         // Formulation d'un intent de réponse à destination de l'activité ayant la main

@@ -31,7 +31,6 @@ import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.ForumMessage;
 import fr.srombauts.sjlb.model.UserContactDescr;
 import fr.srombauts.sjlb.service.API;
-import fr.srombauts.sjlb.service.AsynchTaskDeletePM;
 import fr.srombauts.sjlb.service.OnServiceResponseListener;
 import fr.srombauts.sjlb.service.ResponseReceiver;
 import fr.srombauts.sjlb.service.ServiceSJLB;
@@ -290,8 +289,8 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
     */
     void deletePM (long aIdPm) {
         Log.d (LOG_TAG, "deletePM (" + aIdPm + ")" );
-        AsynchTaskDeletePM TaskDeletePM = new AsynchTaskDeletePM(this);
-        TaskDeletePM.execute(Long.toString(aIdPm));
+        // Met dans la fifo du service l'id du pm à effacer   
+        StartService.delPM(this, aIdPm);
     }
 
     /**
@@ -299,8 +298,8 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
     */
     void deleteAllPM () {
         Log.d (LOG_TAG, "deletePM (all)" );
-        AsynchTaskDeletePM TaskDeletePM = new AsynchTaskDeletePM(this);
-        TaskDeletePM.execute("all");
+        // Met dans la fifo du service la demande d'effacement de tous les pm   
+        StartService.delAllPM(this);
     }
     
     void answerPM (int aSelectedPmAuthorId) {
