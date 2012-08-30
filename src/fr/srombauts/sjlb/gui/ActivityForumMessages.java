@@ -35,8 +35,6 @@ import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.ForumMessage;
 import fr.srombauts.sjlb.model.UserContactDescr;
 import fr.srombauts.sjlb.service.API;
-import fr.srombauts.sjlb.service.AsynchTaskNewMsg;
-import fr.srombauts.sjlb.service.CallbackTransfer;
 import fr.srombauts.sjlb.service.OnServiceResponseListener;
 import fr.srombauts.sjlb.service.ResponseReceiver;
 import fr.srombauts.sjlb.service.ServiceSJLB;
@@ -47,7 +45,7 @@ import fr.srombauts.sjlb.service.StartService;
  * Activité présentant la liste des messages du sujet sélectionné
  * @author 22/08/2010 SRombauts
  */
-public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, CallbackTransfer, OnServiceResponseListener {
+public class ActivityForumMessages extends ActivityTouchListener implements OnItemClickListener, OnItemLongClickListener, OnServiceResponseListener {
     private static final String LOG_TAG = "ActivityMsg";
     
     public static final String  START_INTENT_EXTRA_CAT_ID       = "CategoryId";
@@ -189,27 +187,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         final boolean bEditTextOpen = (-1 != mOriginalMsgListHeight);
         outState.putBoolean("bEditTextOpen", bEditTextOpen);        
     }
-    
-    
-    /**
-     * Sur réception d'une réponse du service SJLB
-     * 
-     * @param aIntent Informations sur le type d'action traitée et le résultat obtenu
-     */
-    @Override
-    public void onServiceResponse(Intent intent) {
-      //String  responseType    = intent.getStringExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_TYPE);
-        boolean reponseResult   = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
-        if (reponseResult) {
-            if (false != BuildConfig.DEBUG) {
-                // En mise au point uniquement : Toast notification signalant la réponse
-                Toast.makeText(this, "refresh", Toast.LENGTH_SHORT).show();
-            }
-            // Rafraîchit la liste des messages (il y a peut être de nouveaux messages non lus)
-            mCursor.requery();
-        }
-    }
-    
+        
     /**
      * Création du menu général
      */
@@ -333,24 +311,44 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
      * Envoie au server le nouveau Msg 
      */
     public void onSendMsg (View v) {
-        Log.d (LOG_TAG, "onSendMsg ("+ mSelectedCategoryId +", " + mSelectedSubjectId + ", [" + mSelectedGroupId + "]) : " + mEditText.getText().toString());
-        AsynchTaskNewMsg TaskSendMsg = new AsynchTaskNewMsg(this);
-        // Envoie le message en le passant en paramètres
-        TaskSendMsg.execute(Long.toString(mSelectedCategoryId),
-                            Long.toString(mSelectedSubjectId),
-                            Long.toString(mSelectedGroupId),
-                            mEditText.getText().toString());
+        Log.d (LOG_TAG, "onSendMsg ("+ mSelectedSubjectId + " : " + mEditText.getText().toString());
+        // Met dans la fifo du service les données du message à envoyer
+        StartService.newMsg(this, mSelectedSubjectId, mEditText.getText().toString());
+        Toast.makeText(this, getString(R.string.toast_sending), Toast.LENGTH_SHORT).show();
+        // TODO SRombauts : verrouiller le bouton d'envoi et le champ texte !
     }    
 
-    // Appelée lorsqu'un transfert s'est terminé (post d'un nouveau messages, effacement d'un PM...)
-    // TODO SRombauts : en attendant de passer l'envoi de message dans le service, fait un refresh après l'envoi 
-    public void onTransferDone (boolean abResult) {
-        // Si le message a été envoyé avec succès, on peur refermer la zone de saisie texte
-        if (abResult) {
-            closeEditText ();
+    /**
+     * Sur réception d'une réponse du service SJLB
+     * 
+     * @param aIntent Informations sur le type d'action traitée et le résultat obtenu
+     */
+    @Override
+    public void onServiceResponse(Intent intent) {
+        String  responseType    = intent.getStringExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_TYPE);
+        boolean bReponseResult  = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
+        if (responseType.equals(ServiceSJLB.ACTION_NEW_MSG)) {
+            if (bReponseResult) {
+                Toast.makeText(this, getString(R.string.toast_sent), Toast.LENGTH_SHORT).show();
+                // Si le message a été envoyé avec succès, on peur refermer la zone de saisie texte
+                closeEditText ();
+                // Rafraîchit la liste des messages
+                mCursor.requery();
+            } else {
+                Toast.makeText(this, getString(R.string.toast_not_sent), Toast.LENGTH_SHORT).show();
+                // TODO SRombauts : déverrouiller le bouton d'envoi et le champ texte !
+            }
+        } else if (responseType.equals(ServiceSJLB.ACTION_REFRESH)) {
+            if (bReponseResult) {
+                if (false != BuildConfig.DEBUG) {
+                    // En mise au point uniquement : Toast notification signalant la réponse
+                    Toast.makeText(this, "refresh", Toast.LENGTH_SHORT).show();
+                }
+                // Rafraîchit la liste des messages (il y a peut être de nouveaux messages non lus)
+                mCursor.requery();
+            }
         }
     }
-    
     
     @Override
     protected boolean onLeftGesture () {

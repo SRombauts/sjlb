@@ -148,8 +148,8 @@ public class ActivityForumSubjects extends ActivityTouchListener implements OnIt
     @Override
     public void onServiceResponse(Intent intent) {
       //String  responseType    = intent.getStringExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_TYPE);
-        boolean reponseResult   = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
-        if (reponseResult) {
+        boolean bReponseResult   = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
+        if (bReponseResult) {
             if (false != BuildConfig.DEBUG) {
                 // En mise au point uniquement : Toast notification signalant la réponse
                 Toast.makeText(this, "refresh", Toast.LENGTH_SHORT).show();

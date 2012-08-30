@@ -75,13 +75,17 @@
     
     <!-- Toast notifications -->
     <string name="toast_auth_needed">       Action not available : need login/password ! </string>
-    <string name="toast_refreshing">        Refreshing&#8230;   </string>
-    <string name="toast_deleting">          Deleting&#8230;     </string>
-    <string name="toast_sending">           Sending&#8230;      </string>
-    <string name="toast_sent">              Message sent !      </string>
-    <string name="toast_not_sent">          Message NOT sent !  </string>
-    <string name="toast_deleted">           Message deleted !   </string>
-
+    <string name="toast_refreshing">        Refreshing&#8230;           </string>
+    <string name="toast_editing">           Editing&#8230;              </string>
+    <string name="toast_sending">           Sending&#8230;              </string>
+    <string name="toast_deleting">          Deleting&#8230;             </string>
+    <string name="toast_sent">              Message sent                </string>
+    <string name="toast_not_sent">          ERROR: message NOT sent !   </string>
+    <string name="toast_edited">            Message edited              </string>
+    <string name="toast_not_edited">        ERROR: message NOT edited ! </string>
+    <string name="toast_deleted">           Message deleted             </string>
+    <string name="toast_not_deleted">       ERROR: message deleted !    </string>
+    
     <!-- Notifications -->
     <string name="notification_title_pm">   Private Message(s)      </string>
     <string name="notification_text_pm">    new private message(s)  </string>

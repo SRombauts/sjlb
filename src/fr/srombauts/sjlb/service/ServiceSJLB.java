@@ -66,9 +66,29 @@ public class ServiceSJLB extends IntentService {
         if (action.equals(ACTION_REFRESH)) {
             bSuccess = mAPI.refresh();
         }
+        else if (action.equals(ACTION_NEW_MSG)) {
+            final String msgSubjId  = intent.getExtras().getString(START_INTENT_EXTRA_SUBJ_ID);
+            final String msgText    = intent.getExtras().getString(START_INTENT_EXTRA_TEXT);
+            bSuccess = mAPI.newMsg(msgSubjId, msgText);
+        }
+        else if (action.equals(ACTION_EDIT_MSG)) {
+            final String msgId      = intent.getExtras().getString(START_INTENT_EXTRA_MSG_ID);
+            final String msgText    = intent.getExtras().getString(START_INTENT_EXTRA_TEXT);
+            final String msgEditText= intent.getExtras().getString(START_INTENT_EXTRA_EDIT_TEXT);
+            bSuccess = mAPI.editMsg(msgId, msgText, msgEditText);
+        }
+        else if (action.equals(ACTION_DEL_MSG)) {
+            final String msgId      = intent.getExtras().getString(START_INTENT_EXTRA_MSG_ID);
+            bSuccess = mAPI.delMsg(msgId);
+        }
+        else if (action.equals(ACTION_NEW_PM)) {
+            final String pmDestId   = intent.getExtras().getString(START_INTENT_EXTRA_DEST_ID);
+            final String pmText     = intent.getExtras().getString(START_INTENT_EXTRA_TEXT);
+            bSuccess = mAPI.newPM(pmDestId, pmText);
+        }
         else if (action.equals(ACTION_DEL_PM)) {
-            String mPmId  = intent.getExtras().getString(START_INTENT_EXTRA_PM_ID);
-            bSuccess = mAPI.delPM(mPmId);
+            final String pmId       = intent.getExtras().getString(START_INTENT_EXTRA_PM_ID);
+            bSuccess = mAPI.delPM(pmId);
         }
         else {
             Log.e(LOG_TAG, "FIXME action=" + action);

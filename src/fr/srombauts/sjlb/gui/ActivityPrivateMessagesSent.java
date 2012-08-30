@@ -69,12 +69,6 @@ public class ActivityPrivateMessagesSent extends ActivityTouchListener implement
         mPrivateMessagesListView.getRootView().setOnTouchListener(this);
     }
     
-    // Appelée lorsque l'activité était déjà lancée (par exemple clic sur une notification de nouveau PM)
-    protected void onNewIntent (Intent intent) {
-        // Rafraîchit la liste des messages privés 
-        mCursor.requery();
-    }
-    
     protected void onResume () {
         super.onResume();
         
@@ -108,8 +102,8 @@ public class ActivityPrivateMessagesSent extends ActivityTouchListener implement
     @Override
     public void onServiceResponse(Intent intent) {
       //String  responseType    = intent.getStringExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_TYPE);
-        boolean reponseResult   = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
-        if (reponseResult) {
+        boolean bReponseResult   = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
+        if (bReponseResult) {
             if (false != BuildConfig.DEBUG) {
                 // En mise au point uniquement : Toast notification signalant la réponse
                 Toast.makeText(this, "refresh", Toast.LENGTH_SHORT).show();

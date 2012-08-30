@@ -14,25 +14,29 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 import fr.srombauts.sjlb.R;
 import fr.srombauts.sjlb.db.SJLB;
-import fr.srombauts.sjlb.service.AsynchTaskNewPM;
+import fr.srombauts.sjlb.service.OnServiceResponseListener;
+import fr.srombauts.sjlb.service.ResponseReceiver;
+import fr.srombauts.sjlb.service.ServiceSJLB;
+import fr.srombauts.sjlb.service.StartService;
 
 
 /**
  * Activité permettant d'envoyer un nouveau message privé
  * @author 14/08/2010 SRombauts
  */
-public class ActivityNewPrivateMessage extends Activity {
+public class ActivityNewPrivateMessage extends Activity implements OnServiceResponseListener {
     private static final String LOG_TAG = "ActivityNewPM";
     
     public  static final String START_INTENT_EXTRA_AUTHOR_ID = "AuthorId";
     
-    private Cursor              mCursor         = null;
-    private SimpleCursorAdapter mAdapter        = null;
-    private Spinner             mUsersSpinner   = null;
+    private Spinner             mUsersSpinner       = null;
     
-    private EditText            mText           = null;
+    private ResponseReceiver    mResponseReceiver   = null;
+    
+    private EditText            mText               = null;
     
     /** Called when the activity is first created. */
     @Override
@@ -44,9 +48,9 @@ public class ActivityNewPrivateMessage extends Activity {
         setTitle(getString(R.string.pm_description));
 
         // Récupère un curseur sur les données (les utilisateurs) 
-        mCursor = managedQuery( SJLB.User.CONTENT_URI, null,
-                                null,
-                                null, null);
+        Cursor cursor = managedQuery(SJLB.User.CONTENT_URI, null,
+                                     null,
+                                     null, null);
 
         // Les colonnes à mapper :
         final String[] from = { SJLB.User.PSEUDO };
@@ -54,14 +58,14 @@ public class ActivityNewPrivateMessage extends Activity {
         final int[]    to   = { android.R.id.text1 };
 
         // Créer l'adapteur entre le curseur et le layout et les informations sur le mapping des colonnes
-        mAdapter = new SimpleCursorAdapter( this,
-                                            android.R.layout.simple_spinner_item,
-                                            mCursor,
-                                            from,
-                                            to);
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
+                                                              android.R.layout.simple_spinner_item,
+                                                              cursor,
+                                                              from,
+                                                              to);
         
         mUsersSpinner = (Spinner)findViewById(R.id.destinataireListView);
-        mUsersSpinner.setAdapter (mAdapter);
+        mUsersSpinner.setAdapter (adapter);
         
         // Récupère l'éventuel paramètre de lancement (id de l'auteur du message auquel on souhaite répondre)
         Intent startIntent = getIntent();
@@ -76,6 +80,25 @@ public class ActivityNewPrivateMessage extends Activity {
         mText = (EditText)findViewById(R.id.textEditText);
     }
     
+    // Appelée lorsque l'activité passe au premier plan 
+    protected void onResume () {
+        super.onResume();
+        Log.d (LOG_TAG, "onResume");
+        
+        // Demande à être notifié des résultats des actions réalisées par le service
+        mResponseReceiver = new ResponseReceiver(this);
+    }
+    
+    // Appelée lorsque l'activité passe de "au premier plan" à "en pause/cachée" 
+    protected void onPause() {
+        super.onPause();
+        Log.d (LOG_TAG, "onPause");
+        
+        // Plus de notification de résultat du service, vu qu'on se met en pause !
+        mResponseReceiver.unregister(this);
+        mResponseReceiver = null;
+    }
+   
     /**
      * Création du menu général
      */
@@ -127,9 +150,33 @@ public class ActivityNewPrivateMessage extends Activity {
     public void onSendPM (View v) {
         long destinataireId = mUsersSpinner.getSelectedItemId();
         Log.d (LOG_TAG, "onSendPM ("+ destinataireId +") : " + mText.getText().toString());
-        AsynchTaskNewPM TaskSendPM = new AsynchTaskNewPM(this);
-        // Envoie le message en le passant en paramètres
-        TaskSendPM.execute(Long.toString(destinataireId), mText.getText().toString());
-        finish ();
+        // Met dans la fifo du service les données du pm à envoyer
+        StartService.newPM(this, destinataireId, mText.getText().toString());
+        Toast.makeText(this, getString(R.string.toast_sending), Toast.LENGTH_SHORT).show();
+        // TODO SRombauts : verrouiller le bouton d'envoi et le champ texte !
     }
-}
+    
+    /**
+     * Sur réception d'une réponse du service SJLB
+     * 
+     * @param aIntent Informations sur le type d'action traitée et le résultat obtenu
+     */
+    @Override
+    public void onServiceResponse(Intent intent) {
+        String  responseType    = intent.getStringExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_TYPE);
+        boolean bReponseResult  = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
+        if (responseType.equals(ServiceSJLB.ACTION_NEW_PM)) {
+            if (bReponseResult) {
+                Toast.makeText(this, getString(R.string.toast_sent), Toast.LENGTH_SHORT).show();
+                // Lance l'activité listant les PM envoyés
+                Intent intentPmEnvoyes = new Intent(this, ActivityPrivateMessagesSent.class);
+                startActivity(intentPmEnvoyes);
+                // puis termine l'activité courante pour ne plus repasser par ici
+                finish ();
+            } else {
+                Toast.makeText(this, getString(R.string.toast_not_sent), Toast.LENGTH_SHORT).show();
+                // TODO SRombauts : déverrouiller le bouton d'envoi et le champ texte !
+            }
+        }
+    }
+ }

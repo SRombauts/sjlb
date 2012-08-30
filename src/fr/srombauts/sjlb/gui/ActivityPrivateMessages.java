@@ -118,25 +118,6 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
         notificationManager.cancel(API.NOTIFICATION_NEW_PM_ID);
     }
 
-    /**
-     * Sur réception d'une réponse du service SJLB
-     * 
-     * @param aIntent Informations sur le type d'action traitée et le résultat obtenu
-     */
-    @Override
-    public void onServiceResponse(Intent intent) {
-      //String  responseType    = intent.getStringExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_TYPE);
-        boolean reponseResult   = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
-        if (reponseResult) {
-            if (false != BuildConfig.DEBUG) {
-                // En mise au point uniquement : Toast notification signalant la réponse
-                Toast.makeText(this, "refresh", Toast.LENGTH_SHORT).show();
-            }
-            // Rafraîchit la liste des messages privés (il y a peut être de nouveaux messages privés)
-            mCursor.requery();
-        }
-    }
-    
     @Override
     protected boolean onLeftGesture () {
         Log.i (LOG_TAG, "onTouch: va a l'ecran de gauche... quitte l'activite pour retour à la liste des sujets");
@@ -276,14 +257,33 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
     }
 
     /**
-     * Sur click du bouton correspondant, lance l'activité d'affichage des PM
+     * Sur clic du bouton correspondant, lance l'activité d'affichage des PM
      */
     public void onShowPMSent (View v) {
-        // Lance l'activité lisant les PM envoyés
+        // Lance l'activité listant les PM envoyés
         Intent intent = new Intent(this, ActivityPrivateMessagesSent.class);
         startActivity(intent);
     }
     
+    /**
+     * Sur clic contextuel de réponse à un PM 
+     */
+    void answerPM (int aSelectedPmAuthorId) {
+        Log.d (LOG_TAG, "answerPM (" + aSelectedPmAuthorId + ")" );        
+        // Lance l'activité correspondante avec en paramètre l'id du destinataire :
+        Intent intent = new Intent(this, ActivityNewPrivateMessage.class);
+        intent.putExtra(ActivityNewPrivateMessage.START_INTENT_EXTRA_AUTHOR_ID, aSelectedPmAuthorId);
+        startActivity(intent);        
+    }
+    
+    /**
+     * Sur clic du bouton de rédaction d'un nouveau PM 
+     */
+    public void onNewPM (View v) {
+        Intent intent = new Intent(this, ActivityNewPrivateMessage.class);
+        startActivity(intent);
+    }
+
     /**
      * Effacement d'un message privé
     */
@@ -291,6 +291,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
         Log.d (LOG_TAG, "deletePM (" + aIdPm + ")" );
         // Met dans la fifo du service l'id du pm à effacer   
         StartService.delPM(this, aIdPm);
+        Toast.makeText(this, getString(R.string.toast_deleting), Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -300,26 +301,38 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
         Log.d (LOG_TAG, "deletePM (all)" );
         // Met dans la fifo du service la demande d'effacement de tous les pm   
         StartService.delAllPM(this);
+        Toast.makeText(this, getString(R.string.toast_deleting), Toast.LENGTH_SHORT).show();
     }
     
-    void answerPM (int aSelectedPmAuthorId) {
-        Log.d (LOG_TAG, "answerPM (" + aSelectedPmAuthorId + ")" );        
-        // Lance l'activité correspondante avec en paramètre l'id du destinataire :
-        Intent intent = new Intent(this, ActivityNewPrivateMessage.class);
-        intent.putExtra(ActivityNewPrivateMessage.START_INTENT_EXTRA_AUTHOR_ID, aSelectedPmAuthorId);
-        startActivity(intent);        
-    }
-    
-
     /**
-     * Rédaction d'un nouveau PM sur clic sur le bouton approprié 
+     * Sur réception d'une réponse du service SJLB
+     * 
+     * @param aIntent Informations sur le type d'action traitée et le résultat obtenu
      */
-    public void onNewPM (View v) {
-        Intent intent = new Intent(this, ActivityNewPrivateMessage.class);
-        startActivity(intent);
+    @Override
+    public void onServiceResponse(Intent intent) {
+        String  responseType    = intent.getStringExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_TYPE);
+        boolean bReponseResult  = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
+        if (responseType.equals(ServiceSJLB.ACTION_DEL_PM)) {
+            if (bReponseResult) {
+                Toast.makeText(this, getString(R.string.toast_deleted), Toast.LENGTH_SHORT).show();
+                // Rafraîchit la liste des messages privés
+                mCursor.requery();
+            } else {
+                Toast.makeText(this, getString(R.string.toast_not_deleted), Toast.LENGTH_SHORT).show();
+            }
+        } else if (responseType.equals(ServiceSJLB.ACTION_REFRESH)) {
+            if (bReponseResult) {
+                if (false != BuildConfig.DEBUG) {
+                    // En mise au point uniquement : Toast notification signalant la réponse
+                    Toast.makeText(this, "refresh", Toast.LENGTH_SHORT).show();
+                }
+                // Rafraîchit la liste des messages privés (il y a peut être de nouveaux messages privés)
+                mCursor.requery();
+            }
+        }
     }
-    
-
+        
     // Adaptateur mappant les données du curseur dans des objets du cache du pool d'objets View utilisés par la ListView
     private final class PmListItemAdapter extends ResourceCursorAdapter {
         public PmListItemAdapter(Context context, int layout, Cursor cursor) {

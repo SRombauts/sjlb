@@ -132,7 +132,7 @@ Se mettre vers l'avant de la rame, genre 3ème wagon, c'est l'idéal.</notes></u
  * @author 14/06/2010 SRombauts
  */
 public class API {
-    private static final String  LOG_TAG                    = "RefreshTask";
+    private static final String  LOG_TAG                    = "NetworkAPI";
 
     public static final int     NOTIFICATION_NEW_PM_ID      = 1;
     public static final int     NOTIFICATION_NEW_MSG_ID     = 2;
@@ -246,6 +246,26 @@ public class API {
         return sendAndFetchNewContent(null, null, null, null, null, null);
     }
 
+    public boolean newMsg(String aSubjectId, String aText) {
+        Log.d(LOG_TAG, "newMsg(" + aSubjectId + ", " + aText + ")");
+        return sendAndFetchNewContent(null, aSubjectId, aText, null, null, null);
+    }
+    
+    public boolean editMsg(String aMessageId, String aText, String aEditText) {
+        Log.d(LOG_TAG, "editMsg(" + aMessageId + ", " + aText + ", " + aEditText + ")");
+        return sendAndFetchNewContent(aMessageId, null, aText, aEditText, null, null);
+    }
+    
+    public boolean delMsg(String aMessageId) {
+        Log.d(LOG_TAG, "delMsg(" + aMessageId + ")");
+        return sendAndFetchNewContent(aMessageId, null, null, null, null, null);
+    }
+
+    public boolean newPM(String aDestId, String aText) {
+        Log.d(LOG_TAG, "newPM(" + aDestId + ", " + aText + ")");
+        return sendAndFetchNewContent(null, null, aText, null, aDestId, null);
+    }
+
     public boolean delPM(String aPmId) {
         Log.d(LOG_TAG, "delPM(" + aPmId + ")");
         return sendAndFetchNewContent(null, null, null, null, null, aPmId);
@@ -260,7 +280,7 @@ public class API {
      * - les nouveaux messages (bien qu'il puisent avoir déjà été récupérés par l'application mobile)
      * - les messages modifiés (qui ont déjà été récupéré, mais dont le contenu a changé entre temps)
      * 
-     * TODO SRombauts : compléter la documentation
+     * Paramètres optionnels à utiliser (en combinaisons intelligentes) pour envoyer des requêtes au serveur SJLB :
      * @param aMessageId    
      * @param aSubjectId    
      * @param aText         
@@ -373,37 +393,39 @@ public class API {
 
             // TODO SRombauts : ajouter l'état de l'application (ouverte/fermée) + le nombre de messages récupérés localement
 
-            // TODO SRombauts : ajouter tous les paramètres optionnels dès lors qu'ils sont non nuls
+            // Prend en compte les combinaisons de paramètres optionnels lorsqu'ils sont non nuls
             if (   (null != aSubjectId)
                 && (null != aText) ) {
                 // Post d'un nouveau message :
-                //static final private String PARAM_MSG_NEW_ID_SUBJ       = "id_subj_new";    // id du sujet où poster le nouveau message
-                //static final private String PARAM_MSG_NEW_TEXT          = "msg_new";     // texte du message (doit être non vide)
+                nameValuePairs.add(new BasicNameValuePair(PARAM_MSG_NEW_ID_SUBJ,aSubjectId));   // id du sujet où poster le nouveau message
+                nameValuePairs.add(new BasicNameValuePair(PARAM_MSG_NEW_TEXT,   aText));        // texte du message (doit être non vide)
+                Log.i(LOG_TAG, "Post d'un nouveau Msg " + PARAM_MSG_NEW_ID_SUBJ + "=" + aSubjectId + ", " + PARAM_MSG_NEW_TEXT + "=" + aText);
             }
-            if (   (null != aMessageId)
-                && (null != aText)
-                && (null != aEditText) ) {
+            else if (   (null != aMessageId)
+                     && (null != aText)
+                     && (null != aEditText) ) {
                 // Edition d'un message existant :
-                //static final private String PARAM_MSG_EDIT_ID           = "id_msg_edit"; // id du message à éditer
-                //static final private String PARAM_MSG_EDIT_TEXT         = "msg_edit";    // nouveau texte du message (doit être non vide)
-                //static final private String PARAM_MSG_EDIT_RAISON       = "raison_edit"; // texte optionnel expliquant la raison de l'édition
+                nameValuePairs.add(new BasicNameValuePair(PARAM_MSG_EDIT_ID,    aMessageId));   // id du message à éditer
+                nameValuePairs.add(new BasicNameValuePair(PARAM_MSG_EDIT_TEXT,  aText));        // nouveau texte du message (doit être non vide)
+                nameValuePairs.add(new BasicNameValuePair(PARAM_MSG_EDIT_RAISON,aEditText));    // texte optionnel expliquant la raison de l'édition
+                Log.i(LOG_TAG, "Edition d'un Msg existant " + PARAM_MSG_EDIT_ID + "=" + aMessageId + ", " + PARAM_MSG_EDIT_TEXT + "=" + aText + ", " + PARAM_MSG_EDIT_RAISON + "=" + aEditText);
             }
-            if (   (null != aMessageId)
-                && (null == aText)
-                && (null == aEditText) ) {
-                // Suppression d'un message existant :
-                //static final private String PARAM_MSG_DEL_ID            = "id_msg_del"; // id du message à supprimer
+            else if (null != aMessageId) {
+                // Suppression d'un message :
+                nameValuePairs.add(new BasicNameValuePair(PARAM_MSG_DEL_ID,     aMessageId));   // id du message à supprimer
+                Log.i(LOG_TAG, "Suppression d'un Msg " + PARAM_MSG_DEL_ID + "=" + aMessageId);
             }
-            if (   (null != aDestId)
-                && (null != aText) ) {
+            else if (   (null != aDestId)
+                     && (null != aText) ) {
                 // Post d'un nouveau PM :
-                //static final private String PARAM_PM_NEW_DEST_ID        = "id_dest_pm"; // id du destinataire du nouveau pm
-                //static final private String PARAM_PM_NEW_TEXT           = "pm_new";     // texte du pm à créer
+                nameValuePairs.add(new BasicNameValuePair(PARAM_PM_NEW_DEST_ID, aDestId));      // id du destinataire du nouveau pm  
+                nameValuePairs.add(new BasicNameValuePair(PARAM_PM_NEW_TEXT,    aText));        // texte du pm à créer
+                Log.i(LOG_TAG, "Post d'un nouveau PM " + PARAM_PM_NEW_DEST_ID + "=" + aDestId + ", " + PARAM_PM_NEW_TEXT + "=" + aText);
             }
-            if (null != aPmId) {
-                // Suppression d'un PM existant :
-                nameValuePairs.add(new BasicNameValuePair(PARAM_PM_DEL_ID, aPmId));  
-                Log.i(LOG_TAG, "Suppression d'un PM existant " + PARAM_PM_DEL_ID + "=" + aPmId);
+            else if (null != aPmId) {
+                // Suppression d'un PM :
+                nameValuePairs.add(new BasicNameValuePair(PARAM_PM_DEL_ID,      aPmId));        // id du pm à supprimer  
+                Log.i(LOG_TAG, "Suppression d'un PM " + PARAM_PM_DEL_ID + "=" + aPmId);
             }
             
             // puis place tous ces paramètres dans la requête HTTP POST

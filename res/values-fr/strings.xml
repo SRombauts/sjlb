@@ -76,12 +76,16 @@
     <!-- Toast notifications -->
     <string name="toast_auth_needed">       Action non disponible : nécessite login/mot de passe ! </string>
     <string name="toast_refreshing">        En cours de rafraichissement&#8230; </string>
-    <string name="toast_deleting">          Effacement demandé&#8230;           </string>
     <string name="toast_sending">           Envoi en cours&#8230;               </string>
-    <string name="toast_sent">              Message envoyé !                    </string>
-    <string name="toast_not_sent">          Message NON envoyé !                </string>
-    <string name="toast_deleted">           Message effacé !                    </string>
-
+    <string name="toast_editing">           Modification demandé&#8230;         </string>
+    <string name="toast_deleting">          Effacement demandé&#8230;           </string>
+    <string name="toast_sent">              Message envoyé                      </string>
+    <string name="toast_not_sent">          ERREUR: message NON envoyé !        </string>
+    <string name="toast_edited">            Message modifié                     </string>
+    <string name="toast_not_edited">        ERREUR: message NON modifié !       </string>
+    <string name="toast_deleted">           Message effacé                      </string>
+    <string name="toast_not_deleted">       ERREUR: message NON effacé !        </string>
+    
     <!-- Notifications -->
     <string name="notification_title_pm">   Message(s) Privé(s)             </string>
     <string name="notification_text_pm">    nouveau(x) message(s) privé(s)  </string>
