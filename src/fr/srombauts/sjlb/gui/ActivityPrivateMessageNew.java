@@ -37,6 +37,7 @@ public class ActivityPrivateMessageNew extends Activity implements OnServiceResp
     
     private ResponseReceiver    mResponseReceiver   = null;
     
+    private boolean             mbIsSending         = false;
     private EditText            mEditText           = null;
     private Button              mEditButton         = null;
     
@@ -81,27 +82,40 @@ public class ActivityPrivateMessageNew extends Activity implements OnServiceResp
         // Binding de la zone de saisie du message
         mEditText   = (EditText)findViewById(R.id.textEditText);
         mEditButton = (Button)findViewById(R.id.buttonSendPm);
-    }
-    
-    // Appelée lorsque l'activité passe au premier plan 
-    protected void onResume () {
-        super.onResume();
-        Log.d (LOG_TAG, "onResume");
         
+        // Restaure un éventuel état sauvegardé (état de la boîte d'édition) suite à un changement d'orientation  :
+        if (null != savedInstanceState) {
+            mbIsSending = savedInstanceState.getBoolean("mbIsSending");
+            Log.i(LOG_TAG, "mbIsSending=" + mbIsSending);
+            if (mbIsSending) {
+                // Sur envoi en cours, verrouille le bouton et le champ texte pour éviter les envois multiples
+                mEditText.setEnabled(false);
+                mEditButton.setEnabled(false);
+            }
+        }        
+                
         // Demande à être notifié des résultats des actions réalisées par le service
+        // (ceci pour toute la durée de vie de l'activité car on ne peut se permettre de louper un ack sous peine d'état incohérent)
         mResponseReceiver = new ResponseReceiver(this);
     }
     
-    // Appelée lorsque l'activité passe de "au premier plan" à "en pause/cachée" 
-    protected void onPause() {
-        super.onPause();
-        Log.d (LOG_TAG, "onPause");
+    // Appelée lorsque l'activité se termine ("back")
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d (LOG_TAG, "onDestroy...");
         
-        // Plus de notification de résultat du service, vu qu'on se met en pause !
+        // Plus de notification de résultat du service
         mResponseReceiver.unregister(this);
-        mResponseReceiver = null;
     }
-   
+
+    // Sauvegarde l'état de la boîte d'édition (pour restauration suite à un changement d'orientation par exemple)
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.i (LOG_TAG, "onSaveInstanceState");
+        outState.putBoolean("mbIsSending", mbIsSending);        
+    }
+    
     /**
      * Création du menu général
      */
@@ -157,6 +171,7 @@ public class ActivityPrivateMessageNew extends Activity implements OnServiceResp
         StartService.newPM(this, destinataireId, mEditText.getText().toString());
         Toast.makeText(this, getString(R.string.toast_sending), Toast.LENGTH_SHORT).show();
         // Sur tentative d'envoi, verrouille le bouton et le champ texte pour éviter les envois multiples
+        mbIsSending = true;
         mEditText.setEnabled(false);
         mEditButton.setEnabled(false);
     }
@@ -171,6 +186,7 @@ public class ActivityPrivateMessageNew extends Activity implements OnServiceResp
         String  responseType    = intent.getStringExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_TYPE);
         boolean bReponseResult  = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
         if (responseType.equals(ServiceSJLB.ACTION_NEW_PM)) {
+            mbIsSending = false;
             if (bReponseResult) {
                 Toast.makeText(this, getString(R.string.toast_sent), Toast.LENGTH_SHORT).show();
                 // Lance l'activité listant les PM envoyés

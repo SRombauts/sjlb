@@ -56,6 +56,8 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     private Cursor                  mCursor         = null;
     private MessageListItemAdapter  mAdapter        = null;
     static private ListView         mMsgListView    = null; // TODO SRombauts "static" pour être accéder depuis la CallbackImageDownload
+
+    private boolean                 mbIsSending     = false;
     private EditText                mEditText       = null;
     private Button                  mEditButton     = null;
     
@@ -131,11 +133,22 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         // Restaure un éventuel état sauvegardé (état de la boîte d'édition) suite à un changement d'orientation  :
         if (null != savedInstanceState) {
             final boolean bEditTextOpen = savedInstanceState.getBoolean("bEditTextOpen");
-            Log.i(LOG_TAG, "bEditTextOpen=" + bEditTextOpen);
+            mbIsSending = savedInstanceState.getBoolean("mbIsSending");
+            Log.i(LOG_TAG, "bEditTextOpen=" + bEditTextOpen + ", mbIsSending=" + mbIsSending);
             if (bEditTextOpen) {
+                // Sur édition en cours, restaure la boîte d'édition
                 openEditText();
             }
+            if (mbIsSending) {
+                // Sur envoi en cours, verrouille le bouton et le champ texte pour éviter les envois multiples
+                mEditText.setEnabled(false);
+                mEditButton.setEnabled(false);
+            }            
         }        
+        
+        // Demande à être notifié des résultats des actions réalisées par le service
+        // (ceci pour toute la durée de vie de l'activité car on ne peut se permettre de louper un ack sous peine d'état incohérent)
+        mResponseReceiver = new ResponseReceiver(this);
     }
     
     @Override
@@ -164,19 +177,15 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         // NOTE : selectionArgs est identique
         final int nbUpdatedRowsSubj = getContentResolver ().update(SJLB.Subj.CONTENT_URI, valuesSubj, whereSubj, selectionArgs);
         Log.i (LOG_TAG, "nbUpdatedRowsSubj=" + nbUpdatedRowsSubj);
-        
-        // Demande à être notifié des résultats des actions réalisées par le service
-        mResponseReceiver = new ResponseReceiver(this);
     }
     
-    // Appelée lorsque l'activité passe de "au premier plan" à "en pause/cachée" 
-    protected void onPause() {
-        super.onPause();
-        Log.d (LOG_TAG, "onPause...");
+    // Appelée lorsque l'activité se termine ("back")
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d (LOG_TAG, "onDestroy...");
         
         // Plus de notification de résultat du service, vu qu'on se met en pause !
         mResponseReceiver.unregister(this);
-        mResponseReceiver = null;
     }
 
     // Sauvegarde l'état de la boîte d'édition (pour restauration suite à un changement d'orientation par exemple)
@@ -185,7 +194,8 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         super.onSaveInstanceState(outState);
         Log.i (LOG_TAG, "onSaveInstanceState");
         final boolean bEditTextOpen = (-1 != mOriginalMsgListHeight);
-        outState.putBoolean("bEditTextOpen", bEditTextOpen);        
+        outState.putBoolean("bEditTextOpen", bEditTextOpen);
+        outState.putBoolean("mbIsSending",   mbIsSending);
     }
         
     /**
@@ -318,6 +328,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         StartService.newMsg(this, mSelectedSubjectId, mEditText.getText().toString());
         Toast.makeText(this, getString(R.string.toast_sending), Toast.LENGTH_SHORT).show();
         // Sur tentative d'envoi, verrouille le bouton et le champ texte pour éviter les envois multiples
+        mbIsSending = true;
         mEditText.setEnabled(false);
         mEditButton.setEnabled(false);
     }    
@@ -332,6 +343,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         String  responseType    = intent.getStringExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_TYPE);
         boolean bReponseResult  = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
         if (responseType.equals(ServiceSJLB.ACTION_NEW_MSG)) {
+            mbIsSending = false;
             if (bReponseResult) {
                 Toast.makeText(this, getString(R.string.toast_sent), Toast.LENGTH_SHORT).show();
                 // Si le message a été envoyé avec succès, on peur refermer la zone de saisie texte
