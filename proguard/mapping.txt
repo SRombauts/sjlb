@@ -101,9 +101,9 @@ fr.srombauts.sjlb.db.SJLB$Subj -> fr.srombauts.sjlb.db.f:
     android.net.Uri CONTENT_URI -> a
 fr.srombauts.sjlb.db.SJLB$User -> fr.srombauts.sjlb.db.g:
     android.net.Uri CONTENT_URI -> a
-fr.srombauts.sjlb.gui.ActivityFiles -> fr.srombauts.sjlb.gui.ActivityFiles:
-    fr.srombauts.sjlb.gui.ActivityFiles$FileListItemAdapter mAdapter -> a
-    fr.srombauts.sjlb.gui.ActivityFiles$FileListItem[] mFileListItem -> b
+fr.srombauts.sjlb.gui.ActivityForumFiles -> fr.srombauts.sjlb.gui.ActivityForumFiles:
+    fr.srombauts.sjlb.gui.ActivityForumFiles$FileListItemAdapter mAdapter -> a
+    fr.srombauts.sjlb.gui.ActivityForumFiles$FileListItem[] mFileListItem -> b
     long mSelectedMessageId -> e
     java.lang.String mSelectedMessageText -> f
     java.lang.String mSelectedSubjectLabel -> g
@@ -115,19 +115,19 @@ fr.srombauts.sjlb.gui.ActivityFiles -> fr.srombauts.sjlb.gui.ActivityFiles:
     java.lang.String saveImage(android.graphics.Bitmap,java.lang.String) -> a
     void onImageDownloaded(android.graphics.Bitmap,int) -> a
     boolean onLeftGesture() -> a
-    java.lang.String access$0(fr.srombauts.sjlb.gui.ActivityFiles) -> a
-fr.srombauts.sjlb.gui.ActivityFiles$FileListItem -> fr.srombauts.sjlb.gui.a:
+    java.lang.String access$0(fr.srombauts.sjlb.gui.ActivityForumFiles) -> a
+fr.srombauts.sjlb.gui.ActivityForumFiles$FileListItem -> fr.srombauts.sjlb.gui.a:
     fr.srombauts.sjlb.service.AsynchTaskDownloadImage fileDownloader -> a
     android.graphics.Bitmap fileBitmap -> b
     java.lang.String fileName -> c
-fr.srombauts.sjlb.gui.ActivityFiles$FileListItemAdapter -> fr.srombauts.sjlb.gui.b:
+fr.srombauts.sjlb.gui.ActivityForumFiles$FileListItemAdapter -> fr.srombauts.sjlb.gui.b:
     android.view.LayoutInflater mInflater -> b
-    fr.srombauts.sjlb.gui.ActivityFiles this$0 -> a
+    fr.srombauts.sjlb.gui.ActivityForumFiles this$0 -> a
     android.view.View getView(int,android.view.View,android.view.ViewGroup) -> getView
-fr.srombauts.sjlb.gui.ActivityFiles$MyMediaScannerConnectionClient -> fr.srombauts.sjlb.gui.c:
+fr.srombauts.sjlb.gui.ActivityForumFiles$MyMediaScannerConnectionClient -> fr.srombauts.sjlb.gui.c:
     android.media.MediaScannerConnection mScanner -> b
     java.lang.String mPath -> c
-    fr.srombauts.sjlb.gui.ActivityFiles this$0 -> a
+    fr.srombauts.sjlb.gui.ActivityForumFiles this$0 -> a
     void startScanner(android.media.MediaScannerConnection,java.lang.String) -> a
     void onMediaScannerConnected() -> onMediaScannerConnected
     void onScanCompleted(java.lang.String,android.net.Uri) -> onScanCompleted
@@ -135,26 +135,26 @@ fr.srombauts.sjlb.gui.ActivityForumMessages -> fr.srombauts.sjlb.gui.ActivityFor
     android.database.Cursor mCursor -> a
     fr.srombauts.sjlb.gui.ActivityForumMessages$MessageListItemAdapter mAdapter -> b
     android.widget.ListView mMsgListView -> e
-    android.widget.EditText mEditText -> f
-    android.widget.Button mEditButton -> g
-    long mSelectedCategoryId -> h
-    long mSelectedSubjectId -> i
-    java.lang.String mSelectedSubjectLabel -> j
-    long mSelectedGroupId -> k
-    int mOriginalMsgListHeight -> l
-    fr.srombauts.sjlb.service.ResponseReceiver mResponseReceiver -> m
+    boolean mbIsSending -> f
+    android.widget.EditText mEditText -> g
+    android.widget.Button mEditButton -> h
+    long mSelectedCategoryId -> i
+    long mSelectedSubjectId -> j
+    java.lang.String mSelectedSubjectLabel -> k
+    long mSelectedGroupId -> l
+    int mOriginalMsgListHeight -> m
+    fr.srombauts.sjlb.service.ResponseReceiver mResponseReceiver -> n
     void onCreate(android.os.Bundle) -> onCreate
     void onResume() -> onResume
-    void onPause() -> onPause
+    void onDestroy() -> onDestroy
     void onSaveInstanceState(android.os.Bundle) -> onSaveInstanceState
-    void onServiceResponse(android.content.Intent) -> a
     boolean onCreateOptionsMenu(android.view.Menu) -> onCreateOptionsMenu
     boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
     void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick
     boolean onItemLongClick(android.widget.AdapterView,android.view.View,int,long) -> onItemLongClick
     void openEditText() -> c
     void onSendMsg(android.view.View) -> onSendMsg
-    void onTransferDone(boolean) -> a
+    void onServiceResponse(android.content.Intent) -> a
     boolean onLeftGesture() -> a
     java.lang.String access$0(fr.srombauts.sjlb.gui.ActivityForumMessages) -> a
 fr.srombauts.sjlb.gui.ActivityForumMessages$MessageListItemAdapter -> fr.srombauts.sjlb.gui.d:
@@ -222,18 +222,22 @@ fr.srombauts.sjlb.gui.ActivityMain -> fr.srombauts.sjlb.gui.ActivityMain:
     void onShowUserList(android.view.View) -> onShowUserList
     boolean onLeftGesture() -> a
     boolean onRightGesture() -> b
-fr.srombauts.sjlb.gui.ActivityNewPrivateMessage -> fr.srombauts.sjlb.gui.ActivityNewPrivateMessage:
-    android.database.Cursor mCursor -> a
-    android.widget.SimpleCursorAdapter mAdapter -> b
-    android.widget.Spinner mUsersSpinner -> c
-    android.widget.EditText mText -> d
+fr.srombauts.sjlb.gui.ActivityPreferences -> fr.srombauts.sjlb.gui.ActivityPreferences:
     void onCreate(android.os.Bundle) -> onCreate
+fr.srombauts.sjlb.gui.ActivityPrivateMessageNew -> fr.srombauts.sjlb.gui.ActivityPrivateMessageNew:
+    android.widget.Spinner mUsersSpinner -> a
+    fr.srombauts.sjlb.service.ResponseReceiver mResponseReceiver -> b
+    boolean mbIsSending -> c
+    android.widget.EditText mEditText -> d
+    android.widget.Button mEditButton -> e
+    void onCreate(android.os.Bundle) -> onCreate
+    void onDestroy() -> onDestroy
+    void onSaveInstanceState(android.os.Bundle) -> onSaveInstanceState
     boolean onCreateOptionsMenu(android.view.Menu) -> onCreateOptionsMenu
     void onCreateContextMenu(android.view.ContextMenu,android.view.View,android.view.ContextMenu$ContextMenuInfo) -> onCreateContextMenu
     boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
     void onSendPM(android.view.View) -> onSendPM
-fr.srombauts.sjlb.gui.ActivityPreferences -> fr.srombauts.sjlb.gui.ActivityPreferences:
-    void onCreate(android.os.Bundle) -> onCreate
+    void onServiceResponse(android.content.Intent) -> a
 fr.srombauts.sjlb.gui.ActivityPrivateMessages -> fr.srombauts.sjlb.gui.ActivityPrivateMessages:
     android.database.Cursor mCursor -> a
     fr.srombauts.sjlb.gui.ActivityPrivateMessages$PmListItemAdapter mAdapter -> b
@@ -244,7 +248,6 @@ fr.srombauts.sjlb.gui.ActivityPrivateMessages -> fr.srombauts.sjlb.gui.ActivityP
     void onNewIntent(android.content.Intent) -> onNewIntent
     void onResume() -> onResume
     void onPause() -> onPause
-    void onServiceResponse(android.content.Intent) -> a
     boolean onLeftGesture() -> a
     boolean onCreateOptionsMenu(android.view.Menu) -> onCreateOptionsMenu
     boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
@@ -252,10 +255,13 @@ fr.srombauts.sjlb.gui.ActivityPrivateMessages -> fr.srombauts.sjlb.gui.ActivityP
     boolean onContextItemSelected(android.view.MenuItem) -> onContextItemSelected
     android.app.Dialog onCreateDialog(int) -> onCreateDialog
     void onPrepareDialog(int,android.app.Dialog) -> onPrepareDialog
+    void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick
     void onShowPMSent(android.view.View) -> onShowPMSent
+    void answerPM(int) -> a
+    void onNewPM(android.view.View) -> onNewPM
     void deletePM(long) -> a
     void deleteAllPM() -> c
-    void onNewPM(android.view.View) -> onNewPM
+    void onServiceResponse(android.content.Intent) -> a
     long access$0(fr.srombauts.sjlb.gui.ActivityPrivateMessages) -> a
 fr.srombauts.sjlb.gui.ActivityPrivateMessages$1 -> fr.srombauts.sjlb.gui.h:
     fr.srombauts.sjlb.gui.ActivityPrivateMessages this$0 -> a
@@ -284,7 +290,6 @@ fr.srombauts.sjlb.gui.ActivityPrivateMessagesSent -> fr.srombauts.sjlb.gui.Activ
     android.widget.ListView mPrivateMessagesListView -> e
     fr.srombauts.sjlb.service.ResponseReceiver mResponseReceiver -> f
     void onCreate(android.os.Bundle) -> onCreate
-    void onNewIntent(android.content.Intent) -> onNewIntent
     void onResume() -> onResume
     void onPause() -> onPause
     void onServiceResponse(android.content.Intent) -> a
@@ -391,15 +396,8 @@ fr.srombauts.sjlb.service.API -> fr.srombauts.sjlb.service.a:
     fr.srombauts.sjlb.db.ContentProviderMsg mMsgDBAdapter -> d
     fr.srombauts.sjlb.db.ContentProviderFile mFileDBAdapter -> e
     fr.srombauts.sjlb.db.ContentProviderUser mUserDBAdapter -> f
-    boolean fetchNewContent() -> a
-fr.srombauts.sjlb.service.AsynchTaskDeletePM -> fr.srombauts.sjlb.service.b:
-    android.content.Context mContext -> a
-    int mNbPM -> b
-    void onPreExecute() -> onPreExecute
-    java.lang.Void doInBackground(java.lang.String[]) -> a
-    void onPostExecute(java.lang.Object) -> onPostExecute
-    java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
-fr.srombauts.sjlb.service.AsynchTaskDownloadImage -> fr.srombauts.sjlb.service.c:
+    boolean sendAndFetchNewContent(java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String,java.lang.String) -> a
+fr.srombauts.sjlb.service.AsynchTaskDownloadImage -> fr.srombauts.sjlb.service.b:
     java.lang.String mUrl -> a
     int mPosition -> b
     fr.srombauts.sjlb.service.CallbackImageDownload mCallbackDownload -> c
@@ -409,35 +407,16 @@ fr.srombauts.sjlb.service.AsynchTaskDownloadImage -> fr.srombauts.sjlb.service.c
     void onPostExecute(java.lang.Object) -> onPostExecute
     java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
     void onProgressUpdate(java.lang.Object[]) -> onProgressUpdate
-fr.srombauts.sjlb.service.AsynchTaskNewMsg -> fr.srombauts.sjlb.service.d:
-    android.content.Context mContext -> a
-    fr.srombauts.sjlb.service.CallbackTransfer mCallbackTransfer -> b
-    fr.srombauts.sjlb.db.ContentProviderMsg mMsgDBAdapter -> c
-    void onPreExecute() -> onPreExecute
-    java.lang.Boolean sendMsg(java.lang.String,java.lang.String,java.lang.String,java.lang.String) -> a
-    void onPostExecute(java.lang.Object) -> onPostExecute
-    java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
-    void onProgressUpdate(java.lang.Object[]) -> onProgressUpdate
-fr.srombauts.sjlb.service.AsynchTaskNewPM -> fr.srombauts.sjlb.service.e:
-    android.content.Context mContext -> a
-    int mNbPM -> b
-    void onPreExecute() -> onPreExecute
-    java.lang.Boolean sendPM(java.lang.String,java.lang.String) -> a
-    void onPostExecute(java.lang.Object) -> onPostExecute
-    java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
-    void onProgressUpdate(java.lang.Object[]) -> onProgressUpdate
-fr.srombauts.sjlb.service.CallbackImageDownload -> fr.srombauts.sjlb.service.f:
+fr.srombauts.sjlb.service.CallbackImageDownload -> fr.srombauts.sjlb.service.c:
     void onImageDownloaded(android.graphics.Bitmap,int) -> a
-fr.srombauts.sjlb.service.CallbackTransfer -> fr.srombauts.sjlb.service.g:
-    void onTransferDone(boolean) -> a
-fr.srombauts.sjlb.service.FlushedInputStream -> fr.srombauts.sjlb.service.h:
+fr.srombauts.sjlb.service.FlushedInputStream -> fr.srombauts.sjlb.service.d:
     long skip(long) -> skip
 fr.srombauts.sjlb.service.IntentReceiverStartService -> fr.srombauts.sjlb.service.IntentReceiverStartService:
     void onReceive(android.content.Context,android.content.Intent) -> onReceive
     void startAlarm$5ffc00fd(android.content.Context) -> a
-fr.srombauts.sjlb.service.OnServiceResponseListener -> fr.srombauts.sjlb.service.i:
+fr.srombauts.sjlb.service.OnServiceResponseListener -> fr.srombauts.sjlb.service.e:
     void onServiceResponse(android.content.Intent) -> a
-fr.srombauts.sjlb.service.ResponseReceiver -> fr.srombauts.sjlb.service.j:
+fr.srombauts.sjlb.service.ResponseReceiver -> fr.srombauts.sjlb.service.f:
     fr.srombauts.sjlb.service.OnServiceResponseListener mOnServiceResponseListener -> a
     void unregister(android.content.Context) -> a
     void onReceive(android.content.Context,android.content.Intent) -> onReceive
@@ -445,5 +424,5 @@ fr.srombauts.sjlb.service.ServiceSJLB -> fr.srombauts.sjlb.service.ServiceSJLB:
     fr.srombauts.sjlb.service.API mAPI -> a
     void onHandleIntent(android.content.Intent) -> onHandleIntent
     android.os.IBinder onBind(android.content.Intent) -> onBind
-fr.srombauts.sjlb.service.StartService -> fr.srombauts.sjlb.service.k:
+fr.srombauts.sjlb.service.StartService -> fr.srombauts.sjlb.service.g:
     void refresh(android.content.Context) -> a
