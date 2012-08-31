@@ -272,7 +272,9 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         // On fait apparaître la zone d'édition
         //mMsgListView.setVisibility(View.VISIBLE);
         mEditText.setVisibility(View.VISIBLE);
+        mEditText.setEnabled(true);
         mEditButton.setVisibility(View.VISIBLE);
+        mEditButton.setEnabled(true);
 
         // donne le focus à la zone d'édition
         mEditText.requestFocus();
@@ -315,7 +317,9 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         // Met dans la fifo du service les données du message à envoyer
         StartService.newMsg(this, mSelectedSubjectId, mEditText.getText().toString());
         Toast.makeText(this, getString(R.string.toast_sending), Toast.LENGTH_SHORT).show();
-        // TODO SRombauts : verrouiller le bouton d'envoi et le champ texte !
+        // Sur tentative d'envoi, verrouille le bouton et le champ texte pour éviter les envois multiples
+        mEditText.setEnabled(false);
+        mEditButton.setEnabled(false);
     }    
 
     /**
@@ -336,7 +340,9 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                 mCursor.requery();
             } else {
                 Toast.makeText(this, getString(R.string.toast_not_sent), Toast.LENGTH_SHORT).show();
-                // TODO SRombauts : déverrouiller le bouton d'envoi et le champ texte !
+                // Erreur d'envoi, déverrouille le bouton et le champ texte pour permettre une nouvelle tentative
+                mEditText.setEnabled(true);
+                mEditButton.setEnabled(true);
             }
         } else if (responseType.equals(ServiceSJLB.ACTION_REFRESH)) {
             if (bReponseResult) {

@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
@@ -36,7 +37,8 @@ public class ActivityNewPrivateMessage extends Activity implements OnServiceResp
     
     private ResponseReceiver    mResponseReceiver   = null;
     
-    private EditText            mText               = null;
+    private EditText            mEditText           = null;
+    private Button              mEditButton         = null;
     
     /** Called when the activity is first created. */
     @Override
@@ -77,7 +79,8 @@ public class ActivityNewPrivateMessage extends Activity implements OnServiceResp
         }
         
         // Binding de la zone de saisie du message
-        mText = (EditText)findViewById(R.id.textEditText);
+        mEditText   = (EditText)findViewById(R.id.textEditText);
+        mEditButton = (Button)findViewById(R.id.buttonSendPm);
     }
     
     // Appelée lorsque l'activité passe au premier plan 
@@ -149,11 +152,13 @@ public class ActivityNewPrivateMessage extends Activity implements OnServiceResp
      */
     public void onSendPM (View v) {
         long destinataireId = mUsersSpinner.getSelectedItemId();
-        Log.d (LOG_TAG, "onSendPM ("+ destinataireId +") : " + mText.getText().toString());
+        Log.d (LOG_TAG, "onSendPM ("+ destinataireId +") : " + mEditText.getText().toString());
         // Met dans la fifo du service les données du pm à envoyer
-        StartService.newPM(this, destinataireId, mText.getText().toString());
+        StartService.newPM(this, destinataireId, mEditText.getText().toString());
         Toast.makeText(this, getString(R.string.toast_sending), Toast.LENGTH_SHORT).show();
-        // TODO SRombauts : verrouiller le bouton d'envoi et le champ texte !
+        // Sur tentative d'envoi, verrouille le bouton et le champ texte pour éviter les envois multiples
+        mEditText.setEnabled(false);
+        mEditButton.setEnabled(false);
     }
     
     /**
@@ -175,7 +180,9 @@ public class ActivityNewPrivateMessage extends Activity implements OnServiceResp
                 finish ();
             } else {
                 Toast.makeText(this, getString(R.string.toast_not_sent), Toast.LENGTH_SHORT).show();
-                // TODO SRombauts : déverrouiller le bouton d'envoi et le champ texte !
+                // Sur échec d'envoi, déverrouille le bouton et le champ texte pour permettre de retenter l'envoi
+                mEditText.setEnabled(true);
+                mEditButton.setEnabled(true);
             }
         }
     }
