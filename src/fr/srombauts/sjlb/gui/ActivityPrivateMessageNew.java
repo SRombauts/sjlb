@@ -28,7 +28,7 @@ import fr.srombauts.sjlb.service.StartService;
  * Activité permettant d'envoyer un nouveau message privé
  * @author 14/08/2010 SRombauts
  */
-public class ActivityNewPrivateMessage extends Activity implements OnServiceResponseListener {
+public class ActivityPrivateMessageNew extends Activity implements OnServiceResponseListener {
     private static final String LOG_TAG = "ActivityNewPM";
     
     public  static final String START_INTENT_EXTRA_AUTHOR_ID = "AuthorId";

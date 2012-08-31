@@ -142,7 +142,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
         
         switch (item.getItemId()) {
             case (R.id.menu_new_pm): {
-                Intent intent = new Intent(this, ActivityNewPrivateMessage.class);
+                Intent intent = new Intent(this, ActivityPrivateMessageNew.class);
                 startActivity(intent);
                 break;
             }
@@ -271,8 +271,8 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
     void answerPM (int aSelectedPmAuthorId) {
         Log.d (LOG_TAG, "answerPM (" + aSelectedPmAuthorId + ")" );        
         // Lance l'activité correspondante avec en paramètre l'id du destinataire :
-        Intent intent = new Intent(this, ActivityNewPrivateMessage.class);
-        intent.putExtra(ActivityNewPrivateMessage.START_INTENT_EXTRA_AUTHOR_ID, aSelectedPmAuthorId);
+        Intent intent = new Intent(this, ActivityPrivateMessageNew.class);
+        intent.putExtra(ActivityPrivateMessageNew.START_INTENT_EXTRA_AUTHOR_ID, aSelectedPmAuthorId);
         startActivity(intent);        
     }
     
@@ -280,7 +280,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
      * Sur clic du bouton de rédaction d'un nouveau PM 
      */
     public void onNewPM (View v) {
-        Intent intent = new Intent(this, ActivityNewPrivateMessage.class);
+        Intent intent = new Intent(this, ActivityPrivateMessageNew.class);
         startActivity(intent);
     }
 

@@ -35,7 +35,7 @@ import fr.srombauts.sjlb.service.CallbackImageDownload;
  * Activité présentant la liste des sujets de la catégorie sélectionnée
  * @author 22/08/2010 SRombauts
  */
-public class ActivityFiles extends ActivityTouchListener implements OnItemClickListener, CallbackImageDownload {
+public class ActivityForumFiles extends ActivityTouchListener implements OnItemClickListener, CallbackImageDownload {
     private static final String LOG_TAG = "ActivityFiles";
     
     public static final String  START_INTENT_EXTRA_MSG_ID           = "MessageId";
