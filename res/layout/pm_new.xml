@@ -3,8 +3,8 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
+    android:paddingLeft="4dp"
+    android:paddingRight="4dp"
     android:background="#e4e4e4"
 >
     <Spinner
@@ -16,24 +16,31 @@
         android:background="#09C"
         android:paddingLeft="16dp"
     />
-    <EditText
-        android:id="@+id/textEditText"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="152dp"
-        android:layout_marginTop="4dp"
-        android:gravity="top"
-        android:textSize="14sp"
-        android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
-    />
-    <Button
-        android:id="@+id/buttonSendPm"
-        android:layout_width="fill_parent" 
-        android:layout_height="40dp" 
-        android:layout_marginBottom="4dp"
-        android:background="#09C"
-        android:textSize="18sp"
-        android:text="@string/button_send_pm"
-        android:onClick="onSendPM"
-    />
-
+        android:layout_height="wrap_content"
+        android:weightSum="8"
+        >
+        <EditText
+            android:id="@+id/textEditText"
+            android:layout_weight="7"
+            android:layout_width="0dp"
+            android:layout_height="152dp"
+            android:layout_marginTop="4dp"
+            android:gravity="top"
+            android:textSize="14sp"
+            android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
+        />
+        <Button
+            android:id="@+id/buttonSendPm"
+            android:layout_weight="1"
+            android:layout_width="0dp" 
+            android:layout_height="wrap_content" 
+            android:layout_gravity="center"
+            android:textSize="14sp"
+            android:text="@string/button_send_pm"
+            android:onClick="onSendPM"
+        />
+    </LinearLayout>    
 </LinearLayout>

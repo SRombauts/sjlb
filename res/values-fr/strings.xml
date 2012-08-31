@@ -4,7 +4,8 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        Mise au propre du service de traitements en tâche de fond\n
+        - Amélioration de l\'ergonomie de la saisie\n
+        - Mise au propre du service de traitements en tâche de fond\n
     </string>
     <string name="loginscreen_title">   Login et mot de passe                                                           </string>
     <string name="loginscreen_message"> Veuillez saisir votre login et votre mot de passe dans le menu des préférences  </string>
@@ -17,8 +18,8 @@
     <string name="button_show_pm">        Messages Privés            </string>
     <string name="button_show_user_list"> Membres                    </string>
     <string name="button_show_pm_sent">   Messages Privés Envoyés    </string>
-    <string name="button_send_pm">        Envoyer le message privé   </string>
-    <string name="button_send_msg">       Envoyer le message         </string>
+    <string name="button_send_pm">        Ok                         </string>
+    <string name="button_send_msg">       Ok                         </string>
     <string name="button_show_file">      Fichier attaché            </string>
     <string name="button_show_files">     fichiers attachés          </string>
     

@@ -12,27 +12,35 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="#FFF"
-    />    
-    <EditText
-        android:id="@+id/textEditText"
+    />
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="152dp"
-        android:layout_marginTop="4dp"
-        android:gravity="top"
-        android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
-        android:hint="@string/hint_send_msg"
-        android:textSize="14sp"
-        android:visibility="invisible"
-    />
-    <Button
-        android:id="@+id/textSendButton"
-        android:layout_width="fill_parent" 
-        android:layout_height="40dp" 
-        android:layout_marginBottom="4dp"
-        android:background="#09C"
-        android:text="@string/button_send_msg"
-        android:onClick="onSendMsg"
-        android:textSize="18sp"
-        android:visibility="invisible"
-    />
+        android:layout_height="wrap_content"
+        android:weightSum="15"
+        >
+        <EditText
+            android:id="@+id/textEditText"
+            android:layout_weight="13"
+            android:layout_width="0dp"
+            android:layout_height="152dp"
+            android:gravity="top"
+            android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
+            android:hint="@string/hint_send_msg"
+            android:textSize="14sp"
+            android:visibility="gone"
+        />
+        <Button
+            android:id="@+id/textSendButton"
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" 
+            android:layout_marginTop="4dp"
+            android:layout_gravity="top"
+            android:textSize="14sp"
+            android:text="@string/button_send_msg"
+            android:visibility="gone"
+            android:onClick="onSendMsg"
+        />
+    </LinearLayout>
 </LinearLayout>

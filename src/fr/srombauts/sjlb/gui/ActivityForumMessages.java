@@ -277,7 +277,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             mOriginalMsgListHeight = params.height;
         }
         // TODO SRombauts : remplacer le nombre de pixel par des "sp" ou trouver une manière vraiment plus élégante de faire 
-        params.height = getWindowManager().getDefaultDisplay().getHeight() - 380;
+        params.height = getWindowManager().getDefaultDisplay().getHeight() - 310;
         mMsgListView.requestLayout();
         // On fait apparaître la zone d'édition
         //mMsgListView.setVisibility(View.VISIBLE);
