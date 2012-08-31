@@ -165,15 +165,20 @@ public class ActivityPrivateMessageNew extends Activity implements OnServiceResp
      * Envoie au server le nouveau PM 
      */
     public void onSendPM (View v) {
-        long destinataireId = mUsersSpinner.getSelectedItemId();
-        Log.d (LOG_TAG, "onSendPM ("+ destinataireId +") : " + mEditText.getText().toString());
-        // Met dans la fifo du service les données du pm à envoyer
-        StartService.newPM(this, destinataireId, mEditText.getText().toString());
-        Toast.makeText(this, getString(R.string.toast_sending), Toast.LENGTH_SHORT).show();
-        // Sur tentative d'envoi, verrouille le bouton et le champ texte pour éviter les envois multiples
-        mbIsSending = true;
-        mEditText.setEnabled(false);
-        mEditButton.setEnabled(false);
+        final long      destinataireId  = mUsersSpinner.getSelectedItemId();
+        final String    text            = mEditText.getText().toString();
+        if (0 < text.length()) {
+            Log.d (LOG_TAG, "onSendPM ("+ destinataireId +") : " + text);
+            // Met dans la fifo du service les données du pm à envoyer
+            StartService.newPM(this, destinataireId, text);
+            Toast.makeText(this, getString(R.string.toast_sending), Toast.LENGTH_SHORT).show();
+            // Sur tentative d'envoi, verrouille le bouton et le champ texte pour éviter les envois multiples
+            mbIsSending = true;
+            mEditText.setEnabled(false);
+            mEditButton.setEnabled(false);
+        } else {
+            Toast.makeText(this, getString(R.string.toast_text_needed), Toast.LENGTH_SHORT).show();
+        }
     }
     
     /**

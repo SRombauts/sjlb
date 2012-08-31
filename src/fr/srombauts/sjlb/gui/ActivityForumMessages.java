@@ -323,14 +323,19 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
      * Envoie au server le nouveau Msg 
      */
     public void onSendMsg (View v) {
-        Log.d (LOG_TAG, "onSendMsg ("+ mSelectedSubjectId + " : " + mEditText.getText().toString());
-        // Met dans la fifo du service les données du message à envoyer
-        StartService.newMsg(this, mSelectedSubjectId, mEditText.getText().toString());
-        Toast.makeText(this, getString(R.string.toast_sending), Toast.LENGTH_SHORT).show();
-        // Sur tentative d'envoi, verrouille le bouton et le champ texte pour éviter les envois multiples
-        mbIsSending = true;
-        mEditText.setEnabled(false);
-        mEditButton.setEnabled(false);
+        final String text = mEditText.getText().toString();
+        if (0 < text.length()) {
+            Log.d (LOG_TAG, "onSendMsg ("+ mSelectedSubjectId + " : " + text);
+            // Met dans la fifo du service les données du message à envoyer
+            StartService.newMsg(this, mSelectedSubjectId, text);
+            Toast.makeText(this, getString(R.string.toast_sending), Toast.LENGTH_SHORT).show();
+            // Sur tentative d'envoi, verrouille le bouton et le champ texte pour éviter les envois multiples
+            mbIsSending = true;
+            mEditText.setEnabled(false);
+            mEditButton.setEnabled(false);
+        } else {
+            Toast.makeText(this, getString(R.string.toast_text_needed), Toast.LENGTH_SHORT).show();
+        }
     }    
 
     /**

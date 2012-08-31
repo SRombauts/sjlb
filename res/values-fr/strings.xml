@@ -76,6 +76,7 @@
 
     <!-- Toast notifications -->
     <string name="toast_auth_needed">       Action non disponible : nécessite login/mot de passe ! </string>
+    <string name="toast_text_needed">       Veuillez saisir un texte à envoyer !</string>
     <string name="toast_refreshing">        En cours de rafraichissement&#8230; </string>
     <string name="toast_sending">           Envoi en cours&#8230;               </string>
     <string name="toast_editing">           Modification demandé&#8230;         </string>
