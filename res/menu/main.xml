@@ -16,5 +16,6 @@
     <item android:id="@+id/menu_prefs"
           android:title="@string/menu_prefs" />
     <item android:id="@+id/menu_quit"
-          android:title="@string/menu_quit" />
+          android:title="@string/menu_quit"
+          /> <!-- android:showAsAction="ifRoom" -->
 </menu>
