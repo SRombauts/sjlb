@@ -4,6 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
+        - Bugfix on sending message\n
         - Improved usability of publishing\n
         - Background service cleanup\n
     </string>

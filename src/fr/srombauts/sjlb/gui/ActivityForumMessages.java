@@ -279,7 +279,7 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         // TODO SRombauts : remplacer le nombre de pixel par des "sp" ou trouver une manière vraiment plus élégante de faire 
         params.height = getWindowManager().getDefaultDisplay().getHeight() - 310;
         mMsgListView.requestLayout();
-        // On fait apparaître la zone d'édition
+        // On fait apparaître la zone d'édition et le bouton
         //mMsgListView.setVisibility(View.VISIBLE);
         mEditText.setVisibility(View.VISIBLE);
         mEditText.setEnabled(true);
@@ -306,12 +306,14 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         ViewGroup.LayoutParams params = mMsgListView.getLayoutParams();
         if (-1 != mOriginalMsgListHeight) {
             params.height = mOriginalMsgListHeight;
+            mOriginalMsgListHeight = -1;
         }
-        // On fait disparaître la zone d'édition
+        // On fait disparaître la zone d'édition, le texte qu'elle contient et le bouton
         mEditText.setVisibility(View.GONE);
+        mEditText.setText("");
         mEditButton.setVisibility(View.GONE);
 
-        // et cache lève le clavier virtuel
+        // et cache le clavier virtuel
         InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         mgr.showSoftInput(mEditText, InputMethodManager.HIDE_IMPLICIT_ONLY);   
 

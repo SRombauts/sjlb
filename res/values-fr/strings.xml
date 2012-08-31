@@ -4,6 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
+        - Correction bug d\'envoi de message\n
         - Amélioration de l\'ergonomie de la saisie\n
         - Mise au propre du service de traitements en tâche de fond\n
     </string>
