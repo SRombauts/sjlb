@@ -19,6 +19,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.QuickContactBadge;
 import android.widget.ResourceCursorAdapter;
@@ -41,7 +43,7 @@ import fr.srombauts.sjlb.service.StartService;
  * Activité présentant la liste des messages privés reçus
  * @author 14/06/2010 SRombauts
  */
-public class ActivityPrivateMessages extends ActivityTouchListener implements OnServiceResponseListener {
+public class ActivityPrivateMessages extends ActivityTouchListener implements OnItemClickListener, OnServiceResponseListener {
     private static final String LOG_TAG = "ActivityPM";
     
     static final private int    DIALOG_ID_PM_DELETE_ONE     = 1;
@@ -83,6 +85,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
         registerForContextMenu (mPrivateMessagesListView);        
         
         // Enregistre les listener d'IHM que la classe implémente        
+        mPrivateMessagesListView.setOnItemClickListener(this);
         mPrivateMessagesListView.setOnTouchListener(this);
         mPrivateMessagesListView.getRootView().setOnTouchListener(this);
     }
@@ -186,6 +189,8 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
       AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
       switch (item.getItemId()) {
           case R.id.menu_pm_answer:
+              // Déplace le curseur à la position du PM sélectionné  
+              mCursor.moveToPosition(info.position);
               answerPM(mCursor.getInt(mCursor.getColumnIndexOrThrow(SJLB.PM.AUTHOR_ID)));
               return true;
           case R.id.menu_pm_delete:
@@ -256,6 +261,15 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
         }        
     }
 
+    /**
+     *  Sur clic sur un pm, fait apparaître la boîte de réponse
+     */
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        // Déplace le curseur à la position du PM sélectionné  
+        mCursor.moveToPosition(position);
+        answerPM(mCursor.getInt(mCursor.getColumnIndexOrThrow(SJLB.PM.AUTHOR_ID)));
+    }
+    
     /**
      * Sur clic du bouton correspondant, lance l'activité d'affichage des PM
      */
