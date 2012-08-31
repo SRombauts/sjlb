@@ -101,8 +101,4 @@
     <string name="sjlb_forum_subj_param">   &amp;id_sujet=                                      </string>
     <string name="sjlb_forum_subj_dernier"> #dernier_message                                    </string>
 
-    <string name="sjlb_users_uri">      http://www.sjlb.fr/Android/Users.php                    </string>
-    <string name="sjlb_pm_uri">         http://www.sjlb.fr/Android/PrivateMessages.php          </string>
-    <string name="sjlb_msg_uri">        http://www.sjlb.fr/Android/ForumMessages.php            </string>
-
 </resources>
