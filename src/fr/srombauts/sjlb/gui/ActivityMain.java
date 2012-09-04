@@ -1,6 +1,8 @@
 package fr.srombauts.sjlb.gui;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +12,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +23,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import fr.srombauts.sjlb.BuildConfig;
 import fr.srombauts.sjlb.R;
@@ -31,6 +35,7 @@ import fr.srombauts.sjlb.db.ContentProviderUser;
 import fr.srombauts.sjlb.db.DBOpenHelper;
 import fr.srombauts.sjlb.db.SJLB;
 import fr.srombauts.sjlb.model.PrefsLoginPassword;
+import fr.srombauts.sjlb.service.API;
 import fr.srombauts.sjlb.service.IntentReceiverStartService;
 import fr.srombauts.sjlb.service.OnServiceResponseListener;
 import fr.srombauts.sjlb.service.ResponseReceiver;
@@ -49,8 +54,8 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
 
     // Liste des catégories du forum
     private ListView            mCategoriesListView     = null;
-    ArrayAdapter<String>        mAA;
-    ArrayList<String>           mCategories             = new ArrayList<String>();
+    private ArrayAdapter<String>mAA                     = null;
+    private ArrayList<String>   mCategories             = new ArrayList<String>();
 
     private long                mSelectedCategoryId     = 0;
     private String              mSelectedCategoryLabel  = "";
@@ -196,6 +201,18 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
 
         // Puis affiches ces infos dans le titre
         setTitle("SJLB " + info.versionName + "   (" + NbMsg + " messages)");
+        
+        // Récupère l'état et la date de la dernière synchronisation avec le serveur SJLB 
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        final String lastSynchroStatus  = prefs.getString(API.PREFS_STATUS_LAST_SYNCHRO, "");
+        final long   lastSynchroTime    = prefs.getLong(API.PREFS_DATE_LAST_SYNCHRO, 0);
+        final Date   lastSynchroDate    = new Date(lastSynchroTime*1000);
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+
+        // Puis affiches ces infos sous la liste
+        String textSynchStatus = dateFormat.format(lastSynchroDate) + " : " + lastSynchroStatus;
+        TextView textSynchStatusView = (TextView)findViewById(R.id.textSynchStatus);
+        textSynchStatusView.setText(textSynchStatus);
     }    
     
     /**

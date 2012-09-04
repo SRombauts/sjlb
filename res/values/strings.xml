@@ -4,9 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Bugfix on sending message\n
-        - Improved usability of publishing\n
-        - Background service cleanup\n
+        - Showing date and status of last server synch\n
     </string>
     <string name="loginscreen_title">   Login/password                                          </string>
     <string name="loginscreen_message"> Enter your login and password in the preferences menu   </string>

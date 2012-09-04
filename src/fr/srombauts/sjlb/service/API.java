@@ -36,6 +36,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ParseException;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.text.format.Time;
 import android.util.Log;
 import fr.srombauts.sjlb.ApplicationSJLB;
 import fr.srombauts.sjlb.R;
@@ -219,6 +220,12 @@ public class API {
     static final private String ATTR_NAME_USER_DATE_MAJ         = "DateDerniereMaj";
     static final private String ATTR_NAME_USER_IS_ACTIVE        = "is_active";
 
+    // "Préférences" sauvegardant le status de la synchronisation au serveur
+    static final public  String PREFS_DATE_LAST_SYNCHRO_OK      = "LastDateSynchroOk";
+    static final public  String PREFS_DATE_LAST_SYNCHRO         = "LastDateSynchro";
+    static final public  String PREFS_STATUS_LAST_SYNCHRO       = "LastStatusSynchro";
+    
+    
     private ServiceSJLB             mContext        = null;
     
     private ContentProviderPM       mPMDBAdapter    = null;
@@ -297,9 +304,13 @@ public class API {
                                            String aPmId) {
         boolean bSuccess    = false;
 
+        String  status      = "erreur";
+        
         int     nbNewPM     = 0;    // Nombre d'ID de PM inconnus (issu de la liste XML de nouveaux PM)
         int     nbUnreadMsg = 0;    // Nombre de messages non lus par l'utilisateur (issu directement de la liste XML fournie par le site SJLB)
         int     nbNewMsg    = 0;    // Nombre de messages mis à jour ou ajoutés lors de cette opération de synchro avec le site SJLB
+
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         
         try {
             Log.i(LOG_TAG, "fetchNewContent"
@@ -323,7 +334,6 @@ public class API {
             long dateLastUpdateUser = mUserDBAdapter.getDateLastUpdateUser();
             
             // Récupère dans les préférences les dates de suppression du dernier message et du dernier PM supprimé 
-            final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
             final long dateLastMsgSuppr  = prefs.getLong(PARAM_DATE_LAST_MSG_SUPPR, 0);
             final long dateLastPmSuppr   = prefs.getLong(PARAM_DATE_LAST_PM_SUPPR, 0);
             
@@ -784,6 +794,7 @@ public class API {
                         //////////////////////////////////////////////////////////////
                         // Arrivé ici, c'est qu'il n'y a manifestement pas eu d'erreur (pas d'exception)
                         bSuccess = true;
+                        status   = "succès";
 
                         // Mémorise les informations de versions qui ont été transmis au site SJLB
                         // ... seulement s'il y a eu du nouveau !
@@ -835,14 +846,17 @@ public class API {
                     }
                 } else {
                     Log.e(LOG_TAG, "no XML document: server error");
+                    status = "problème serveur";
                 }
             } else {
                 Log.e(LOG_TAG, "http error");
+                status = "serveur injoignable";
             }
             
         } catch (LoginPasswordEmptyException e) {
             // e.printStackTrace();
             Log.w(LOG_TAG, "No Login/Password set in Preferences");                                        
+            status = "erreur login/mot de passe";
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {
@@ -866,6 +880,19 @@ public class API {
         mUserDBAdapter.close();
         mSubjDBAdapter.close();
         mFileDBAdapter.close();
+        
+        Time now = new Time();
+        now.setToNow();
+        final long date = (now.toMillis(false)/1000);
+
+        // Mémorise la date et le status de la synchronisation
+        SharedPreferences.Editor editor = prefs.edit();
+        if (bSuccess) {
+            editor.putLong(PREFS_DATE_LAST_SYNCHRO_OK, date);
+        }
+        editor.putLong(PREFS_DATE_LAST_SYNCHRO, date);
+        editor.putString(PREFS_STATUS_LAST_SYNCHRO, status);
+        editor.commit();
         
         return bSuccess;
     }
