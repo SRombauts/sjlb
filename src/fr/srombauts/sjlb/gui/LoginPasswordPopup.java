@@ -19,7 +19,8 @@ public class LoginPasswordPopup {
         mActivity = context;
     }
  
-    public void show() {
+    public boolean show() {
+        boolean bShown = false; 
         // Récupère le login/mot de passe dans les préférences :
         final SharedPreferences prefs       = PreferenceManager.getDefaultSharedPreferences(mActivity);
         String                  login       = prefs.getString(SJLB.PREFS.LOGIN,    "");
@@ -28,6 +29,7 @@ public class LoginPasswordPopup {
         if (   (true == login.contentEquals(""))
             || (true == password.contentEquals("")) ) {
             Log.w(LOG_TAG, "login/password are not filled");
+            bShown = true;
 
             final String title   = mActivity.getString(R.string.loginscreen_title);
             final String message = mActivity.getString(R.string.loginscreen_message);
@@ -45,6 +47,8 @@ public class LoginPasswordPopup {
         } else {
             Log.i(LOG_TAG, "login/password are filled");
         }
+        
+        return bShown;
     }
  
 }

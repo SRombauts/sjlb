@@ -22,7 +22,8 @@ public class WhatsNewScreen {
         mActivity = context;
     }
  
-    public void show() {
+    public boolean show() {
+        boolean bShown = false; 
         try {
             // Get the versionCode of the Package, which must be different (incremented) in each release on the market in the AndroidManifest.xml
             final PackageInfo packageInfo = mActivity.getPackageManager().getPackageInfo(mActivity.getPackageName(), PackageManager.GET_ACTIVITIES);
@@ -32,6 +33,7 @@ public class WhatsNewScreen {
             
             if (packageInfo.versionCode != lastVersionCode) {
                 Log.i(LOG_TAG, "versionCode " + packageInfo.versionCode + " is different from the last known version " + lastVersionCode);
+                bShown = true;
 
                 final String title = mActivity.getString(R.string.app_name) + " v" + packageInfo.versionName;
      
@@ -59,6 +61,8 @@ public class WhatsNewScreen {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
+        
+        return bShown;
     }
  
 }

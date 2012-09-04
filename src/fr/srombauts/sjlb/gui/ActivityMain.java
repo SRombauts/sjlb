@@ -73,11 +73,13 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         // Layout de l'activité
         setContentView(R.layout.main_list);
 
-        // Affiche si nécessaire les modifications de la nouvelle version
-        new WhatsNewScreen(this).show();
-
         // Demande si nécessaire les infos de login/mot de passe
-        new LoginPasswordPopup(this).show();
+        final boolean bPasswordAsked = new LoginPasswordPopup(this).show();
+        if (false == bPasswordAsked) {
+            // A la première ouverture de l'application sans demande de renseignement de mot de passe,
+            // affiche la descriptions des nouvelles fonctionnalités et correction de la version logicielle.
+            new WhatsNewScreen(this).show();
+        }
         
         // binding de la liste des catégories
         mCategoriesListView     = (ListView)findViewById(R.id.categoriesListView);
@@ -200,7 +202,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         }
 
         // Puis affiches ces infos dans le titre
-        setTitle("SJLB " + info.versionName + "   (" + NbMsg + " messages)");
+        setTitle(getString(R.string.app_name) + " " + info.versionName + "   (" + NbMsg + " " + getString(R.string.msg_description) + ")");
         
         // Récupère l'état et la date de la dernière synchronisation avec le serveur SJLB 
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -210,7 +212,7 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
         final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
         // Puis affiches ces infos sous la liste
-        String textSynchStatus = dateFormat.format(lastSynchroDate) + " : " + lastSynchroStatus;
+        String textSynchStatus = dateFormat.format(lastSynchroDate) + " (" + lastSynchroStatus + ")";
         TextView textSynchStatusView = (TextView)findViewById(R.id.textSynchStatus);
         textSynchStatusView.setText(textSynchStatus);
     }    
