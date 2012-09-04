@@ -9,6 +9,7 @@
     <string name="loginscreen_title">   Login/password                                          </string>
     <string name="loginscreen_message"> Enter your login and password in the preferences menu   </string>
     
+    <string name="msg_description">       posts                   </string>
     <string name="pm_description">        Private Messages        </string>
     <string name="pm_sent_description">   Private Messages Sent   </string>
     <string name="user_description">      Users                   </string>
@@ -100,4 +101,10 @@
     <string name="sjlb_forum_subj_param">   &amp;id_sujet=                                      </string>
     <string name="sjlb_forum_subj_dernier"> #dernier_message                                    </string>
 
+    <!-- Messages d'erreurs du service -->
+    <string name="api_no_error">            success                     </string>
+    <string name="api_internal_error">      error                       </string>
+    <string name="api_login_password_error">login/password error        </string>
+    <string name="api_server_error">        server error                </string>
+    <string name="api_server_unreachable">  server unreachable          </string>
 </resources>

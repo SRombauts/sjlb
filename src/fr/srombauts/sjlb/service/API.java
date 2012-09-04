@@ -304,7 +304,7 @@ public class API {
                                            String aPmId) {
         boolean bSuccess    = false;
 
-        String  status      = "erreur";
+        String  status      = mContext.getString(R.string.api_internal_error);
         
         int     nbNewPM     = 0;    // Nombre d'ID de PM inconnus (issu de la liste XML de nouveaux PM)
         int     nbUnreadMsg = 0;    // Nombre de messages non lus par l'utilisateur (issu directement de la liste XML fournie par le site SJLB)
@@ -794,7 +794,7 @@ public class API {
                         //////////////////////////////////////////////////////////////
                         // Arrivé ici, c'est qu'il n'y a manifestement pas eu d'erreur (pas d'exception)
                         bSuccess = true;
-                        status   = "succès";
+                        status   = mContext.getString(R.string.api_no_error);
 
                         // Mémorise les informations de versions qui ont été transmis au site SJLB
                         // ... seulement s'il y a eu du nouveau !
@@ -846,17 +846,17 @@ public class API {
                     }
                 } else {
                     Log.e(LOG_TAG, "no XML document: server error");
-                    status = "problème serveur";
+                    status = mContext.getString(R.string.api_server_error);
                 }
             } else {
                 Log.e(LOG_TAG, "http error");
-                status = "serveur injoignable";
+                status = mContext.getString(R.string.api_server_unreachable);
             }
             
         } catch (LoginPasswordEmptyException e) {
             // e.printStackTrace();
             Log.w(LOG_TAG, "No Login/Password set in Preferences");                                        
-            status = "erreur login/mot de passe";
+            status = mContext.getString(R.string.api_login_password_error);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {

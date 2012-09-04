@@ -9,6 +9,7 @@
     <string name="loginscreen_title">   Login et mot de passe                                                           </string>
     <string name="loginscreen_message"> Veuillez saisir votre login et votre mot de passe dans le menu des préférences  </string>
     
+    <string name="msg_description">       posts                      </string>
     <string name="pm_description">        Messages Privés            </string>
     <string name="pm_sent_description">   Messages Privés Envoyés    </string>
     <string name="user_description">      Membres                    </string>
@@ -92,5 +93,11 @@
     <string name="notification_text_pm">    nouveau(x) message(s) privé(s)  </string>
     <string name="notification_title_msg">  Post(s) non lu(s)               </string>
     <string name="notification_text_msg">   post(s) non lu(s)               </string>
-    <!-- URI -->
+
+    <!-- Messages d'erreurs du service -->
+    <string name="api_no_error">            succès                          </string>
+    <string name="api_internal_error">      erreur                          </string>
+    <string name="api_login_password_error">login/mot de passe incorrect    </string>
+    <string name="api_server_error">        erreur serveur                  </string>
+    <string name="api_server_unreachable">  serveur injoignable             </string>
 </resources>
