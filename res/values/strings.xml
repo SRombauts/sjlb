@@ -107,4 +107,5 @@
     <string name="api_login_password_error">login/password error        </string>
     <string name="api_server_error">        server error                </string>
     <string name="api_server_unreachable">  server unreachable          </string>
+    <string name="api_network_error">       network error               </string>
 </resources>

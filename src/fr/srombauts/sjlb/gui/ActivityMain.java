@@ -224,16 +224,13 @@ public class ActivityMain extends ActivityTouchListener implements OnItemClickLi
      */
     @Override
     public void onServiceResponse(Intent intent) {
-      //String  responseType    = intent.getStringExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_TYPE);
-        boolean bReponseResult   = intent.getBooleanExtra(ServiceSJLB.RESPONSE_INTENT_EXTRA_RESULT, false);
-        if (bReponseResult) {
-            if (false != BuildConfig.DEBUG) {
-                // En mise au point uniquement : Toast notification signalant la réponse
-                Toast.makeText(this, "refresh", Toast.LENGTH_SHORT).show();
-            }
-            // Met à jour l'affichage de la liste des catégories (il y a peut être de nouveaux messages)
-            refreshCategoryList();
+        // Rafraîchi dans tous les cas l'affichage (même s'il y a eu une erreur, ce qui permet d'afficher le status de l'erreur)
+        if (false != BuildConfig.DEBUG) {
+            // En mise au point uniquement : Toast notification signalant la réponse
+            Toast.makeText(this, "refresh", Toast.LENGTH_SHORT).show();
         }
+        // Met à jour l'affichage de la liste des catégories (il y a peut être de nouveaux messages)
+        refreshCategoryList();
     }
     
     // Sur clic sur l'une des catégories

@@ -33,7 +33,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.net.ParseException;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.format.Time;
@@ -863,12 +862,9 @@ public class API {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            status = mContext.getString(R.string.api_network_error);
         } catch (SAXException e) {
             Log.e(LOG_TAG, "SAXException");                                        
-            e.printStackTrace();
-        } catch (ClassCastException e) {        
-            e.printStackTrace();
-        } catch (ParseException e) {
             e.printStackTrace();
         } catch (NameNotFoundException e) {
             e.printStackTrace();
