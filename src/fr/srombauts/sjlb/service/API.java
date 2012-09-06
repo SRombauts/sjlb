@@ -923,7 +923,10 @@ public class API {
         // ... et instanciation de la Notification :
         Notification    notification    = new Notification(icon, tickerText, when);
 
-        notification.number     = aNbNewPM;
+        // affiche un numéro à la place de l'icone s'il y a plus d'un nouveau PM
+        if (1 < aNbNewPM) {
+            notification.number = aNbNewPM;
+        }
         
         notification.defaults   = 0;
         if (notificationPrefs.mbSound) {
@@ -976,7 +979,10 @@ public class API {
         // et instanciation de la Notification :
         Notification notification = new Notification(icon, tickerText, when);
     
-        notification.number     = aNbUnreadMsg;
+        // affiche un numéro à la place de l'icone s'il y a plus d'un nouveau message
+        if (1 < aNbUnreadMsg) {
+            notification.number = aNbUnreadMsg;
+        }
     
         notification.defaults   = 0;
         if (notificationPrefs.mbSound) {

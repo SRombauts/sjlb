@@ -4,7 +4,10 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-        - Showing date and status of last server synch\n
+    - Quick pm button to author of a message\n
+    - Click on a member to send him a pm\n
+    - Click on a sent pm to send another pm\n
+    - Showing date and status of last server synch\n
     </string>
     <string name="loginscreen_title">   Login/password                                          </string>
     <string name="loginscreen_message"> Enter your login and password in the preferences menu   </string>
