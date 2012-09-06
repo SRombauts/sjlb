@@ -38,6 +38,8 @@ public class ResponseReceiver extends BroadcastReceiver {
     
     @Override
     public void onReceive(Context context, Intent intent) {
-         mOnServiceResponseListener.onServiceResponse(intent);
+        if (null != mOnServiceResponseListener) {
+            mOnServiceResponseListener.onServiceResponse(intent);
+        }
     }
 }
