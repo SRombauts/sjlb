@@ -400,10 +400,13 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
             final MessageListItemCache  cache = (MessageListItemCache) view.getTag();
-                        
+
+            // mémorise l'ID du message (en cas de clic sur le bouton "fichiers attachés")
+            cache.msgId = cursor.getLong(0); // cursor.getColumnIndexOrThrow(SJLB.Msg._ID)
+
             // Récupère le pseudo et le contact (Uri et photo) éventuellement associé à l'utilisateur
-            int userId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.AUTHOR_ID));
-            UserContactDescr user = ((ApplicationSJLB)getApplication ()).getUserContactById(userId);
+            cache.authorId = cursor.getInt(cursor.getColumnIndexOrThrow(SJLB.Msg.AUTHOR_ID));
+            UserContactDescr user = ((ApplicationSJLB)getApplication ()).getUserContactById(cache.authorId);
             
             // Fixe la barre d'informations du message 
             String  pseudo = user.getPseudo(); // on utilise le pseudo fourni par la liste d'utilisateur, plus simple qu'un croisement en bdd
@@ -427,8 +430,16 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
                 cache.quickContactView.setImageResource(R.drawable.ic_contact_picture);
             }
 
-            // mémorise l'ID du message (en cas de clic sur le bouton "fichiers attachés")
-            cache.msgId = cursor.getLong(0); // cursor.getColumnIndexOrThrow(SJLB.Msg._ID)
+            // Affiche le bouton d'envoi rapide d'un PM si l'auteur du message n'est pas l'utilisateur lui même
+            if (cache.authorId != ((ApplicationSJLB)getApplication ()).getUserId()) {
+                cache.pmButton.setVisibility(View.VISIBLE);
+                cache.pmButton.setOnClickListener (this);
+                
+            }
+            else {
+                cache.pmButton.setVisibility(View.GONE);
+                cache.pmButton.setOnClickListener (null);
+            }
             
             // Récupère un curseur sur les données (les fichiers) en filtrant sur l'id du sujet sélectionné
             final String[] columns = {SJLB.File.FILENAME};
@@ -464,11 +475,11 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             MessageListItemCache cache = new MessageListItemCache();
             // et binding sur les View décrites par le Layout
             cache.quickContactView  = (QuickContactBadge)   view.findViewById(R.id.msgBadge);
-            cache.quickContactView  = (QuickContactBadge)   view.findViewById(R.id.msgBadge);
             cache.pseudoView        = (TextView)            view.findViewById(R.id.msgPseudo);
             cache.dateView          = (TextView)            view.findViewById(R.id.msgDate);
             cache.textView          = (TextView)            view.findViewById(R.id.msgText);
             cache.imageViewNew      = (ImageView)           view.findViewById(R.id.msgNew);
+            cache.pmButton          = (Button)              view.findViewById(R.id.msgPmButton);
             cache.fileButton        = (Button)              view.findViewById(R.id.msgFileButton);
             // enregistre cet objet de cache
             view.setTag(cache);
@@ -477,18 +488,29 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
         }
         
         /**
-         *  Sur clic sur le bouton pour voir la liste des fichiers
+         *  Sur clic sur :
+         *  - le bouton pour envoyer un PM à l'auteur
+         *  - le bouton pour voir la liste des fichiers, ou
          */
         @Override
         public void onClick(View view) {
-            // lien vers le fichier sur le Site Web :
-            final MessageListItemCache  cache = (MessageListItemCache) ((View) view.getParent()).getTag();
-            Intent intent = new Intent(mContext, ActivityForumFiles.class);
-            intent.putExtra(ActivityForumFiles.START_INTENT_EXTRA_MSG_ID,        cache.msgId);
-            intent.putExtra(ActivityForumFiles.START_INTENT_EXTRA_MSG_TEXT,      cache.textView.getText());
-            intent.putExtra(ActivityForumFiles.START_INTENT_EXTRA_SUBJ_LABEL,    mSelectedSubjectLabel);
-            Log.d (LOG_TAG, "onClick: Message Id=" + cache.msgId);                
-            startActivity(intent);
+            if (R.id.msgPmButton == view.getId()) {
+                final MessageListItemCache  cache = (MessageListItemCache) ((View)view.getParent().getParent()).getTag();
+                // Lance l'activité de rédaction d'un PM à l'auteur de ce message
+                Intent intent = new Intent(mContext, ActivityPrivateMessageNew.class);
+                intent.putExtra(ActivityPrivateMessageNew.START_INTENT_EXTRA_DEST_ID, cache.authorId);
+                Log.d (LOG_TAG, "onClick: Message Id=" + cache.msgId);                
+                startActivity(intent);
+            } else if (R.id.msgFileButton == view.getId()) {
+                final MessageListItemCache  cache = (MessageListItemCache) ((View)view.getParent()).getTag();
+                // Lance l'activité de visualisation du/des fichiers attachés à ce message
+                Intent intent = new Intent(mContext, ActivityForumFiles.class);
+                intent.putExtra(ActivityForumFiles.START_INTENT_EXTRA_MSG_ID,        cache.msgId);
+                intent.putExtra(ActivityForumFiles.START_INTENT_EXTRA_MSG_TEXT,      cache.textView.getText());
+                intent.putExtra(ActivityForumFiles.START_INTENT_EXTRA_SUBJ_LABEL,    mSelectedSubjectLabel);
+                Log.d (LOG_TAG, "onClick: Message Id=" + cache.msgId);                
+                startActivity(intent);
+            }
         }
     }
     
@@ -496,11 +518,13 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
     // Objet utilisé comme cache des données d'une View, dans un pool d'objets utilisés par la ListView
     final static class MessageListItemCache {
         public long                 msgId;
+        public int                  authorId;
         public QuickContactBadge    quickContactView;
         public TextView             pseudoView;
         public TextView             dateView;
         public TextView             textView;
         public ImageView            imageViewNew;
+        public Button               pmButton;
         public Button               fileButton;
     }
 

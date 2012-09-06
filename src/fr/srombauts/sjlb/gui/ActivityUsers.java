@@ -1,11 +1,14 @@
 package fr.srombauts.sjlb.gui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.QuickContactBadge;
 import android.widget.ResourceCursorAdapter;
@@ -20,7 +23,7 @@ import fr.srombauts.sjlb.model.UserContactDescr;
  * Activité présentant la liste des messages privés
  * @author 10/08/2012 SRombauts
  */
-public class ActivityUsers extends ActivityTouchListener {
+public class ActivityUsers extends ActivityTouchListener implements OnItemClickListener {
     private static final String LOG_TAG = "ActivityUsers";
     
     private Cursor              mCursor             = null;
@@ -41,7 +44,7 @@ public class ActivityUsers extends ActivityTouchListener {
         
         // Récupère un curseur sur les données (les membres, classé par ordre alphabétique de pseudo)
         mCursor = managedQuery( SJLB.User.CONTENT_URI,
-                                null,
+                                null, // toutes les colonnes nous intéressent
                                 SJLB.User.IS_ACTIVE + "=1",
                                 null,
                                 SJLB.User.PSEUDO_SORT_ORDER);
@@ -58,6 +61,7 @@ public class ActivityUsers extends ActivityTouchListener {
         registerForContextMenu (mUsersListView);        
         
         // Enregistre les listener d'IHM que la classe implémente        
+        mUsersListView.setOnItemClickListener(this);
         mUsersListView.setOnTouchListener(this);
         mUsersListView.getRootView().setOnTouchListener(this);
     }
@@ -135,7 +139,7 @@ public class ActivityUsers extends ActivityTouchListener {
       AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
       switch (item.getItemId()) {
           case R.id.menu_user_answer:
-              answerPM(mCursor.getInt(mCursor.getColumnIndexOrThrow(SJLB.User.AUTHOR_ID)));
+              sendPM(mCursor.getInt(mCursor.getColumnIndexOrThrow(SJLB.User.AUTHOR_ID)));
               return true;
           case R.id.menu_user_delete:
               mSelectedPmId = info.id;
@@ -148,6 +152,26 @@ public class ActivityUsers extends ActivityTouchListener {
     */
 
 
+    /**
+     *  Sur clic sur un user, fait apparaître la boîte d'envoi d'un pm
+     */
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        // Déplace le curseur à la position du User sélectionné  
+        mCursor.moveToPosition(position);
+        sendPM(mCursor.getInt(mCursor.getColumnIndexOrThrow(SJLB.User._ID)));
+    }
+
+    /**
+     * Sur clic contextuel de réponse à un user 
+     */
+    void sendPM (int aSelectedAuthorId) {
+        Log.d (LOG_TAG, "sendPM (" + aSelectedAuthorId + ")" );        
+        // Lance l'activité correspondante avec en paramètre l'id du destinataire :
+        Intent intent = new Intent(this, ActivityPrivateMessageNew.class);
+        intent.putExtra(ActivityPrivateMessageNew.START_INTENT_EXTRA_DEST_ID, aSelectedAuthorId);
+        startActivity(intent);        
+    }
+        
     // Adaptateur mappant les données du curseur dans des objets du cache du pool d'objets View utilisés par la ListView
     private final class UserListItemAdapter extends ResourceCursorAdapter {
         public UserListItemAdapter(Context context, int layout, Cursor cursor) {

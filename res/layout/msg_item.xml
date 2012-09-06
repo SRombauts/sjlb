@@ -4,25 +4,23 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:padding="8dp"
-    android:background="#FFF"
-    >
+    android:background="#FFF">
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="wrap_content">
         <QuickContactBadge
             android:id="@+id/msgBadge"
             android:layout_marginRight="8dp"
             android:layout_width="48dp"
             android:layout_height="56dp"
             android:src="@drawable/ic_contact_picture"
-            style="?android:attr/quickContactBadgeStyleWindowSmall" />
+            style="?android:attr/quickContactBadgeStyleWindowSmall"
+        />
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="wrap_content">
             <TextView
                 android:id="@+id/msgPseudo"
                 android:layout_width="wrap_content"
@@ -30,24 +28,33 @@
                 android:textSize="18sp"
                 android:paddingRight="4dp"
                 android:textColor="#000"
-                />
+            />
             <TextView
                 android:id="@+id/msgDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textColor="#000"
-                />
+            />
         </LinearLayout>
+	     <Button
+	         android:id="@+id/msgPmButton"
+	         android:layout_width="wrap_content"
+	         android:layout_height="wrap_content"
+            android:gravity="center"
+	         android:textSize="12sp"
+	         android:text="@string/button_quick_pm"
+	         android:visibility="gone"
+	     />    
         <ImageView
             android:id="@+id/msgNew"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="right"
             android:src="@drawable/msg_new"
             android:contentDescription="@string/file_description"
-            android:visibility="invisible"
-            android:gravity="right"
-            />
+            android:visibility="gone"
+        />
     </LinearLayout>
     <TextView
         android:id="@+id/msgText"

@@ -31,7 +31,7 @@ import fr.srombauts.sjlb.service.StartService;
 public class ActivityPrivateMessageNew extends Activity implements OnServiceResponseListener {
     private static final String LOG_TAG = "ActivityNewPM";
     
-    public  static final String START_INTENT_EXTRA_AUTHOR_ID = "AuthorId";
+    public  static final String START_INTENT_EXTRA_DEST_ID = "DestId";
     
     private Spinner             mUsersSpinner       = null;
     
@@ -75,8 +75,8 @@ public class ActivityPrivateMessageNew extends Activity implements OnServiceResp
         if (null != startIntent.getExtras())
         {
             // Sélectionne le destinataire du PM pour répondre
-            int authorId = startIntent.getExtras().getInt(START_INTENT_EXTRA_AUTHOR_ID);
-            mUsersSpinner.setSelection(authorId-1);
+            final int destId = startIntent.getExtras().getInt(START_INTENT_EXTRA_DEST_ID);
+            mUsersSpinner.setSelection(destId-1);
         }
         
         // Binding de la zone de saisie du message

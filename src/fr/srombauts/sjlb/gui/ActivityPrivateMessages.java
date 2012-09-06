@@ -286,7 +286,7 @@ public class ActivityPrivateMessages extends ActivityTouchListener implements On
         Log.d (LOG_TAG, "answerPM (" + aSelectedPmAuthorId + ")" );        
         // Lance l'activité correspondante avec en paramètre l'id du destinataire :
         Intent intent = new Intent(this, ActivityPrivateMessageNew.class);
-        intent.putExtra(ActivityPrivateMessageNew.START_INTENT_EXTRA_AUTHOR_ID, aSelectedPmAuthorId);
+        intent.putExtra(ActivityPrivateMessageNew.START_INTENT_EXTRA_DEST_ID, aSelectedPmAuthorId);
         startActivity(intent);        
     }
     
