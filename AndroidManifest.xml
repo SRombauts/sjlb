@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ATTENTION, le versionCode ne doit être incrémenté que pour l'ultime compilation en release pour publication,
-     PAS pour les tests, car cette valeur pourrait être utilisée pour signaler automatiquement une mise à jour disponible -->
+<!-- Le versionCode doit être incrémenté pour chaque publication.
+     Cette valeur est utilisée pour signaler automatiquement une mise à jour disponible. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="fr.srombauts.sjlb"
       android:versionCode="83"

@@ -102,8 +102,8 @@ fr.srombauts.sjlb.db.SJLB$Subj -> fr.srombauts.sjlb.db.f:
 fr.srombauts.sjlb.db.SJLB$User -> fr.srombauts.sjlb.db.g:
     android.net.Uri CONTENT_URI -> a
 fr.srombauts.sjlb.gui.ActivityForumFiles -> fr.srombauts.sjlb.gui.ActivityForumFiles:
-    fr.srombauts.sjlb.gui.ActivityForumFiles$FileListItemAdapter mAdapter -> a
-    fr.srombauts.sjlb.gui.ActivityForumFiles$FileListItem[] mFileListItem -> b
+    fr.srombauts.sjlb.gui.ActivityForumFiles$FileListItemAdapter mAdapter -> c
+    fr.srombauts.sjlb.gui.ActivityForumFiles$FileListItem[] mFileListItem -> d
     long mSelectedMessageId -> e
     java.lang.String mSelectedMessageText -> f
     java.lang.String mSelectedSubjectLabel -> g
@@ -132,8 +132,8 @@ fr.srombauts.sjlb.gui.ActivityForumFiles$MyMediaScannerConnectionClient -> fr.sr
     void onMediaScannerConnected() -> onMediaScannerConnected
     void onScanCompleted(java.lang.String,android.net.Uri) -> onScanCompleted
 fr.srombauts.sjlb.gui.ActivityForumMessages -> fr.srombauts.sjlb.gui.ActivityForumMessages:
-    android.database.Cursor mCursor -> a
-    fr.srombauts.sjlb.gui.ActivityForumMessages$MessageListItemAdapter mAdapter -> b
+    android.database.Cursor mCursor -> c
+    fr.srombauts.sjlb.gui.ActivityForumMessages$MessageListItemAdapter mAdapter -> d
     android.widget.ListView mMsgListView -> e
     boolean mbIsSending -> f
     android.widget.EditText mEditText -> g
@@ -165,15 +165,17 @@ fr.srombauts.sjlb.gui.ActivityForumMessages$MessageListItemAdapter -> fr.srombau
     void onClick(android.view.View) -> onClick
 fr.srombauts.sjlb.gui.ActivityForumMessages$MessageListItemCache -> fr.srombauts.sjlb.gui.e:
     long msgId -> a
-    android.widget.QuickContactBadge quickContactView -> b
-    android.widget.TextView pseudoView -> c
-    android.widget.TextView dateView -> d
-    android.widget.TextView textView -> e
-    android.widget.ImageView imageViewNew -> f
-    android.widget.Button fileButton -> g
+    int authorId -> b
+    android.widget.QuickContactBadge quickContactView -> c
+    android.widget.TextView pseudoView -> d
+    android.widget.TextView dateView -> e
+    android.widget.TextView textView -> f
+    android.widget.ImageView imageViewNew -> g
+    android.widget.Button pmButton -> h
+    android.widget.Button fileButton -> i
 fr.srombauts.sjlb.gui.ActivityForumSubjects -> fr.srombauts.sjlb.gui.ActivityForumSubjects:
-    android.database.Cursor mCursor -> a
-    fr.srombauts.sjlb.gui.ActivityForumSubjects$SubjectListItemAdapter mAdapter -> b
+    android.database.Cursor mCursor -> c
+    fr.srombauts.sjlb.gui.ActivityForumSubjects$SubjectListItemAdapter mAdapter -> d
     android.widget.ListView mSubjectsListView -> e
     long mSelectedCategoryId -> f
     java.lang.String mSelectedCategoryLabel -> g
@@ -200,9 +202,9 @@ fr.srombauts.sjlb.gui.ActivityForumSubjects$SubjectListItemAdapter -> fr.srombau
 fr.srombauts.sjlb.gui.ActivityForumSubjects$SubjectListItemCache -> fr.srombauts.sjlb.gui.g:
     android.widget.TextView nameView -> a
 fr.srombauts.sjlb.gui.ActivityMain -> fr.srombauts.sjlb.gui.ActivityMain:
-    android.widget.ListView mCategoriesListView -> e
-    android.widget.ArrayAdapter mAA -> a
-    java.util.ArrayList mCategories -> b
+    android.widget.ListView mCategoriesListView -> c
+    android.widget.ArrayAdapter mAA -> d
+    java.util.ArrayList mCategories -> e
     long mSelectedCategoryId -> f
     java.lang.String mSelectedCategoryLabel -> g
     android.content.Intent mSavedIntent -> h
@@ -239,8 +241,8 @@ fr.srombauts.sjlb.gui.ActivityPrivateMessageNew -> fr.srombauts.sjlb.gui.Activit
     void onSendPM(android.view.View) -> onSendPM
     void onServiceResponse(android.content.Intent) -> a
 fr.srombauts.sjlb.gui.ActivityPrivateMessages -> fr.srombauts.sjlb.gui.ActivityPrivateMessages:
-    android.database.Cursor mCursor -> a
-    fr.srombauts.sjlb.gui.ActivityPrivateMessages$PmListItemAdapter mAdapter -> b
+    android.database.Cursor mCursor -> c
+    fr.srombauts.sjlb.gui.ActivityPrivateMessages$PmListItemAdapter mAdapter -> d
     android.widget.ListView mPrivateMessagesListView -> e
     long mSelectedPmId -> f
     fr.srombauts.sjlb.service.ResponseReceiver mResponseReceiver -> g
@@ -285,13 +287,14 @@ fr.srombauts.sjlb.gui.ActivityPrivateMessages$PmListItemAdapter -> fr.srombauts.
     void bindView(android.view.View,android.content.Context,android.database.Cursor) -> bindView
     android.view.View newView(android.content.Context,android.database.Cursor,android.view.ViewGroup) -> newView
 fr.srombauts.sjlb.gui.ActivityPrivateMessagesSent -> fr.srombauts.sjlb.gui.ActivityPrivateMessagesSent:
-    android.database.Cursor mCursor -> a
-    fr.srombauts.sjlb.gui.ActivityPrivateMessagesSent$PmListItemAdapter mAdapter -> b
+    android.database.Cursor mCursor -> c
+    fr.srombauts.sjlb.gui.ActivityPrivateMessagesSent$PmListItemAdapter mAdapter -> d
     android.widget.ListView mPrivateMessagesListView -> e
     fr.srombauts.sjlb.service.ResponseReceiver mResponseReceiver -> f
     void onCreate(android.os.Bundle) -> onCreate
     void onResume() -> onResume
     void onPause() -> onPause
+    void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick
     void onServiceResponse(android.content.Intent) -> a
     boolean onLeftGesture() -> a
 fr.srombauts.sjlb.gui.ActivityPrivateMessagesSent$MessageListItemCache -> fr.srombauts.sjlb.gui.n:
@@ -304,19 +307,20 @@ fr.srombauts.sjlb.gui.ActivityPrivateMessagesSent$PmListItemAdapter -> fr.sromba
     void bindView(android.view.View,android.content.Context,android.database.Cursor) -> bindView
     android.view.View newView(android.content.Context,android.database.Cursor,android.view.ViewGroup) -> newView
 fr.srombauts.sjlb.gui.ActivityTouchListener -> fr.srombauts.sjlb.gui.p:
-    float mTouchStartPositionX -> c
-    float mTouchStartPositionY -> d
-    float mSensibility -> a
+    float mTouchStartPositionX -> a
+    float mTouchStartPositionY -> b
+    float mSensibility -> c
     boolean onTouch(android.view.View,android.view.MotionEvent) -> onTouch
     boolean onLeftGesture() -> a
     boolean onRightGesture() -> b
 fr.srombauts.sjlb.gui.ActivityUsers -> fr.srombauts.sjlb.gui.ActivityUsers:
-    android.database.Cursor mCursor -> a
-    fr.srombauts.sjlb.gui.ActivityUsers$UserListItemAdapter mAdapter -> b
+    android.database.Cursor mCursor -> c
+    fr.srombauts.sjlb.gui.ActivityUsers$UserListItemAdapter mAdapter -> d
     android.widget.ListView mUsersListView -> e
     void onCreate(android.os.Bundle) -> onCreate
     void onResume() -> onResume
     boolean onLeftGesture() -> a
+    void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick
 fr.srombauts.sjlb.gui.ActivityUsers$UserListItemAdapter -> fr.srombauts.sjlb.gui.q:
     fr.srombauts.sjlb.gui.ActivityUsers this$0 -> a
     void bindView(android.view.View,android.content.Context,android.database.Cursor) -> bindView
@@ -334,6 +338,7 @@ fr.srombauts.sjlb.gui.LoginPasswordPopup$1 -> fr.srombauts.sjlb.gui.t:
     void onClick(android.content.DialogInterface,int) -> onClick
 fr.srombauts.sjlb.gui.WhatsNewScreen -> fr.srombauts.sjlb.gui.u:
     android.app.Activity mActivity -> a
+    boolean show() -> a
 fr.srombauts.sjlb.gui.WhatsNewScreen$1 -> fr.srombauts.sjlb.gui.v:
     fr.srombauts.sjlb.gui.WhatsNewScreen this$0 -> a
     android.content.SharedPreferences val$prefs -> b

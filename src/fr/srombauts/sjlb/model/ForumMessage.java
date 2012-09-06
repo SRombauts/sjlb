@@ -58,8 +58,8 @@ public class ForumMessage {
 
     // Formate une date en chaîne de caractère
     static public String getDateString (Date aDate) {
-        SimpleDateFormat    sdf         = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        String              dateString  = sdf.format(aDate);
+        final SimpleDateFormat  dateFormat  = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        final String            dateString  = dateFormat.format(aDate);
 
         return dateString;
     }
