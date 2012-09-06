@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.QuickContactBadge;
 import android.widget.ResourceCursorAdapter;
@@ -31,7 +33,7 @@ import fr.srombauts.sjlb.service.ServiceSJLB;
  * Activité présentant la liste des messages privés envoyés
  * @author 14/06/2010 SRombauts
  */
-public class ActivityPrivateMessagesSent extends ActivityTouchListener implements OnServiceResponseListener {
+public class ActivityPrivateMessagesSent extends ActivityTouchListener implements  OnItemClickListener, OnServiceResponseListener {
     private static final String LOG_TAG = "ActivityPM";
     
     private Cursor              mCursor                     = null;
@@ -65,6 +67,7 @@ public class ActivityPrivateMessagesSent extends ActivityTouchListener implement
         mPrivateMessagesListView.setSelection(mCursor.getCount()-1);
         
         // Enregistre les listener d'IHM que la classe implémente        
+        mPrivateMessagesListView.setOnItemClickListener(this);
         mPrivateMessagesListView.setOnTouchListener(this);
         mPrivateMessagesListView.getRootView().setOnTouchListener(this);
     }
@@ -92,6 +95,26 @@ public class ActivityPrivateMessagesSent extends ActivityTouchListener implement
         String              ns                      = Context.NOTIFICATION_SERVICE;
         NotificationManager notificationManager     = (NotificationManager) getSystemService(ns);
         notificationManager.cancel(API.NOTIFICATION_NEW_PM_ID);
+    }
+
+    /**
+     *  Sur clic sur un pm envoyé, fait apparaître la boîte d'envoi d'un nouveau pm pour le destinataire
+     */
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        // Déplace le curseur à la position du PM sélectionné  
+        mCursor.moveToPosition(position);
+        sendPM(mCursor.getInt(mCursor.getColumnIndexOrThrow(SJLB.PM.DEST_ID)));
+    }
+
+    /**
+     * Sur clic contextuel de réponse à un user 
+     */
+    void sendPM (int aSelectedAuthorId) {
+        Log.d (LOG_TAG, "sendPM (" + aSelectedAuthorId + ")" );        
+        // Lance l'activité correspondante avec en paramètre l'id du destinataire :
+        Intent intent = new Intent(this, ActivityPrivateMessageNew.class);
+        intent.putExtra(ActivityPrivateMessageNew.START_INTENT_EXTRA_DEST_ID, aSelectedAuthorId);
+        startActivity(intent);        
     }
 
     /**
