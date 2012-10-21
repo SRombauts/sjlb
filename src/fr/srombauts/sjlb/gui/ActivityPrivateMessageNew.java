@@ -50,10 +50,12 @@ public class ActivityPrivateMessageNew extends Activity implements OnServiceResp
         setContentView(R.layout.pm_new);
         setTitle(getString(R.string.pm_description));
 
-        // Récupère un curseur sur les données (les utilisateurs) 
-        Cursor cursor = managedQuery(SJLB.User.CONTENT_URI, null,
+        // Récupère un curseur sur les données (les membres, classé par ordre alphabétique de pseudo)
+        Cursor cursor = managedQuery(SJLB.User.CONTENT_URI,
+                                     null,                       // toutes les colonnes nous intéressent
+                                     SJLB.User.IS_ACTIVE + "=1", // mais seulement les members actifs 
                                      null,
-                                     null, null);
+                                     SJLB.User.PSEUDO_SORT_ORDER);
 
         // Les colonnes à mapper :
         final String[] from = { SJLB.User.PSEUDO };

@@ -25,9 +25,11 @@
             android:layout_width="0dp"
             android:layout_height="152dp"
             android:gravity="top"
-            android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
-            android:hint="@string/hint_send_msg"
             android:textSize="14sp"
+            android:textColor="#000"
+            android:hint="@string/hint_send_msg"
+            android:background="@android:drawable/editbox_background_normal"
+            android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
             android:visibility="gone"
         />
         <Button

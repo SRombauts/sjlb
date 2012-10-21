@@ -4,6 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
+    - Fix white text on edit text on certain devices\n
     - Fix clic on message with attached files\n
     - Quick pm button to author of a message\n
     - Click on a member to send him a pm\n
@@ -29,7 +30,8 @@
     <string name="button_show_files">     attached files          </string>
     
     <!-- hint text and content description -->
-    <string name="hint_send_msg">         Write you message, then remove the keyboard to push the \"send\" button"    </string>
+    <string name="hint_send_msg">         Write you message, then remove the keyboard to push the \"ok\" button"    </string>
+    <string name="hint_send_pm">          Write you message, then remove the keyboard to push the \"ok\" button"    </string>
     
     <string name="file_description">      File    </string>
 

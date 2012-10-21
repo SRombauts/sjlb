@@ -4,6 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
+    - Correction texte blanc dans les boîtes d\'éditions de certains téléphones\n
     - Correction clic non pris en compte sur message contenant des fichiers attachés\n 
     - Ajout d\'un bouton d\'envoi rapide de PM à l\'auteur d\'un message\n
     - Ajout d\'un bouton d\'envoi rapide de PM sur la liste des pm envoyés\n
@@ -29,7 +30,8 @@
     <string name="button_show_files">     fichiers attachés          </string>
     
     <!-- hint text and content description -->
-    <string name="hint_send_msg">         Rédigez votre message, puis faites disparaître le clavier et utilisez le bouton ci-dessous pour \"Envoyer le message\""    </string>
+    <string name="hint_send_msg">         Rédigez votre message, puis utilisez le bouton \"ok\" pour l\'envoyer"    </string>
+    <string name="hint_send_pm">          Rédigez votre message, puis utilisez le bouton \"ok\" pour l\'envoyer"    </string>
     
     <string name="file_description">      Fichier    </string>
     
