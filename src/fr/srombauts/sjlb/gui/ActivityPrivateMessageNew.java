@@ -78,7 +78,20 @@ public class ActivityPrivateMessageNew extends Activity implements OnServiceResp
         {
             // Sélectionne le destinataire du PM pour répondre
             final int destId = startIntent.getExtras().getInt(START_INTENT_EXTRA_DEST_ID);
-            mUsersSpinner.setSelection(destId-1);
+            int index = 0;
+            boolean bOk = cursor.moveToFirst(); 
+            while (bOk)
+            {
+                final int userId = cursor.getInt(cursor.getColumnIndex(SJLB.User._ID));
+                if (userId == destId) {
+                    mUsersSpinner.setSelection(index);
+                    bOk = false;
+                }
+                else {
+                    index++;
+                    bOk = cursor.moveToNext();
+                }
+            }
         }
         
         // Binding de la zone de saisie du message

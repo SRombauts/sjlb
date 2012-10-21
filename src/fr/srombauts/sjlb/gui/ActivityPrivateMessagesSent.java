@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,6 +30,7 @@ import fr.srombauts.sjlb.service.API;
 import fr.srombauts.sjlb.service.OnServiceResponseListener;
 import fr.srombauts.sjlb.service.ResponseReceiver;
 import fr.srombauts.sjlb.service.ServiceSJLB;
+import fr.srombauts.sjlb.service.StartService;
 
 
 /**
@@ -143,6 +147,51 @@ public class ActivityPrivateMessagesSent extends ActivityTouchListener implement
         return true;
     }
 
+    
+    /**
+     * Création du menu général
+     */
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.pm, menu);
+        return true;
+    }
+    
+    /**
+     * Sur sélection dans le menu général
+     */
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        
+        switch (item.getItemId()) {
+            case (R.id.menu_new_pm): {
+                // Lance l'activité de rédaction d'un nouveau pm
+                Intent intent = new Intent(this, ActivityPrivateMessageNew.class);
+                startActivity(intent);
+                // puis termine l'activité courante pour ne plus repasser par ici
+                finish ();
+                break;
+            }
+            case (R.id.menu_update): {
+                // Demande de rafraîchissement asynchrone des informations
+                StartService.refresh(this);
+                Toast.makeText(this, getString(R.string.toast_refreshing), Toast.LENGTH_SHORT).show();
+                break;            }
+            case (R.id.menu_prefs): {
+                Intent intent = new Intent(this, ActivityPreferences.class);
+                startActivity(intent);
+                break;
+            }
+            case (R.id.menu_quit): {
+                finish ();
+                break;
+            }
+            default:
+                return false;
+        }
+        return true;
+    }
+    
     // Adaptateur mappant les données du curseur dans des objets du cache du pool d'objets View utilisés par la ListView
     private final class PmListItemAdapter extends ResourceCursorAdapter {
         public PmListItemAdapter(Context context, int layout, Cursor cursor) {
