@@ -297,6 +297,8 @@ fr.srombauts.sjlb.gui.ActivityPrivateMessagesSent -> fr.srombauts.sjlb.gui.Activ
     void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick
     void onServiceResponse(android.content.Intent) -> a
     boolean onLeftGesture() -> a
+    boolean onCreateOptionsMenu(android.view.Menu) -> onCreateOptionsMenu
+    boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
 fr.srombauts.sjlb.gui.ActivityPrivateMessagesSent$MessageListItemCache -> fr.srombauts.sjlb.gui.n:
     android.widget.QuickContactBadge quickContactView -> a
     android.widget.TextView pseudoView -> b
