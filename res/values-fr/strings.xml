@@ -4,6 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
+    - Correction clic non pris en compte sur message contenant des fichiers attachés\n 
     - Ajout d\'un bouton d\'envoi rapide de PM à l\'auteur d\'un message\n
     - Ajout d\'un bouton d\'envoi rapide de PM sur la liste des pm envoyés\n
     - Ajout d\'un bouton d\'envoi rapide de PM à un membre\n
@@ -22,8 +23,8 @@
     <string name="button_show_user_list"> Membres                    </string>
     <string name="button_show_pm_sent">   Messages Privés Envoyés    </string>
     <string name="button_quick_pm">       pm                         </string>
-    <string name="button_send_pm">        Ok                         </string>
-    <string name="button_send_msg">       Ok                         </string>
+    <string name="button_send_pm">        ok                         </string>
+    <string name="button_send_msg">       ok                         </string>
     <string name="button_show_file">      Fichier attaché            </string>
     <string name="button_show_files">     fichiers attachés          </string>
     

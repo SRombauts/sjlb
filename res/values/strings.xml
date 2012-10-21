@@ -4,6 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
+    - Fix clic on message with attached files\n
     - Quick pm button to author of a message\n
     - Click on a member to send him a pm\n
     - Click on a sent pm to send another pm\n
@@ -22,8 +23,8 @@
     <string name="button_show_user_list"> Users                   </string>
     <string name="button_show_pm_sent">   Private messages sent   </string>
     <string name="button_quick_pm">       pm                      </string>
-    <string name="button_send_pm">        Send                    </string>
-    <string name="button_send_msg">       Send                    </string>
+    <string name="button_send_pm">        ok                      </string>
+    <string name="button_send_msg">       ok                      </string>
     <string name="button_show_file">      Attached file           </string>
     <string name="button_show_files">     attached files          </string>
     

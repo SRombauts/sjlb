@@ -434,7 +434,6 @@ public class ActivityForumMessages extends ActivityTouchListener implements OnIt
             if (cache.authorId != ((ApplicationSJLB)getApplication ()).getUserId()) {
                 cache.pmButton.setVisibility(View.VISIBLE);
                 cache.pmButton.setOnClickListener (this);
-                
             }
             else {
                 cache.pmButton.setVisibility(View.GONE);

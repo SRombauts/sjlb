@@ -37,14 +37,15 @@
                 android:textColor="#000"
             />
         </LinearLayout>
-	     <Button
-	         android:id="@+id/msgPmButton"
-	         android:layout_width="wrap_content"
-	         android:layout_height="wrap_content"
-	         android:textSize="12sp"
-	         android:text="@string/button_quick_pm"
-	         android:visibility="gone"
-	     />    
+        <Button
+            android:id="@+id/msgPmButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:textSize="12sp"
+            android:text="@string/button_quick_pm"
+            android:visibility="gone"
+        />    
         <ImageView
             android:id="@+id/msgNew"
             android:layout_width="wrap_content"
@@ -70,6 +71,7 @@
         android:layout_marginLeft="75dp"
         android:layout_marginRight="75dp"
         android:gravity="center"
+        android:focusable="false"
         android:textSize="12sp"
         android:text="@string/button_show_files"
         android:visibility="gone"
