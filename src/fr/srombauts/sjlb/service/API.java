@@ -488,7 +488,7 @@ public class API {
                                     Element eltAddr = (Element)listAddr.item(0);
                                     Node    txtAddr = eltAddr.getFirstChild();
                                     if (null != txtAddr) {
-                                        strAddress  = eltAddr.getFirstChild().getNodeValue();
+                                        strAddress  = txtAddr.getNodeValue();
                                     }
                                     
                                     // Récupère les notes complémentaires à l'adresse de l'utilisateur
@@ -630,7 +630,11 @@ public class API {
                                 for (int i = 0; i < nbSubj; i++) {
                                     Element eltSubj     = (Element)listSubj.item(i);
                                     
-                                    String  strText     = eltSubj.getFirstChild().getNodeValue();
+                                    String  strText     = "";
+                                    Node    nodeText    = eltSubj.getFirstChild();
+                                    if (null != nodeText) {
+                                        strText = nodeText.getNodeValue();
+                                    }
         
                                     String  strIdSubj   = eltSubj.getAttribute(ATTR_NAME_FORUM_SUBJ_ID);
                                     int     idSubj      = Integer.parseInt(strIdSubj);
@@ -677,7 +681,11 @@ public class API {
                                 for (int i = 0; i < nbMsg; i++) {
                                     Element eltMsg      = (Element)listMsg.item(i);
                                     
-                                    String  strText     = eltMsg.getFirstChild().getNodeValue();
+                                    String  strText     = "";
+                                    Node    nodeText    = eltMsg.getFirstChild();
+                                    if (null != nodeText) {
+                                        strText = nodeText.getNodeValue();
+                                    }
         
                                     String  strIdMsg    = eltMsg.getAttribute(ATTR_NAME_FORUM_MSG_ID);
                                     int     idMsg       = Integer.parseInt(strIdMsg);
@@ -729,7 +737,11 @@ public class API {
                                     int nbFile = listFile.getLength();
                                     for (int j = 0; j < nbFile; j++) {
                                         Element eltFile     = (Element)listFile.item(j);
-                                        String  fileName    = eltFile.getFirstChild().getNodeValue();
+                                        String  fileName    = "";
+                                        Node    nodeFilename= eltFile.getFirstChild();
+                                        if (null != nodeFilename) {
+                                            fileName = nodeFilename.getNodeValue();
+                                        }
     
                                         AttachedFile newAttachedFile = new AttachedFile(idMsg, fileName);
                                         Log.d(LOG_TAG, "Fichier " + newAttachedFile);
@@ -757,7 +769,11 @@ public class API {
                                 for (int i = 0; i < nbPM; i++) {
                                     Element eltPm       = (Element)listPM.item(i);
                                     
-                                    String  strText     = eltPm.getFirstChild().getNodeValue();
+                                    String  strText     = "";
+                                    Node    nodeText    = eltPm.getFirstChild();
+                                    if (null != nodeText) {
+                                        strText = nodeText.getNodeValue();
+                                    }
         
                                     String  strIdPM     = eltPm.getAttribute(ATTR_NAME_PRIVATE_MSG_ID);
                                     int     idPM        = Integer.parseInt(strIdPM);
