@@ -4,12 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-    - Fix white text on edit text on certain devices\n
-    - Fix clic on message with attached files\n
-    - Quick pm button to author of a message\n
-    - Click on a member to send him a pm\n
-    - Click on a sent pm to send another pm\n
-    - Showing date and status of last server synch\n
+    - Fix null pointer when empty message (thanks Juliette ;)\n
     </string>
     <string name="loginscreen_title">   Login/password                                          </string>
     <string name="loginscreen_message"> Enter your login and password in the preferences menu   </string>
