@@ -4,8 +4,8 @@ android {
         srombauts {
             keyAlias 'srombauts'
             storeFile file('android.keystore') // app/android.keystore
-            keyPassword ''
-            storePassword ''
+            keyPassword 'mmdpandroid'
+            storePassword 'mmdpandroid'
         }
     }
 
@@ -21,6 +21,7 @@ android {
 
     buildTypes {
         release {
+            // debuggable true // NOTE: force android:debuggable="true" dans le Manifest, nécessaire pour le debug et logcat dans Android Studio
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-project.txt'
         }

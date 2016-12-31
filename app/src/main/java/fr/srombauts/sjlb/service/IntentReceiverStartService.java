@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
 import fr.srombauts.sjlb.db.SJLB;
 
 
@@ -23,25 +24,32 @@ import fr.srombauts.sjlb.db.SJLB;
 public class IntentReceiverStartService extends BroadcastReceiver {
     public  static final String ACTION_REFRESH_ALARM = "fr.srombauts.sjlb.ACTION_REFRESH_ALARM";
 
-    private static final String LOG_TAG = "StartServiceIntentReceiver";
+    private static final String LOG_TAG = "ReceiverStartService";
 
     /**
      * Callback de réception des Intent
      */
     public void onReceive(Context context, Intent intent) {
         // Récupère l'action transmise par l'intent
-        String action = intent.getAction();        
+        String action = intent.getAction();
         Log.d(LOG_TAG, action);
         if (action == null ) {
             Log.e(LOG_TAG,"Action==null!");
         }
-        else if ("android.intent.action.BOOT_COMPLETED".equals(action)) {
+        else if (action.equals("android.intent.action.BOOT_COMPLETED")) {
             // lance l'alarme périodique si l'action correspond au boot
             startAlarm(context, LOG_TAG);
         }
-        else if (ACTION_REFRESH_ALARM.equals(action)) {
+        else if (action.equals(ACTION_REFRESH_ALARM)) {
             // lance le service si l'action correspond à l'alarme périodique
             StartService.refresh(context);
+        }
+        else if (action.equals("android.intent.action.ACTION_POWER_CONNECTED") ||
+                action.equals("android.intent.action.ACTION_POWER_DISCONNECTED")) {
+            // lance le service et relance l'alarme périodique si l'action correspond au branchement/débranchement du chargeur
+            // ceci permet de parer aux problèmes constatés d'alarmes ne se déclenchant plus après quelques jours
+            StartService.refresh(context);
+            startAlarm(context, LOG_TAG);
         }
     }
 

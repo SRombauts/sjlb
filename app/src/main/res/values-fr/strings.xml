@@ -4,7 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-    - Correction pointeur null sur message vide (merci Juliette ;)\n
+    - Correction crash pointeur nul sur message vide\n- Réinitialise l\'alarme périodique sur branchement du chargeur\n
     </string>
     <string name="loginscreen_title">   Login et mot de passe                                                           </string>
     <string name="loginscreen_message"> Veuillez saisir votre login et votre mot de passe dans le menu des préférences  </string>

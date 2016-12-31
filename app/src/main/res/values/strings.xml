@@ -4,7 +4,7 @@
     
     <!-- Pop-up screens -->
     <string name="whatsnew">
-    - Fix null pointer when empty message (thanks Juliette ;)\n
+    - Fix null pointer crash when empty message\n- Reinit the periodic alarm when the phone is plugged
     </string>
     <string name="loginscreen_title">   Login/password                                          </string>
     <string name="loginscreen_message"> Enter your login and password in the preferences menu   </string>
