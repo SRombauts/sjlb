@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name"> SJLB </string>
+    
+    <!-- Pop-up screens -->
+    <string name="whatsnew">
+    - Fix null pointer when empty message (thanks Juliette ;)\n
+    </string>
+    <string name="loginscreen_title">   Login/password                                          </string>
+    <string name="loginscreen_message"> Enter your login and password in the preferences menu   </string>
+    
+    <string name="msg_description">       posts                   </string>
+    <string name="pm_description">        Private Messages        </string>
+    <string name="pm_sent_description">   Private Messages Sent   </string>
+    <string name="user_description">      Users                   </string>
+    <string name="files_description">     Attached Files          </string>
+    
+    <string name="button_show_pm">        Private messages        </string>
+    <string name="button_show_user_list"> Users                   </string>
+    <string name="button_show_pm_sent">   Private messages sent   </string>
+    <string name="button_quick_pm">       pm                      </string>
+    <string name="button_send_pm">        ok                      </string>
+    <string name="button_send_msg">       ok                      </string>
+    <string name="button_show_file">      Attached file           </string>
+    <string name="button_show_files">     attached files          </string>
+    
+    <!-- hint text and content description -->
+    <string name="hint_send_msg">         Write you message, then remove the keyboard to push the \"ok\" button"    </string>
+    <string name="hint_send_pm">          Write you message, then remove the keyboard to push the \"ok\" button"    </string>
+    
+    <string name="file_description">      File    </string>
+
+    <!-- Preferences -->
+    <string name="prefs_authentication">    Authentication  </string>
+    <string name="prefs_login_title">       Login           </string>
+    <string name="prefs_login_desc">        User Name       </string>
+    <string name="prefs_password_title">    Password        </string>
+    <string name="prefs_password_desc">     User Password   </string>
+
+    <string name="prefs_interface">             Interface               </string>
+    <string name="prefs_switch_screen_title">   Switch Screen Direction </string>
+    <string name="prefs_switch_screen_desc">    Direction of Horizontal Touch movement to switch screens </string>
+
+    <string name="prefs_auto_update">       Auto-Update         </string>
+    <string name="prefs_auto_update_title"> Auto-Update         </string>
+    <string name="prefs_auto_update_desc">  Select to turn on automatic updating        </string>
+    <string name="prefs_update_freq_title"> Update Frequency    </string>
+    <string name="prefs_update_freq_desc">  Frequency at which to auto-update messages  </string>
+
+    <string name="prefs_notification">      Notifications           </string>
+    <string name="prefs_sound_title">       Sound Notification      </string>
+    <string name="prefs_sound_desc">        Select to turn on sound notification        </string>
+    <string name="prefs_vibrate_title">     Vibration Notification  </string>
+    <string name="prefs_vibrate_desc">      Select to turn on vibration notification    </string>
+    <string name="prefs_light_title">       Light Notification      </string>
+    <string name="prefs_light_desc">        Select to turn on light notification        </string>
+
+    <!-- Menus -->
+    <string name="menu_show_online">    Show Online         </string>
+    <string name="menu_show_pm">        Private Messages    </string>
+    <string name="menu_new_pm">         New Private Message </string>
+    <string name="menu_send_pm">        Send Private Message</string>
+    <string name="menu_new_subj">       New Topic           </string>
+    <string name="menu_new_msg">        New Response        </string>
+    <string name="menu_update">         Refresh             </string>
+    <string name="menu_reset">          Reset Local Data    </string>
+    <string name="menu_delete_all_pm">  Delete All PM       </string>
+    <string name="menu_prefs">          Preferences         </string>
+    <string name="menu_quit">           Quit                </string>
+    
+    <string name="menu_pm_answer">      Answer              </string>
+    <string name="menu_pm_delete">      Delete              </string>
+
+    <string name="delete_one_pm_confirmation">  "Are you sure you want to delete this PM ?" </string>
+    <string name="delete_all_pm_confirmation">  "Are you sure you want to delete ALL PM ?!" </string>
+    <string name="yes">                 Yes     </string>
+    <string name="no">                  No      </string>
+    
+    <!-- Toast notifications -->
+    <string name="toast_auth_needed">       Action not available : need login/password ! </string>
+    <string name="toast_text_needed">       Please enter a text to send!</string>
+    <string name="toast_refreshing">        Refreshing&#8230;           </string>
+    <string name="toast_editing">           Editing&#8230;              </string>
+    <string name="toast_sending">           Sending&#8230;              </string>
+    <string name="toast_deleting">          Deleting&#8230;             </string>
+    <string name="toast_sent">              Message sent                </string>
+    <string name="toast_not_sent">          ERROR: message NOT sent !   </string>
+    <string name="toast_edited">            Message edited              </string>
+    <string name="toast_not_edited">        ERROR: message NOT edited ! </string>
+    <string name="toast_deleted">           Message deleted             </string>
+    <string name="toast_not_deleted">       ERROR: message deleted !    </string>
+    
+    <!-- Notifications -->
+    <string name="notification_title_pm">   Private Message(s)      </string>
+    <string name="notification_text_pm">    new private message(s)  </string>
+    <string name="notification_title_msg">  Unread Message(s)       </string>
+    <string name="notification_text_msg">   unread message(s)       </string>
+
+    <!-- URI : TODO SRombauts à sortir des chaînes de traductions au profil de constantes dans le code !? -->
+    <string name="sjlb_forum_uri" translatable="false">      http://www.sjlb.fr/Site/Forum.php                       </string>
+    <string name="sjlb_forum_cat_uri" translatable="false">  http://www.sjlb.fr/Site/ForumSujets.php?id_categorie=   </string>
+    <string name="sjlb_forum_subj_uri" translatable="false"> http://www.sjlb.fr/Site/ForumReponses.php?id_categorie= </string>
+    <string name="sjlb_forum_subj_param" translatable="false">   &amp;id_sujet=                                      </string>
+    <string name="sjlb_forum_subj_dernier" translatable="false"> #dernier_message                                    </string>
+
+    <!-- Messages d'erreurs du service -->
+    <string name="api_no_error">            success                     </string>
+    <string name="api_internal_error">      error                       </string>
+    <string name="api_login_password_error">login/password error        </string>
+    <string name="api_server_error">        server error                </string>
+    <string name="api_server_unreachable">  server unreachable          </string>
+    <string name="api_network_error">       network error               </string>
+</resources>

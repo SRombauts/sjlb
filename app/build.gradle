@@ -1,0 +1,31 @@
+apply plugin: 'com.android.application'
+android {
+    signingConfigs {
+        srombauts {
+            keyAlias 'srombauts'
+            storeFile file('android.keystore') // app/android.keystore
+            keyPassword ''
+            storePassword ''
+        }
+    }
+
+    compileSdkVersion 22
+    buildToolsVersion "25.0.2"
+
+    defaultConfig {
+        applicationId "fr.srombauts.sjlb"
+        minSdkVersion 21    // 5.0 Lollipop permet d'utiliser Material Design
+        targetSdkVersion 22 // 5.1.1 : en 6.0 Marshmallow il faudrait gérer les permissions dynamiques
+        signingConfig signingConfigs.srombauts
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-project.txt'
+        }
+    }
+}
+
+dependencies {
+}
